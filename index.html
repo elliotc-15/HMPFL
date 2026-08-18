@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HMPFL — His Majesty's Prison Fantasy League</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink-black:#111018;
+  --concrete:#211f30;
+  --concrete-light:#2e2d42;
+  --paper:#f2efe9;
+  --paper-dim:#a9a6bb;
+  --jumpsuit:#e8620f;
+  --jumpsuit-bright:#ff751f;
+  --rust:#8f1700;
+  --rust-bright:#cc1d00;
+  --brass:#bfc1c2;
+  --line:#454363;
+  --shadow:rgba(0,0,0,0.55);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--ink-black);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
+  color:var(--paper);
+  font-family:'Archivo', sans-serif;
+  min-height:100vh;
+}
+::selection{background:var(--jumpsuit); color:var(--ink-black);}
+
+/* ===== HEADER / BOOKING PLATE ===== */
+.site-header{
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,117,31,0.16), transparent 60%),
+    linear-gradient(180deg, var(--concrete-light), var(--ink-black) 85%);
+  border-bottom:4px solid var(--jumpsuit);
+  padding:38px 20px 28px;
+  position:relative;
+  overflow:hidden;
+}
+.site-header::before{
+  content:'';
+  position:absolute; inset:0;
+  background-image:repeating-linear-gradient(135deg, rgba(0,0,0,0.18) 0 2px, transparent 2px 14px);
+  pointer-events:none;
+}
+.site-header::after{
+  /* vertical cell-bar shadows across the hero */
+  content:'';
+  position:absolute; inset:0;
+  background-image:repeating-linear-gradient(90deg, rgba(0,0,0,0.35) 0 3px, transparent 3px 64px);
+  opacity:0.5;
+  pointer-events:none;
+}
+.header-inner{
+  max-width:1100px; margin:0 auto; position:relative;
+  display:flex; align-items:center; gap:28px; flex-wrap:wrap;
+}
+.header-logo{
+  width:128px; height:128px; flex:0 0 auto;
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,0.6));
+  border:2px solid var(--jumpsuit);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--concrete-light);
+}
+.header-logo img{width:100%; height:100%; object-fit:contain; display:block; border-radius:50%;}
+.header-logo .logo-fallback{
+  font-family:'Oswald',sans-serif; font-size:34px; color:var(--jumpsuit-bright); letter-spacing:1px;
+}
+.header-text{min-width:240px; flex:1 1 auto;}
+.booking-tag{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--brass); border:1px solid var(--brass); padding:3px 10px;
+  margin-bottom:12px;
+}
+.booking-tag .dot{width:6px; height:6px; border-radius:50%; background:var(--jumpsuit-bright); box-shadow:0 0 8px var(--jumpsuit-bright);}
+h1.site-title{
+  font-family:'Oswald', sans-serif;
+  font-weight:700;
+  font-size:clamp(34px, 7vw, 62px);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin:0 0 6px;
+  color:var(--paper);
+  text-shadow:3px 3px 0 var(--ink-black), 0 0 40px rgba(255,117,31,0.25);
+  line-height:0.95;
+}
+h1.site-title .full{color:var(--jumpsuit-bright);}
+.site-subtitle{
+  font-family:'IBM Plex Mono', monospace;
+  color:var(--paper-dim);
+  font-size:13px;
+  letter-spacing:1px;
+  margin:0;
+}
+.header-stats{
+  display:flex; gap:18px; margin-top:16px; flex-wrap:wrap;
+}
+.header-stats div{
+  font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--brass);
+  text-transform:uppercase; letter-spacing:1px;
+  border-left:2px solid var(--jumpsuit); padding-left:8px;
+}
+.header-stats strong{display:block; font-family:'Oswald',sans-serif; font-size:20px; color:var(--paper); letter-spacing:0.5px;}
+
+/* ===== CHAIN DIVIDER (signature motif, echoes the league crest) ===== */
+.chain-divider{
+  height:22px; overflow:hidden; position:relative;
+  background:var(--ink-black);
+  display:flex; align-items:center;
+}
+.chain-divider svg{width:100%; height:16px; display:block;}
+.chain-link{stroke:var(--brass); stroke-width:2; fill:none; opacity:0.55;}
+
+/* ===== NAV: CELL DOORS ===== */
+.cellblock-nav{
+  max-width:1100px;
+  margin:0 auto;
+  padding:0 20px;
+  position:sticky; top:0; z-index:50;
+  background:var(--ink-black);
+  border-bottom:2px solid var(--line);
+}
+.cellblock-nav ul{
+  list-style:none; margin:0; padding:0;
+  display:flex; overflow-x:auto;
+  scrollbar-width:thin;
+}
+.cellblock-nav li{flex:0 0 auto;}
+.cell-btn{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px; letter-spacing:0.5px; text-transform:uppercase;
+  background:transparent; color:var(--paper-dim);
+  border:none; border-right:1px solid var(--line);
+  padding:14px 16px 12px;
+  cursor:pointer;
+  white-space:nowrap;
+  position:relative;
+  transition:color .15s, background .15s;
+}
+.cell-btn .num{color:var(--brass); margin-right:8px; font-weight:600;}
+.cell-btn:hover{background:var(--concrete); color:var(--paper);}
+.cell-btn.active{color:var(--jumpsuit-bright); background:var(--concrete-light);}
+.cell-btn.active::after{
+  content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px;
+  background:var(--jumpsuit-bright);
+}
+.cell-btn.active .num{color:var(--jumpsuit-bright);}
+
+/* ===== MAIN ===== */
+main{max-width:1100px; margin:0 auto; padding:28px 20px 80px;}
+.panel{
+  background:var(--concrete);
+  border:1px solid var(--line);
+  padding:22px;
+  margin-bottom:22px;
+  position:relative;
+}
+.panel::before{
+  content:attr(data-file-no);
+  position:absolute; top:-1px; right:-1px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px; color:var(--brass);
+  background:var(--ink-black);
+  padding:3px 8px;
+  border-left:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+h2.section-title{
+  font-family:'Oswald', sans-serif;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  font-size:24px;
+  margin:0 0 4px;
+  color:var(--paper);
+  display:flex; align-items:center; gap:10px;
+}
+h2.section-title::before{content:''; width:6px; height:22px; background:var(--jumpsuit);}
+.section-desc{
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px; color:var(--paper-dim);
+  margin:0 0 18px;
+  padding-left:16px;
+  border-left:2px solid var(--line);
+}
+.tab-content{display:none;}
+.tab-content.active{display:block; animation:fadein .25s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+/* ===== TABLES ===== */
+table{width:100%; border-collapse:collapse; font-size:13px;}
+th,td{padding:9px 10px; text-align:left; border-bottom:1px solid var(--line);}
+th{
+  font-family:'IBM Plex Mono', monospace;
+  text-transform:uppercase; font-size:10.5px; letter-spacing:0.8px;
+  color:var(--brass); font-weight:600;
+  cursor:pointer; user-select:none;
+  border-bottom:2px solid var(--brass);
+  white-space:nowrap;
+}
+th:hover{color:var(--jumpsuit-bright);}
+td{font-family:'IBM Plex Mono', monospace; color:var(--paper);}
+tbody tr:hover{background:rgba(255,122,31,0.06);}
+.table-wrap{overflow-x:auto;}
+.num-cell{text-align:right; font-variant-numeric:tabular-nums;}
+.owner-cell{font-weight:600; color:var(--paper);}
+.pill{
+  display:inline-block; font-size:10px; padding:2px 7px;
+  border-radius:2px; font-family:'IBM Plex Mono',monospace; letter-spacing:0.5px;
+}
+.pill-gold{background:rgba(160,138,78,0.25); color:var(--brass); border:1px solid var(--brass);}
+.pill-rust{background:rgba(184,68,47,0.2); color:var(--rust-bright); border:1px solid var(--rust-bright);}
+
+/* ===== STAT CARDS ===== */
+.stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:18px;}
+.stat-card{
+  background:var(--concrete-light); border:1px solid var(--line);
+  padding:14px 12px; text-align:center;
+}
+.stat-card .val{font-family:'Oswald',sans-serif; font-size:28px; color:var(--jumpsuit-bright); font-weight:600;}
+.stat-card .lbl{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--paper-dim); text-transform:uppercase; letter-spacing:1px; margin-top:2px;}
+
+/* ===== MUGSHOT CARDS (team pages) ===== */
+.mug-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px;}
+.mug-card{
+  background:var(--concrete-light);
+  border:1px solid var(--line);
+  cursor:pointer;
+  transition:transform .15s, border-color .15s;
+  overflow:hidden;
+}
+.mug-card:hover{transform:translateY(-3px); border-color:var(--jumpsuit);}
+.mug-photo{
+  aspect-ratio:1/1;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 18px, rgba(255,255,255,0.04) 18px 19px),
+    linear-gradient(160deg, #3a352c, #1e1c18);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Oswald',sans-serif; font-size:44px; color:var(--paper-dim);
+  border-bottom:3px solid var(--jumpsuit);
+  position:relative;
+}
+.mug-photo .height-lines{
+  position:absolute; inset:0;
+  background-image:repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 20%);
+}
+.mug-name{
+  font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:600;
+  text-align:center; padding:10px 6px 4px; text-transform:uppercase; letter-spacing:1px;
+}
+.mug-sub{
+  text-align:center; font-family:'IBM Plex Mono',monospace; font-size:10px;
+  color:var(--brass); padding-bottom:10px;
+}
+.back-link{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--jumpsuit-bright);
+  background:none; border:1px solid var(--jumpsuit-bright); padding:6px 12px; cursor:pointer;
+  margin-bottom:16px;
+}
+.back-link:hover{background:var(--jumpsuit); color:var(--ink-black);}
+
+/* ===== HOF / WOS ===== */
+.era-list{display:flex; flex-direction:column; gap:8px;}
+.era-row{
+  display:flex; justify-content:space-between; align-items:center;
+  background:var(--concrete-light); border-left:3px solid var(--jumpsuit);
+  padding:10px 14px;
+}
+.era-row.shame{border-left-color:var(--rust-bright);}
+.era-row .yr{font-family:'Oswald',sans-serif; font-size:18px; color:var(--brass); min-width:60px;}
+.era-row .who{font-weight:600;}
+.era-row .rec{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--paper-dim);}
+.era-row.champion-row{position:relative; padding-left:36px;}
+.era-row.champion-row::before{
+  content:'\1F33F'; position:absolute; left:10px; top:50%; transform:translateY(-50%) scaleX(-1);
+  font-size:15px; opacity:0.7;
+}
+
+/* ===== FORM CONTROLS ===== */
+select, input[type=text]{
+  background:var(--ink-black); color:var(--paper); border:1px solid var(--line);
+  font-family:'IBM Plex Mono',monospace; padding:8px 10px; font-size:12px;
+}
+select:focus, input:focus{outline:2px solid var(--jumpsuit); outline-offset:1px;}
+.control-row{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center;}
+.control-row label{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--paper-dim); text-transform:uppercase;}
+
+/* ===== LOADING / STATUS ===== */
+.status-msg{
+  font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--paper-dim);
+  padding:16px; border:1px dashed var(--line); text-align:center;
+}
+.status-msg.error{color:var(--rust-bright); border-color:var(--rust-bright);}
+.blink{animation:blink 1.2s infinite;}
+@keyframes blink{50%{opacity:0.3;}}
+.live-dot{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--jumpsuit-bright); box-shadow:0 0 8px var(--jumpsuit-bright); animation:blink 1s infinite; margin-right:6px;}
+.recap-prose{font-family:'Archivo',sans-serif; font-size:14.5px; line-height:1.65; color:var(--paper); white-space:pre-wrap;}
+.recap-prose::first-letter{font-family:'Oswald',sans-serif; font-size:38px; color:var(--jumpsuit-bright); float:left; line-height:0.8; margin-right:6px;}
+
+/* ===== FOOTER ===== */
+footer{
+  text-align:center; padding:30px 20px; font-family:'IBM Plex Mono',monospace;
+  font-size:11px; color:var(--line); border-top:1px solid var(--line);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:640px){
+  .panel{padding:16px;}
+  h2.section-title{font-size:20px;}
+  th,td{padding:7px 6px; font-size:11.5px;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important; transition:none !important;}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-logo"><img src="assets/logo.png" alt="HMPFL league crest" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'logo-fallback',textContent:'HMPFL'}))"></div>
+    <div class="header-text">
+      <div class="booking-tag"><span class="dot"></span> DEPARTMENT OF FANTASY CORRECTIONS — CASE FILE OPEN</div>
+      <h1 class="site-title">HMPFL <span class="full">2026</span></h1>
+      <p class="site-subtitle">His Majesty's Prison Fantasy League — est. 2014</p>
+      <div class="header-stats">
+        <div><strong id="hdrSeasons">—</strong>Seasons</div>
+        <div><strong id="hdrInmates">—</strong>Inmates</div>
+        <div><strong>2014</strong>Founded</div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="chain-divider" aria-hidden="true">
+  <svg preserveAspectRatio="xMidYMid slice" viewBox="0 0 400 16">
+    <g class="chain-link">
+      <ellipse cx="10" cy="8" rx="8" ry="5"/><ellipse cx="24" cy="8" rx="8" ry="5"/><ellipse cx="38" cy="8" rx="8" ry="5"/><ellipse cx="52" cy="8" rx="8" ry="5"/><ellipse cx="66" cy="8" rx="8" ry="5"/><ellipse cx="80" cy="8" rx="8" ry="5"/><ellipse cx="94" cy="8" rx="8" ry="5"/><ellipse cx="108" cy="8" rx="8" ry="5"/><ellipse cx="122" cy="8" rx="8" ry="5"/><ellipse cx="136" cy="8" rx="8" ry="5"/><ellipse cx="150" cy="8" rx="8" ry="5"/><ellipse cx="164" cy="8" rx="8" ry="5"/><ellipse cx="178" cy="8" rx="8" ry="5"/><ellipse cx="192" cy="8" rx="8" ry="5"/><ellipse cx="206" cy="8" rx="8" ry="5"/><ellipse cx="220" cy="8" rx="8" ry="5"/><ellipse cx="234" cy="8" rx="8" ry="5"/><ellipse cx="248" cy="8" rx="8" ry="5"/><ellipse cx="262" cy="8" rx="8" ry="5"/><ellipse cx="276" cy="8" rx="8" ry="5"/><ellipse cx="290" cy="8" rx="8" ry="5"/><ellipse cx="304" cy="8" rx="8" ry="5"/><ellipse cx="318" cy="8" rx="8" ry="5"/><ellipse cx="332" cy="8" rx="8" ry="5"/><ellipse cx="346" cy="8" rx="8" ry="5"/><ellipse cx="360" cy="8" rx="8" ry="5"/><ellipse cx="374" cy="8" rx="8" ry="5"/><ellipse cx="388" cy="8" rx="8" ry="5"/>
+    </g>
+  </svg>
+</div>
+
+<nav class="cellblock-nav">
+  <ul id="tabNav">
+    <li><button class="cell-btn active" data-tab="home"><span class="num">01</span>Home</button></li>
+    <li><button class="cell-btn" data-tab="alltime"><span class="num">02</span>All-Time</button></li>
+    <li><button class="cell-btn" data-tab="seasons"><span class="num">03</span>Seasons</button></li>
+    <li><button class="cell-btn" data-tab="fame"><span class="num">04</span>Fame &amp; Shame</button></li>
+    <li><button class="cell-btn" data-tab="rules"><span class="num">05</span>Rules</button></li>
+    <li><button class="cell-btn" data-tab="draft2026"><span class="num">06</span>2026 Draft</button></li>
+    <li><button class="cell-btn" data-tab="h2h"><span class="num">07</span>Head-to-Head</button></li>
+    <li><button class="cell-btn" data-tab="records"><span class="num">08</span>Records</button></li>
+    <li><button class="cell-btn" data-tab="draftanalysis"><span class="num">09</span>Draft Analysis</button></li>
+    <li><button class="cell-btn" data-tab="teams"><span class="num">10</span>Inmates</button></li>
+    <li><button class="cell-btn" data-tab="live"><span class="num">11</span>Live Scores</button></li>
+    <li><button class="cell-btn" data-tab="recap"><span class="num">12</span>Weekly Recap</button></li>
+  </ul>
+</nav>
+
+<main id="mainContent">
+  <section id="tab-home" class="tab-content active"></section>
+  <section id="tab-alltime" class="tab-content"></section>
+  <section id="tab-seasons" class="tab-content"></section>
+  <section id="tab-fame" class="tab-content"></section>
+  <section id="tab-rules" class="tab-content"></section>
+  <section id="tab-draft2026" class="tab-content"></section>
+  <section id="tab-h2h" class="tab-content"></section>
+  <section id="tab-records" class="tab-content"></section>
+  <section id="tab-draftanalysis" class="tab-content"></section>
+  <section id="tab-teams" class="tab-content"></section>
+  <section id="tab-live" class="tab-content"></section>
+  <section id="tab-recap" class="tab-content"></section>
+</main>
+
+<footer>HMPFL DEPT. OF CORRECTIONS · RECORDS DIVISION · DATA FROM SLEEPER API + LEAGUE ARCHIVES</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+name: Weekly Recap
+
+on:
+  schedule:
+    # Every Tuesday at 11:00 UTC — after Monday Night Football wraps and Sleeper
+    # has finalized the week's scores. Adjust the cron if you want a different time.
+    - cron: '0 11 * * 2'
+  workflow_dispatch: {}   # lets you trigger this manually from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  generate-recap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate recap
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLEEPER_LEAGUE_ID: ${{ secrets.SLEEPER_LEAGUE_ID }}
+        run: python scripts/generate_recap.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "HMPFL Recap Bot"
+          git config user.email "actions@github.com"
+          git add recaps/
+          git diff --quiet && git diff --staged --quiet || git commit -m "Weekly recap: auto-generated"
+          git push
