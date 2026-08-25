@@ -47,6 +47,23 @@ function getPlayerDirectory() {
   if (!playerDirectoryPromise) playerDirectoryPromise = sleeperFetch('/players/nfl').catch(() => ({}));
   return playerDirectoryPromise;
 }
+// An honor icon with a tooltip: hover shows it on desktop; tapping toggles
+// it on mobile (title alone doesn't reliably show on tap). Tapping anywhere
+// else closes any open tooltip.
+function honorBadge(emoji, label) {
+  const badge = el('span', { class: 'honor-badge', title: label, tabindex: '0' }, [
+    emoji, el('span', { class: 'honor-tip' }, label),
+  ]);
+  badge.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.honor-badge.show-tip').forEach(b => { if (b !== badge) b.classList.remove('show-tip'); });
+    badge.classList.toggle('show-tip');
+  });
+  return badge;
+}
+document.addEventListener('click', () => {
+  document.querySelectorAll('.honor-badge.show-tip').forEach(b => b.classList.remove('show-tip'));
+});
 function playerLabel(dir, pid) {
   const p = dir && dir[pid];
   if (!p) return pid;
@@ -354,7 +371,7 @@ async function renderHome() {
   root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 01A' }, [
     el('h2', { class: 'section-title' }, 'League at a Glance'),
     el('div', { class: 'stat-grid' }, [
-      statCard(alltimeTotalSeasons(), 'Seasons Served'),
+      statCard(alltimeTotalSeasons(), 'Seasons Served', true, 'seasonsServedVal'),
       statCard(ALLTIME.length, 'Inmates Booked'),
       statCard('—', 'Reigning Champion', true, 'reigningChampionVal'),
       statCard('—', 'This Week’s Top Scorer', true, 'topScorerVal'),
@@ -376,6 +393,8 @@ async function renderHome() {
     await ensureLiveSeasonMerged();
     const champVal = document.getElementById('reigningChampionVal');
     if (champVal) champVal.textContent = reigningChampion();
+    const seasonsVal = document.getElementById('seasonsServedVal');
+    if (seasonsVal) seasonsVal.textContent = liveAlltimeTotalSeasons(await getLiveAlltime());
     const seasons = await loadSleeperHistory();
     const latest = seasons[seasons.length - 1];
     renderHomeStandings(latest);
@@ -459,6 +478,44 @@ function updateTopScorer(top) {
 function alltimeTotalSeasons() {
   return Math.max(...ALLTIME.map(o => o.seasons || 0));
 }
+// data.js's spreadsheet-derived ALLTIME career table covers seasons through
+// this year only — it isn't re-exported every year. Any later Sleeper
+// season needs folding in live, or career totals (wins, championships,
+// points) quietly go stale the moment someone wins it. Caught 2026-08-25:
+// Rhys's 2025 championship wasn't reflected in All-Time/Inmates totals.
+const ALLTIME_STATIC_THROUGH_YEAR = 2024;
+let liveAlltimeCache = null;
+async function getLiveAlltime() {
+  if (liveAlltimeCache) return liveAlltimeCache;
+  try { await ensureLiveSeasonMerged(); } catch (e) { /* fall back to static-only totals */ }
+  const byOwner = {};
+  ALLTIME.forEach(o => { byOwner[o.owner] = { ...o }; });
+  Object.entries(SEASON_DATA).forEach(([year, data]) => {
+    if (Number(year) <= ALLTIME_STATIC_THROUGH_YEAR) return;
+    Object.entries(data).forEach(([owner, s]) => {
+      if ((s.wins || 0) + (s.losses || 0) === 0) return; // in-progress/no-games season
+      const o = byOwner[owner] = byOwner[owner] || {
+        owner, seasons: 0, wins: 0, losses: 0, scoring_titles: 0,
+        league_winner: 0, overall_winner: 0, pf: 0, pa: 0, playoff_wins: 0, playoff_losses: 0,
+      };
+      o.seasons = (o.seasons || 0) + 1;
+      o.wins = (o.wins || 0) + (s.wins || 0);
+      o.losses = (o.losses || 0) + (s.losses || 0);
+      o.pf = (o.pf || 0) + (s.pf || 0);
+      o.pa = (o.pa || 0) + (s.pa || 0);
+      if (s.overall_winner) o.overall_winner = (o.overall_winner || 0) + 1;
+      if (s.league_winner) o.league_winner = (o.league_winner || 0) + 1;
+      if (s.scoring_title) o.scoring_titles = (o.scoring_titles || 0) + 1;
+      if (typeof s.playoff_wins === 'number') o.playoff_wins = (o.playoff_wins || 0) + s.playoff_wins;
+      if (typeof s.playoff_losses === 'number') o.playoff_losses = (o.playoff_losses || 0) + s.playoff_losses;
+    });
+  });
+  liveAlltimeCache = Object.values(byOwner);
+  return liveAlltimeCache;
+}
+function liveAlltimeTotalSeasons(liveAlltime) {
+  return Math.max(...liveAlltime.map(o => o.seasons || 0));
+}
 function renderHomeStandings(season) {
   const status = document.getElementById('homeStatus');
   status.innerHTML = '';
@@ -492,9 +549,13 @@ function renderHomeStandings(season) {
 // ===========================================================
 // TAB 2: ALL-TIME LEADERBOARD
 // ===========================================================
-function renderAlltime() {
+async function renderAlltime() {
   const root = document.getElementById('tab-alltime');
-  const rows = [...ALLTIME].sort((a, b) => b.wins - a.wins);
+  const loadingMsg = el('div', { class: 'status-msg' }, ['Pulling every case file', el('span', { class: 'blink' }, '...')]);
+  root.appendChild(loadingMsg);
+  const liveAlltime = await getLiveAlltime();
+  root.removeChild(loadingMsg);
+  const rows = [...liveAlltime].sort((a, b) => b.wins - a.wins);
   const table = el('table', {}, [
     el('thead', {}, el('tr', {}, [
       th('Inmate', 'owner', 'str'), th('Seasons', 'seasons'), th('W', 'wins'), th('L', 'losses'),
@@ -525,7 +586,7 @@ function renderAlltime() {
   ]);
   root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 02' }, [
     el('h2', { class: 'section-title' }, 'All-Time Leaderboard'),
-    el('p', { class: 'section-desc' }, `Career records across all ${alltimeTotalSeasons()} seasons of the league\u2019s history. Click a column header to sort.`),
+    el('p', { class: 'section-desc' }, `Career records across all ${liveAlltimeTotalSeasons(liveAlltime)} seasons of the league\u2019s history. Click a column header to sort.`),
     el('div', { class: 'table-wrap' }, table),
   ]));
   makeSortable(table);
@@ -1325,25 +1386,17 @@ async function buildDraftValueLeaderboard(draftSeasons) {
     latePicks: r.latePicks, lateAvg: r.latePicks ? r.lateSum / r.latePicks : null,
   }));
 }
-function renderDraftValueLeaderboardTable(rows) {
-  const withEarly = rows.filter(r => r.earlyPicks >= 2).sort((a, b) => (b.earlyAvg || 0) - (a.earlyAvg || 0));
-  const withLate = rows.filter(r => r.latePicks >= 2).sort((a, b) => (b.lateAvg || 0) - (a.lateAvg || 0));
-  const bestEarly = withEarly[0];
-  const bestLate = withLate[0];
-  const sorted = [...rows].sort((a, b) => (b.earlyAvg || 0) - (a.earlyAvg || 0));
-  return el('table', {}, [
-    el('thead', {}, el('tr', {}, ['Manager', 'Early Picks (Rd 1-3)', 'Avg Pts-in-Wins (Early)', 'Late Picks (Last 3 Rd)', 'Avg Pts-in-Wins (Late)'].map(x => el('th', {}, x)))),
-    el('tbody', {}, sorted.map(r => el('tr', {}, [
-      el('td', { class: 'owner-cell' }, [
-        r.manager,
-        bestEarly && r.manager === bestEarly.manager ? el('span', { class: 'pill pill-gold', style: 'margin-left:6px;white-space:nowrap;' }, '🥇 Best Early') : null,
-        bestLate && r.manager === bestLate.manager ? el('span', { class: 'pill pill-gold', style: 'margin-left:6px;white-space:nowrap;' }, '🌱 Best Late') : null,
-      ]),
-      el('td', { class: 'num-cell' }, String(r.earlyPicks)),
-      el('td', { class: 'num-cell' }, r.earlyAvg === null ? '—' : fmt(r.earlyAvg)),
-      el('td', { class: 'num-cell' }, String(r.latePicks)),
-      el('td', { class: 'num-cell' }, r.lateAvg === null ? '—' : fmt(r.lateAvg)),
-    ]))),
+function renderDraftValueLeaderboardLists(rows) {
+  const early = rows.filter(r => r.earlyPicks >= 2 && r.earlyAvg !== null).sort((a, b) => b.earlyAvg - a.earlyAvg);
+  const late = rows.filter(r => r.latePicks >= 2 && r.lateAvg !== null).sort((a, b) => b.lateAvg - a.lateAvg);
+  const rankedList = (items, key) => el('div', { class: 'era-list' }, items.map((r, i) => el('div', { class: 'era-row' + (i === 0 ? ' champion-row' : '') }, [
+    el('span', { class: 'yr' }, `#${i + 1}`),
+    el('span', { class: 'who' }, r.manager),
+    el('span', { class: 'rec' }, `${fmt(r[key])} avg pts-in-wins`),
+  ])));
+  return el('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;' }, [
+    el('div', {}, [el('h2', { class: 'section-title', style: 'font-size:14px;color:var(--brass)' }, '🥇 Best Early Drafters (Rd 1-3)'), rankedList(early, 'earlyAvg')]),
+    el('div', {}, [el('h2', { class: 'section-title', style: 'font-size:14px;color:var(--brass)' }, '🌱 Best Late Drafters (Last 3 Rd)'), rankedList(late, 'lateAvg')]),
   ]);
 }
 
@@ -1379,20 +1432,34 @@ function pearsonCorrelation(points, xKey, yKey) {
   const denom = Math.sqrt(dx2 * dy2);
   return denom === 0 ? 0 : num / denom;
 }
-function draftFinishScatterSVG(points) {
-  const w = 420, h = 420, pad = 46;
-  const maxX = Math.max(...points.map(p => p.draftPos));
-  const maxY = Math.max(...points.map(p => p.finish));
-  const sx = x => pad + (x - 1) / ((maxX - 1) || 1) * (w - 2 * pad);
-  const sy = y => pad + (y - 1) / ((maxY - 1) || 1) * (h - 2 * pad);
-  let dots = '';
-  points.forEach(p => {
-    dots += `<circle cx="${sx(p.draftPos).toFixed(1)}" cy="${sy(p.finish).toFixed(1)}" r="6" fill="#ff751f" opacity="0.7" stroke="#111018" stroke-width="1"><title>${p.manager} — ${p.season}: drafted #${p.draftPos}, finished #${p.finish}</title></circle>`;
+function computePositionalFinishRows(points) {
+  const byPos = {};
+  points.forEach(p => { (byPos[p.draftPos] = byPos[p.draftPos] || []).push(p.finish); });
+  return Object.entries(byPos).map(([pos, finishes]) => ({
+    draftPos: Number(pos),
+    avgFinish: finishes.reduce((a, b) => a + b, 0) / finishes.length,
+    count: finishes.length,
+  })).sort((a, b) => a.draftPos - b.draftPos);
+}
+function positionalFinishChartSVG(rows) {
+  const w = Math.max(380, rows.length * 46), h = 220, pad = 40;
+  const maxFinish = Math.max(...rows.map(r => r.avgFinish), 1);
+  const midpoint = (maxFinish + 1) / 2;
+  const slot = (w - 2 * pad) / rows.length;
+  const barWidth = Math.min(slot * 0.6, 34);
+  let bars = '';
+  rows.forEach((r, i) => {
+    const x = pad + i * slot + (slot - barWidth) / 2;
+    const barH = (r.avgFinish / maxFinish) * (h - 2 * pad);
+    const y = (h - pad) - barH;
+    const color = r.avgFinish <= midpoint ? '#bfc1c2' : '#cc1d00';
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barH.toFixed(1)}" fill="${color}"><title>Pick #${r.draftPos}: avg finish ${r.avgFinish.toFixed(1)} across ${r.count} draft${r.count === 1 ? '' : 's'}</title></rect>`;
+    bars += `<text x="${(x + barWidth / 2).toFixed(1)}" y="${h - pad + 16}" fill="#a9a6bb" font-size="10" text-anchor="middle" font-family="IBM Plex Mono, monospace">${r.draftPos}</text>`;
+    bars += `<text x="${(x + barWidth / 2).toFixed(1)}" y="${(y - 5).toFixed(1)}" fill="#f2efe9" font-size="10" text-anchor="middle" font-family="IBM Plex Mono, monospace">${r.avgFinish.toFixed(1)}</text>`;
   });
-  const ref = `<line x1="${sx(1).toFixed(1)}" y1="${sy(1).toFixed(1)}" x2="${sx(maxX).toFixed(1)}" y2="${sy(maxX).toFixed(1)}" stroke="#454363" stroke-width="1.5" stroke-dasharray="5 5" />`;
-  const labels = `<text x="${w / 2}" y="${h - 10}" fill="#a9a6bb" font-size="11" text-anchor="middle" font-family="IBM Plex Mono, monospace">Draft position (round 1 pick #) →</text>
-    <text x="16" y="${h / 2}" fill="#a9a6bb" font-size="11" text-anchor="middle" font-family="IBM Plex Mono, monospace" transform="rotate(-90 16 ${h / 2})">← Final standing (1st place at top)</text>`;
-  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;max-width:460px;display:block;margin:0 auto;background:#211f30;border:1px solid #454363;">${ref}${dots}${labels}</svg>`;
+  const baseline = `<line x1="${pad}" y1="${h - pad}" x2="${w - pad}" y2="${h - pad}" stroke="#454363" stroke-width="1"/>`;
+  const label = `<text x="${w / 2}" y="${h - 8}" fill="#a9a6bb" font-size="11" text-anchor="middle" font-family="IBM Plex Mono, monospace">Draft Position (Round 1 pick #)</text>`;
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;max-width:${w}px;display:block;margin:0 auto;">${baseline}${bars}${label}</svg>`;
 }
 async function renderDraftManagerAnalysis(draftSeasons, holder) {
   holder.innerHTML = '';
@@ -1403,10 +1470,11 @@ async function renderDraftManagerAnalysis(draftSeasons, holder) {
     holder.innerHTML = '';
 
     holder.appendChild(el('h2', { class: 'section-title', style: 'font-size:18px;margin-top:8px' }, 'Draft Value Leaderboard'));
-    holder.appendChild(el('p', { class: 'section-desc' }, 'Early-round picks are rounds 1-3; late-round picks are the last 3 rounds of that year’s draft. "Avg Pts-in-Wins" is how many fantasy points that pick’s player scored, on average, in games the manager’s team actually won — across every Sleeper-era draft on record.'));
-    holder.appendChild(el('div', { class: 'table-wrap' }, renderDraftValueLeaderboardTable(leaderboardRows)));
+    holder.appendChild(el('p', { class: 'section-desc' }, 'Early-round picks are rounds 1-3; late-round picks are the last 3 rounds of that year’s draft. "Avg pts-in-wins" is how many fantasy points that pick’s player scored, on average, in games the manager’s team actually won — across every Sleeper-era draft on record.'));
+    holder.appendChild(renderDraftValueLeaderboardLists(leaderboardRows));
 
-    holder.appendChild(el('h2', { class: 'section-title', style: 'font-size:18px;margin-top:24px' }, 'Draft Position vs. Final Standing'));
+    holder.appendChild(el('h2', { class: 'section-title', style: 'font-size:18px;margin-top:28px' }, 'Average Finish by Draft Position'));
+    const posRows = computePositionalFinishRows(points);
     const r = pearsonCorrelation(points, 'draftPos', 'finish');
     let interp = 'Not enough data yet to say.';
     if (r !== null) {
@@ -1415,10 +1483,10 @@ async function renderDraftManagerAnalysis(draftSeasons, holder) {
         ? 'early picks tend to finish better and late picks tend to finish worse'
         : 'early picks tend to finish worse and late picks tend to finish better';
       const rStr = r.toFixed(2) === '-0.00' ? '0.00' : r.toFixed(2);
-      interp = `Correlation coefficient: ${rStr} — ${strength} relationship. In plain terms: ${direction}.`;
+      interp = `Overall correlation: ${rStr} (${strength} relationship) — ${direction}.`;
     }
-    holder.appendChild(el('p', { class: 'section-desc' }, `Round 1 draft slot vs. that season’s final regular-season standing, every Sleeper-era draft. ${interp}`));
-    holder.appendChild(el('div', { html: draftFinishScatterSVG(points) }));
+    holder.appendChild(el('p', { class: 'section-desc' }, `Where a manager drafted in round 1 vs. their average final standing that season, across every Sleeper-era draft. Lower bar = better average finish. ${interp}`));
+    holder.appendChild(el('div', { html: positionalFinishChartSVG(posRows) }));
   } catch (e) {
     holder.innerHTML = '';
     holder.appendChild(el('div', { class: 'status-msg error' }, 'Could not compute draft analysis right now.'));
@@ -1529,7 +1597,8 @@ async function renderTeams() {
     el('p', { class: 'section-desc' }, 'Select an inmate to view their full case file.'),
   ]);
   const grid = el('div', { class: 'mug-grid' });
-  const sorted = [...ALLTIME].sort((a, b) => b.wins - a.wins);
+  const liveAlltime = await getLiveAlltime();
+  const sorted = [...liveAlltime].sort((a, b) => b.wins - a.wins);
   sorted.forEach((o, i) => {
     const photo = el('div', { class: 'mug-photo' }, [el('div', { class: 'height-lines' }), o.owner.charAt(0)]);
     const card = el('div', { class: 'mug-card' }, [
@@ -1573,10 +1642,10 @@ function seasonBarChartSVG(history) {
 async function renderTeamDetail(owner) {
   const holder = document.getElementById('teamDetailHolder');
   holder.innerHTML = '';
-  const o = ALLTIME.find(x => x.owner === owner);
-  if (!o) return;
+  if (!ALLTIME.find(x => x.owner === owner)) return;
   holder.appendChild(el('div', { class: 'status-msg' }, ['Pulling the case file', el('span', { class: 'blink' }, '...')]));
-  try { await ensureLiveSeasonMerged(); } catch (e) { /* fall back to spreadsheet-only years */ }
+  const liveAlltime = await getLiveAlltime();
+  const o = liveAlltime.find(x => x.owner === owner);
   holder.innerHTML = '';
 
   const years = Object.keys(SEASON_DATA).sort();
@@ -1599,16 +1668,17 @@ async function renderTeamDetail(owner) {
   ]));
 
   const table = el('table', {}, [
-    el('thead', {}, el('tr', {}, ['Season', 'W', 'L', 'PF', 'PA', 'Honors'].map(x => el('th', {}, x)))),
+    el('thead', {}, el('tr', {}, ['Season', 'W', 'L', 'PF', 'PA', 'Honors'].map(x => el('th', (x === 'PF' || x === 'PA') ? { style: 'text-align:center;' } : {}, x)))),
     el('tbody', {}, history.map(r => {
       const honors = [];
-      if (r.overall_winner) honors.push('🏆');
-      if (r.league_winner) honors.push('📋');
-      if (r.scoring_title) honors.push('📈');
+      if (r.overall_winner) honors.push(honorBadge('🏆', 'League Champion'));
+      if (r.league_winner) honors.push(honorBadge('📋', 'Best Regular-Season Record'));
+      if (r.scoring_title) honors.push(honorBadge('📈', 'Highest-Scoring Team'));
       return el('tr', {}, [
         el('td', { class: 'owner-cell' }, r.year), el('td', {}, fmtInt(r.wins)), el('td', {}, fmtInt(r.losses)),
-        el('td', { class: 'num-cell' }, fmt(r.pf)), el('td', { class: 'num-cell' }, fmt(r.pa)),
-        el('td', {}, honors.join(' ') || '—'),
+        el('td', { class: 'num-cell', style: 'text-align:center;' }, fmt(r.pf)),
+        el('td', { class: 'num-cell', style: 'text-align:center;' }, fmt(r.pa)),
+        el('td', {}, honors.length ? honors : '—'),
       ]);
     })),
   ]);
