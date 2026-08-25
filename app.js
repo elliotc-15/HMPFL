@@ -1004,7 +1004,7 @@ async function renderH2H() {
   const root = document.getElementById('tab-h2h');
   const panel = el('div', { class: 'panel', 'data-file-no': 'FILE 07' }, [
     el('h2', { class: 'section-title' }, 'Head-to-Head Records'),
-    el('p', { class: 'section-desc' }, 'Computed from Sleeper matchup data (Sleeper-era seasons only — earlier NFL.com seasons did not export matchup-level detail).'),
+    el('p', { class: 'section-desc' }, 'Computed from Sleeper matchup data (Sleeper-era seasons only — earlier NFL.com seasons did not export matchup-level detail). Win-loss grid below; combined scoring and average margin per pairing further down.'),
     el('div', { id: 'h2hHolder' }, el('div', { class: 'status-msg' }, ['Cross-referencing the rap sheets', el('span', { class: 'blink' }, '...')])),
   ]);
   root.appendChild(panel);
@@ -1030,12 +1030,16 @@ async function renderH2H() {
           const nameA = canonicalOwnerNameForRoster(a.roster_id, season);
           const nameB = canonicalOwnerNameForRoster(b.roster_id, season);
           nameSet.add(nameA); nameSet.add(nameB);
+          if (typeof a.points !== 'number' || typeof b.points !== 'number') return;
           const key = [nameA, nameB].sort().join('|');
-          record[key] = record[key] || { [nameA]: 0, [nameB]: 0 };
+          record[key] = record[key] || { [nameA]: 0, [nameB]: 0, totalPoints: 0, marginSum: 0, meetings: 0 };
           record[key][nameA] = record[key][nameA] || 0;
           record[key][nameB] = record[key][nameB] || 0;
           if (a.points > b.points) record[key][nameA]++;
           else if (b.points > a.points) record[key][nameB]++;
+          record[key].totalPoints += a.points + b.points;
+          record[key].marginSum += Math.abs(a.points - b.points);
+          record[key].meetings += 1;
         });
       });
     }
@@ -1058,6 +1062,38 @@ async function renderH2H() {
     ]);
     h.appendChild(el('p', {}, el('em', {}, 'Reading the grid: row vs. column, row\u2019s win-loss record.')));
     h.appendChild(el('div', { class: 'table-wrap' }, table));
+
+    h.appendChild(el('h2', { class: 'section-title', style: 'font-size:16px;margin-top:28px' }, 'Combined Scoring by Pairing'));
+    h.appendChild(el('p', { class: 'section-desc' }, 'Every combined point scored and the average margin of victory, per matchup pairing. Click a column header to sort.'));
+    const pairRows = Object.entries(record).map(([key, rec]) => {
+      const [nameA, nameB] = key.split('|');
+      return {
+        nameA, nameB,
+        winsA: rec[nameA] || 0, winsB: rec[nameB] || 0,
+        totalPoints: rec.totalPoints, avgMargin: rec.meetings ? rec.marginSum / rec.meetings : 0,
+        meetings: rec.meetings,
+      };
+    }).sort((a, b) => b.totalPoints - a.totalPoints);
+    const pairTable = el('table', {}, [
+      el('thead', {}, el('tr', {}, [
+        th('Pairing', 'pairing', 'str'), th('Meetings', 'meetings'), th('Record', 'record', 'str'),
+        th('Combined Points', 'totalPoints'), th('Avg Margin', 'avgMargin'),
+      ])),
+      el('tbody', {}, pairRows.map(r => {
+        const tr = el('tr', {}, [
+          el('td', { class: 'owner-cell' }, `${r.nameA} vs ${r.nameB}`),
+          el('td', { class: 'num-cell' }, String(r.meetings)),
+          el('td', {}, `${r.winsA}-${r.winsB}`),
+          el('td', { class: 'num-cell' }, fmt(r.totalPoints)),
+          el('td', { class: 'num-cell' }, fmt(r.avgMargin)),
+        ]);
+        tr.dataset.pairing = `${r.nameA} vs ${r.nameB}`; tr.dataset.meetings = r.meetings;
+        tr.dataset.record = r.winsA; tr.dataset.totalPoints = r.totalPoints; tr.dataset.avgMargin = r.avgMargin;
+        return tr;
+      })),
+    ]);
+    h.appendChild(el('div', { class: 'table-wrap' }, pairTable));
+    makeSortable(pairTable);
   } catch (e) {
     document.getElementById('h2hHolder').innerHTML = '';
     document.getElementById('h2hHolder').appendChild(el('div', { class: 'status-msg error' }, 'Could not compute head-to-head records right now.'));
@@ -1071,7 +1107,7 @@ async function renderRecords() {
   const root = document.getElementById('tab-records');
   const panel = el('div', { class: 'panel', 'data-file-no': 'FILE 08' }, [
     el('h2', { class: 'section-title' }, 'The Records Book'),
-    el('p', { class: 'section-desc' }, 'Highest weekly scores across Sleeper-era seasons.'),
+    el('p', { class: 'section-desc' }, 'Highest and lowest weekly scores across Sleeper-era seasons, with who they played that week.'),
     el('div', { id: 'recordsHolder' }, el('div', { class: 'status-msg' }, ['Digging through the archive', el('span', { class: 'blink' }, '...')])),
   ]);
   root.appendChild(panel);
@@ -1083,15 +1119,27 @@ async function renderRecords() {
     for (const season of seasons) {
       const matchups = await loadMatchupsForSeason(season, 17);
       matchups.forEach((week, wi) => {
+        const byMatch = {};
         (week || []).forEach(entry => {
-          if (typeof entry.points === 'number' && entry.points > 0) {
+          if (entry.matchup_id === null || entry.matchup_id === undefined) return;
+          (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
+        });
+        Object.values(byMatch).forEach(pair => {
+          if (pair.length !== 2) return;
+          const [a, b] = pair;
+          if (typeof a.points !== 'number' || typeof b.points !== 'number') return;
+          [[a, b], [b, a]].forEach(([mine, theirs]) => {
+            if (mine.points <= 0) return;
             weeklyScores.push({
-              owner: canonicalOwnerNameForRoster(entry.roster_id, season),
-              points: entry.points,
+              owner: canonicalOwnerNameForRoster(mine.roster_id, season),
+              points: mine.points,
+              opponent: canonicalOwnerNameForRoster(theirs.roster_id, season),
+              opponentPoints: theirs.points,
+              result: mine.points > theirs.points ? 'W' : (mine.points < theirs.points ? 'L' : 'T'),
               week: wi + 1,
               season: season.league.season,
             });
-          }
+          });
         });
       });
     }
@@ -1109,12 +1157,26 @@ async function renderRecords() {
   }
 }
 function recordsTable(rows) {
+  const hasOpponent = rows.some(r => r.opponent);
+  const headers = hasOpponent
+    ? ['#', 'Inmate', 'Points', 'Opponent', 'Result', 'Week', 'Season']
+    : ['#', 'Inmate', 'Points', 'Week', 'Season'];
   return el('div', { class: 'table-wrap' }, el('table', {}, [
-    el('thead', {}, el('tr', {}, ['#', 'Inmate', 'Points', 'Week', 'Season'].map(x => el('th', {}, x)))),
-    el('tbody', {}, rows.map((r, i) => el('tr', {}, [
-      el('td', {}, String(i + 1)), el('td', { class: 'owner-cell' }, r.owner),
-      el('td', { class: 'num-cell' }, fmt(r.points)), el('td', {}, String(r.week)), el('td', {}, String(r.season)),
-    ]))),
+    el('thead', {}, el('tr', {}, headers.map(x => el('th', {}, x)))),
+    el('tbody', {}, rows.map((r, i) => {
+      const cells = [
+        el('td', {}, String(i + 1)), el('td', { class: 'owner-cell' }, r.owner),
+        el('td', { class: 'num-cell' }, fmt(r.points)),
+      ];
+      if (hasOpponent) {
+        cells.push(
+          el('td', {}, `${r.opponent} (${fmt(r.opponentPoints)})`),
+          el('td', {}, r.result === 'W' ? el('span', { class: 'pill pill-gold' }, 'W') : r.result === 'L' ? el('span', { class: 'pill pill-rust' }, 'L') : '—'),
+        );
+      }
+      cells.push(el('td', {}, String(r.week)), el('td', {}, String(r.season)));
+      return el('tr', {}, cells);
+    })),
   ]));
 }
 
@@ -1271,9 +1333,17 @@ async function renderDraft() {
       return;
     }
     const select = el('select', {}, draftSeasons.map(s => el('option', { value: s.league.season }, s.league.season)));
-    h.appendChild(el('div', { class: 'control-row' }, [el('label', {}, 'Season:'), select]));
     const tableHolder = el('div');
-    h.appendChild(tableHolder);
+    const boardHint = el('span', { class: 'hint' }, 'click to collapse');
+    const boardDetails = el('details', { class: 'collapsible-board', open: 'open' }, [
+      el('summary', {}, ['Draft Board', boardHint]),
+      el('div', { class: 'control-row' }, [el('label', {}, 'Season:'), select]),
+      tableHolder,
+    ]);
+    boardDetails.addEventListener('toggle', () => {
+      boardHint.textContent = boardDetails.open ? 'click to collapse' : 'click to expand';
+    });
+    h.appendChild(boardDetails);
 
     async function renderForSeason(seasonYear) {
       const season = draftSeasons.find(s => s.league.season === seasonYear);

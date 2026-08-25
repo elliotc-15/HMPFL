@@ -157,6 +157,25 @@ h1.site-title .full{color:var(--jumpsuit-bright);}
 .owner-link{cursor:pointer; text-decoration:underline; text-decoration-style:dotted; text-underline-offset:2px;}
 .owner-link:hover{color:var(--jumpsuit-bright);}
 
+/* ===== COLLAPSIBLE SECTIONS ===== */
+details.collapsible-board{margin-bottom:8px;}
+details.collapsible-board > summary{
+  cursor:pointer; list-style:none; user-select:none;
+  font-family:'Oswald', sans-serif; text-transform:uppercase; letter-spacing:1px;
+  font-size:16px; color:var(--paper); padding:8px 0 12px; display:flex; align-items:center; gap:10px;
+  border-bottom:1px solid var(--line); margin-bottom:12px;
+}
+details.collapsible-board > summary::-webkit-details-marker{display:none;}
+details.collapsible-board > summary::before{
+  content:'▸'; color:var(--jumpsuit-bright); display:inline-block; transition:transform .15s; font-size:13px;
+}
+details.collapsible-board[open] > summary::before{transform:rotate(90deg);}
+details.collapsible-board > summary:hover{color:var(--jumpsuit-bright);}
+details.collapsible-board > summary .hint{
+  font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.5px; text-transform:none;
+  color:var(--paper-dim); margin-left:auto;
+}
+
 /* ===== MAIN ===== */
 main{max-width:1100px; margin:0 auto; padding:28px 20px 80px;}
 .panel{
