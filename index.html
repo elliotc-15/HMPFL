@@ -121,40 +121,41 @@ h1.site-title .full{color:var(--jumpsuit-bright);}
 .chain-divider svg{width:100%; height:16px; display:block;}
 .chain-link{stroke:var(--brass); stroke-width:2; fill:none; opacity:0.55;}
 
-/* ===== NAV: CELL DOORS ===== */
-.cellblock-nav{
-  max-width:1100px;
-  margin:0 auto;
-  padding:0 20px;
-  position:sticky; top:0; z-index:50;
-  background:var(--ink-black);
-  border-bottom:2px solid var(--line);
+/* ===== NAV: HAMBURGER + CELL BLOCK OVERLAY ===== */
+.menu-toggle{
+  position:absolute; top:24px; right:20px;
+  width:46px; height:42px;
+  background:var(--concrete-light); border:2px solid var(--jumpsuit);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+  cursor:pointer; z-index:60; padding:0;
 }
-.cellblock-nav ul{
-  list-style:none; margin:0; padding:0;
-  display:flex; overflow-x:auto;
-  scrollbar-width:thin;
+.menu-toggle span{display:block; width:22px; height:2px; background:var(--paper);}
+.menu-toggle:hover{background:var(--concrete);}
+.header-logo{cursor:pointer;}
+.tab-overlay{
+  position:fixed; inset:0; background:rgba(17,16,24,0.97);
+  z-index:100; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .2s;
 }
-.cellblock-nav li{flex:0 0 auto;}
-.cell-btn{
-  font-family:'IBM Plex Mono', monospace;
-  font-size:12px; letter-spacing:0.5px; text-transform:uppercase;
-  background:transparent; color:var(--paper-dim);
-  border:none; border-right:1px solid var(--line);
-  padding:14px 16px 12px;
-  cursor:pointer;
-  white-space:nowrap;
-  position:relative;
-  transition:color .15s, background .15s;
+.tab-overlay.open{opacity:1; pointer-events:auto;}
+.tab-overlay ul{list-style:none; margin:0; padding:0; width:100%; max-width:440px; max-height:80vh; overflow-y:auto;}
+.tab-overlay li{border-bottom:1px solid var(--line);}
+.overlay-btn{
+  width:100%; text-align:left; background:none; border:none; color:var(--paper-dim);
+  font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:1px;
+  font-size:20px; padding:16px 24px; cursor:pointer; display:flex; align-items:center; gap:14px;
 }
-.cell-btn .num{color:var(--brass); margin-right:8px; font-weight:600;}
-.cell-btn:hover{background:var(--concrete); color:var(--paper);}
-.cell-btn.active{color:var(--jumpsuit-bright); background:var(--concrete-light);}
-.cell-btn.active::after{
-  content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px;
-  background:var(--jumpsuit-bright);
+.overlay-btn .num{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--brass); min-width:20px;}
+.overlay-btn:hover{background:var(--concrete-light); color:var(--paper);}
+.overlay-btn.active{color:var(--jumpsuit-bright);}
+.overlay-btn.active .num{color:var(--jumpsuit-bright);}
+.menu-close{
+  position:absolute; top:24px; right:20px;
+  background:none; border:2px solid var(--jumpsuit); color:var(--paper);
+  width:44px; height:44px; font-size:26px; cursor:pointer; line-height:1;
 }
-.cell-btn.active .num{color:var(--jumpsuit-bright);}
+.owner-link{cursor:pointer; text-decoration:underline; text-decoration-style:dotted; text-underline-offset:2px;}
+.owner-link:hover{color:var(--jumpsuit-bright);}
 
 /* ===== MAIN ===== */
 main{max-width:1100px; margin:0 auto; padding:28px 20px 80px;}
@@ -326,8 +327,11 @@ footer{
 <body>
 
 <header class="site-header">
+  <button id="menuToggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="tabOverlay">
+    <span></span><span></span><span></span>
+  </button>
   <div class="header-inner">
-    <div class="header-logo"><img src="assets/logo.png" alt="HMPFL league crest" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'logo-fallback',textContent:'HMPFL'}))"></div>
+    <div class="header-logo" id="homeLogoBtn" role="button" aria-label="Go to Home" tabindex="0"><img src="assets/logo.png" alt="HMPFL league crest" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'logo-fallback',textContent:'HMPFL'}))"></div>
     <div class="header-text">
       <div class="booking-tag"><span class="dot"></span> DEPARTMENT OF FANTASY CORRECTIONS — CASE FILE OPEN</div>
       <h1 class="site-title">HMPFL <span class="full">2026</span></h1>
@@ -348,20 +352,20 @@ footer{
   </svg>
 </div>
 
-<nav class="cellblock-nav">
+<nav id="tabOverlay" class="tab-overlay" aria-hidden="true">
+  <button id="menuClose" class="menu-close" aria-label="Close menu">&times;</button>
   <ul id="tabNav">
-    <li><button class="cell-btn active" data-tab="home"><span class="num">01</span>Home</button></li>
-    <li><button class="cell-btn" data-tab="alltime"><span class="num">02</span>All-Time</button></li>
-    <li><button class="cell-btn" data-tab="seasons"><span class="num">03</span>Seasons</button></li>
-    <li><button class="cell-btn" data-tab="fame"><span class="num">04</span>Fame &amp; Shame</button></li>
-    <li><button class="cell-btn" data-tab="rules"><span class="num">05</span>Rules</button></li>
-    <li><button class="cell-btn" data-tab="draft2026"><span class="num">06</span>2026 Draft</button></li>
-    <li><button class="cell-btn" data-tab="h2h"><span class="num">07</span>Head-to-Head</button></li>
-    <li><button class="cell-btn" data-tab="records"><span class="num">08</span>Records</button></li>
-    <li><button class="cell-btn" data-tab="draftanalysis"><span class="num">09</span>Draft Analysis</button></li>
-    <li><button class="cell-btn" data-tab="teams"><span class="num">10</span>Inmates</button></li>
-    <li><button class="cell-btn" data-tab="live"><span class="num">11</span>Live Scores</button></li>
-    <li><button class="cell-btn" data-tab="recap"><span class="num">12</span>Weekly Recap</button></li>
+    <li><button class="overlay-btn active" data-tab="home"><span class="num">01</span>Home</button></li>
+    <li><button class="overlay-btn" data-tab="alltime"><span class="num">02</span>All-Time</button></li>
+    <li><button class="overlay-btn" data-tab="seasons"><span class="num">03</span>Seasons</button></li>
+    <li><button class="overlay-btn" data-tab="fame"><span class="num">04</span>Fame &amp; Shame</button></li>
+    <li><button class="overlay-btn" data-tab="rules"><span class="num">05</span>Rules</button></li>
+    <li><button class="overlay-btn" data-tab="draft"><span class="num">06</span>Draft</button></li>
+    <li><button class="overlay-btn" data-tab="h2h"><span class="num">07</span>Head-to-Head</button></li>
+    <li><button class="overlay-btn" data-tab="records"><span class="num">08</span>Records</button></li>
+    <li><button class="overlay-btn" data-tab="teams"><span class="num">09</span>Inmates</button></li>
+    <li><button class="overlay-btn" data-tab="live"><span class="num">10</span>Live Scores</button></li>
+    <li><button class="overlay-btn" data-tab="recap"><span class="num">11</span>Weekly Recap</button></li>
   </ul>
 </nav>
 
@@ -371,10 +375,9 @@ footer{
   <section id="tab-seasons" class="tab-content"></section>
   <section id="tab-fame" class="tab-content"></section>
   <section id="tab-rules" class="tab-content"></section>
-  <section id="tab-draft2026" class="tab-content"></section>
+  <section id="tab-draft" class="tab-content"></section>
   <section id="tab-h2h" class="tab-content"></section>
   <section id="tab-records" class="tab-content"></section>
-  <section id="tab-draftanalysis" class="tab-content"></section>
   <section id="tab-teams" class="tab-content"></section>
   <section id="tab-live" class="tab-content"></section>
   <section id="tab-recap" class="tab-content"></section>

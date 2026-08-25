@@ -16,7 +16,7 @@ function el(tag, attrs = {}, children = []) {
   }
   (Array.isArray(children) ? children : [children]).forEach(c => {
     if (c === null || c === undefined) return;
-    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+    e.appendChild(c instanceof Node ? c : document.createTextNode(String(c)));
   });
   return e;
 }
@@ -168,7 +168,7 @@ async function ensureLiveSeasonMerged() {
 // ---------- TAB ROUTING ----------
 const renderedTabs = new Set();
 function activateTab(name) {
-  document.querySelectorAll('.cell-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.overlay-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('.tab-content').forEach(s => s.classList.toggle('active', s.id === `tab-${name}`));
   if (name !== 'live' && liveScoresInterval) { clearInterval(liveScoresInterval); liveScoresInterval = null; }
   if (!renderedTabs.has(name)) {
@@ -177,10 +177,40 @@ function activateTab(name) {
   }
 }
 document.getElementById('tabNav').addEventListener('click', (e) => {
-  const btn = e.target.closest('.cell-btn');
+  const btn = e.target.closest('.overlay-btn');
   if (!btn) return;
   activateTab(btn.dataset.tab);
+  closeMenu();
 });
+
+// ---------- HAMBURGER MENU ----------
+const menuToggle = document.getElementById('menuToggle');
+const menuClose = document.getElementById('menuClose');
+const tabOverlay = document.getElementById('tabOverlay');
+function openMenu() {
+  tabOverlay.classList.add('open');
+  tabOverlay.setAttribute('aria-hidden', 'false');
+  menuToggle.setAttribute('aria-expanded', 'true');
+}
+function closeMenu() {
+  tabOverlay.classList.remove('open');
+  tabOverlay.setAttribute('aria-hidden', 'true');
+  menuToggle.setAttribute('aria-expanded', 'false');
+}
+menuToggle.addEventListener('click', openMenu);
+menuClose.addEventListener('click', closeMenu);
+tabOverlay.addEventListener('click', (e) => { if (e.target === tabOverlay) closeMenu(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+// ---------- LOGO = HOME BUTTON ----------
+const homeLogoBtn = document.getElementById('homeLogoBtn');
+function goHome() {
+  activateTab('home');
+  closeMenu();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+homeLogoBtn.addEventListener('click', goHome);
+homeLogoBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goHome(); } });
 
 // ---------- SORTABLE TABLE HELPER ----------
 function makeSortable(table) {
@@ -209,28 +239,41 @@ function makeSortable(table) {
 // ===========================================================
 // TAB 1: HOME
 // ===========================================================
+const HOME_BLURB = 'Est. 2014, His Majesty’s Prison Fantasy League has processed sixteen inmates through more than a decade of fantasy football, waiver-wire heists, trade-deadline plea bargains, and one unforgivable last-place sentence handed down every single year. Started on NFL.com, transferred to Sleeper in the 2023 intake. Welcome to the block. Nobody gets out clean.';
+
 async function renderHome() {
   const root = document.getElementById('tab-home');
   root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 01' }, [
+    el('h2', { class: 'section-title' }, 'Booking Report'),
+    el('p', { class: 'recap-prose', style: 'font-size:14px;' }, HOME_BLURB),
+  ]));
+
+  root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 01A' }, [
+    el('h2', { class: 'section-title' }, 'League at a Glance'),
+    el('div', { class: 'stat-grid' }, [
+      statCard(alltimeTotalSeasons(), 'Seasons Served'),
+      statCard(ALLTIME.length, 'Inmates Booked'),
+      statCard(reigningChampion(), 'Reigning Champion', true),
+      statCard('—', 'This Week’s Top Scorer', true, 'topScorerVal'),
+    ]),
+  ]));
+
+  root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 01B' }, [
     el('h2', { class: 'section-title' }, 'Current Standings'),
     el('p', { class: 'section-desc' }, 'Live from Sleeper — pulled fresh every time this page loads.'),
     el('div', { id: 'homeStatus' }, el('div', { class: 'status-msg' }, ['Contacting the warden\u2019s office', el('span', { class: 'blink' }, '...')])),
   ]));
 
-  root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 01B' }, [
-    el('h2', { class: 'section-title' }, 'League at a Glance'),
-    el('div', { class: 'stat-grid' }, [
-      statCard(alltimeTotalSeasons(), 'Seasons Served'),
-      statCard(ALLTIME.length, 'Inmates Booked'),
-      statCard(topByChampionships(), 'Most Championships', true),
-      statCard(topByRegSeasonTitles(), 'Most Reg. Season Titles', true),
-    ]),
+  root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 01C' }, [
+    el('h2', { class: 'section-title' }, 'This Week’s Matchups'),
+    el('div', { id: 'homeMatchups' }, el('div', { class: 'status-msg' }, ['Checking the visitation schedule', el('span', { class: 'blink' }, '...')])),
   ]));
 
   try {
     const seasons = await loadSleeperHistory();
     const latest = seasons[seasons.length - 1];
     renderHomeStandings(latest);
+    await renderHomeMatchups(latest);
   } catch (e) {
     document.getElementById('homeStatus').innerHTML = '';
     document.getElementById('homeStatus').appendChild(
@@ -238,22 +281,71 @@ async function renderHome() {
     );
   }
 }
-function statCard(val, lbl, isText) {
-  return el('div', { class: 'stat-card' }, [
-    el('div', { class: 'val' }, String(val)),
-    el('div', { class: 'lbl' }, lbl),
-  ]);
+function statCard(val, lbl, isText, id) {
+  const valDiv = el('div', { class: 'val' }, String(val));
+  if (id) valDiv.id = id;
+  return el('div', { class: 'stat-card' }, [valDiv, el('div', { class: 'lbl' }, lbl)]);
+}
+function reigningChampion() {
+  const years = Object.keys(SEASON_DATA).filter(y => Object.keys(SEASON_DATA[y]).length).sort((a, b) => b - a);
+  for (const y of years) {
+    const champ = Object.entries(SEASON_DATA[y]).find(([, s]) => s.overall_winner);
+    if (champ) return `${champ[0]} (${y})`;
+  }
+  return '—';
+}
+async function renderHomeMatchups(latest) {
+  const holder = document.getElementById('homeMatchups');
+  if (!latest) { holder.innerHTML = ''; holder.appendChild(el('div', { class: 'status-msg' }, 'No active season found.')); return; }
+  try {
+    const state = await sleeperFetch('/state/nfl');
+    const week = state.week || 1;
+    const matchups = await sleeperFetch(`/league/${latest.league.league_id}/matchups/${week}`);
+    const byMatch = {};
+    (matchups || []).forEach(entry => {
+      if (entry.matchup_id === null || entry.matchup_id === undefined) return;
+      (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
+    });
+    const pairs = Object.values(byMatch).filter(p => p.length === 2);
+    holder.innerHTML = '';
+    holder.appendChild(el('p', { class: 'section-desc' }, `Week ${week} · ${latest.league.season}`));
+    if (!pairs.length) {
+      holder.appendChild(el('div', { class: 'status-msg' }, 'No matchups found for the current week yet.'));
+      updateTopScorer(null);
+      return;
+    }
+    let top = null;
+    const grid = el('div', { class: 'mug-grid' });
+    pairs.forEach(([a, b]) => {
+      const nameA = rosterOwnerName(a.roster_id, latest);
+      const nameB = rosterOwnerName(b.roster_id, latest);
+      const ptsA = a.points || 0, ptsB = b.points || 0;
+      if (!top || ptsA > top.pts) top = { name: nameA, pts: ptsA };
+      if (!top || ptsB > top.pts) top = { name: nameB, pts: ptsB };
+      const leading = ptsA > ptsB ? nameA : (ptsB > ptsA ? nameB : null);
+      grid.appendChild(el('div', { class: 'mug-card', style: 'cursor:default' }, [
+        el('div', { style: 'padding:16px;' }, [
+          matchupRow(nameA, ptsA.toFixed(2), leading === nameA),
+          el('div', { style: 'text-align:center;color:var(--brass);font-family:IBM Plex Mono,monospace;font-size:10px;margin:6px 0;' }, 'VS'),
+          matchupRow(nameB, ptsB.toFixed(2), leading === nameB),
+        ]),
+      ]));
+    });
+    holder.appendChild(grid);
+    updateTopScorer(top);
+  } catch (e) {
+    holder.innerHTML = '';
+    holder.appendChild(el('div', { class: 'status-msg error' }, 'Could not load this week’s matchups.'));
+    updateTopScorer(null);
+  }
+}
+function updateTopScorer(top) {
+  const valDiv = document.getElementById('topScorerVal');
+  if (!valDiv) return;
+  valDiv.textContent = top ? `${top.name} (${fmt(top.pts)})` : '—';
 }
 function alltimeTotalSeasons() {
   return Math.max(...ALLTIME.map(o => o.seasons || 0));
-}
-function topByChampionships() {
-  const top = [...ALLTIME].sort((a, b) => (b.overall_winner || 0) - (a.overall_winner || 0))[0];
-  return top ? `${top.owner} (${top.overall_winner})` : '—';
-}
-function topByRegSeasonTitles() {
-  const top = [...ALLTIME].sort((a, b) => (b.league_winner || 0) - (a.league_winner || 0))[0];
-  return top ? `${top.owner} (${top.league_winner})` : '—';
 }
 function renderHomeStandings(season) {
   const status = document.getElementById('homeStatus');
@@ -294,26 +386,27 @@ function renderAlltime() {
   const table = el('table', {}, [
     el('thead', {}, el('tr', {}, [
       th('Inmate', 'owner', 'str'), th('Seasons', 'seasons'), th('W', 'wins'), th('L', 'losses'),
-      th('Win %', 'winpct'), th('Championships', 'overall_winner'), th('Reg. Season Titles', 'league_winner'),
+      th('Win %', 'winpct'), th('Championships', 'overall_winner'),
       th('Scoring Titles', 'scoring_titles'), th('PF', 'pf'), th('PA', 'pa'), th('Playoff W-L', 'playoff_wins'),
     ])),
     el('tbody', {}, rows.map(o => {
       const winpct = o.wins / (o.wins + o.losses) || 0;
+      const ownerLink = el('span', { class: 'owner-link' }, o.owner);
+      ownerLink.addEventListener('click', () => { activateTab('teams'); renderTeamDetail(o.owner); });
       const tr = el('tr', {}, [
-        el('td', { class: 'owner-cell' }, o.owner),
+        el('td', { class: 'owner-cell' }, ownerLink),
         el('td', { class: 'num-cell' }, fmtInt(o.seasons)),
         el('td', { class: 'num-cell' }, fmtInt(o.wins)),
         el('td', { class: 'num-cell' }, fmtInt(o.losses)),
         el('td', { class: 'num-cell' }, (winpct * 100).toFixed(1) + '%'),
         el('td', { class: 'num-cell' }, o.overall_winner ? el('span', { class: 'pill pill-gold' }, `🏆 ${o.overall_winner}`) : '0'),
-        el('td', { class: 'num-cell' }, fmtInt(o.league_winner)),
         el('td', { class: 'num-cell' }, fmtInt(o.scoring_titles)),
         el('td', { class: 'num-cell' }, fmt(o.pf, 0)),
         el('td', { class: 'num-cell' }, fmt(o.pa, 0)),
         el('td', { class: 'num-cell' }, `${fmtInt(o.playoff_wins)}-${fmtInt(o.playoff_losses)}`),
       ]);
       tr.dataset.owner = o.owner; tr.dataset.seasons = o.seasons; tr.dataset.wins = o.wins; tr.dataset.losses = o.losses;
-      tr.dataset.winpct = winpct; tr.dataset.league_winner = o.league_winner; tr.dataset.overall_winner = o.overall_winner;
+      tr.dataset.winpct = winpct; tr.dataset.overall_winner = o.overall_winner;
       tr.dataset.scoring_titles = o.scoring_titles; tr.dataset.pf = o.pf; tr.dataset.pa = o.pa; tr.dataset.playoff_wins = o.playoff_wins;
       return tr;
     })),
@@ -554,42 +647,6 @@ async function renderRules() {
 }
 
 // ===========================================================
-// TAB 6: 2026 DRAFT RESULTS
-// ===========================================================
-async function renderDraft2026() {
-  const root = document.getElementById('tab-draft2026');
-  const holder = el('div', { class: 'panel', 'data-file-no': 'FILE 06' }, [
-    el('h2', { class: 'section-title' }, '2026 Draft Results'),
-    el('p', { class: 'section-desc' }, 'Live from Sleeper.'),
-    el('div', { id: 'draft2026Holder' }, el('div', { class: 'status-msg' }, ['Pulling the intake sheet', el('span', { class: 'blink' }, '...')])),
-  ]);
-  root.appendChild(holder);
-  try {
-    const seasons = await loadSleeperHistory();
-    const latest = seasons[seasons.length - 1];
-    const h = document.getElementById('draft2026Holder');
-    h.innerHTML = '';
-    if (!latest || !latest.picks || !latest.picks.length) {
-      h.appendChild(el('div', { class: 'status-msg' }, 'No draft picks found yet — check back once the 2026 draft has happened.'));
-      return;
-    }
-    const rows = latest.picks.sort((a, b) => a.pick_no - b.pick_no);
-    const table = el('table', {}, [
-      el('thead', {}, el('tr', {}, ['Pick', 'Round', 'Manager', 'Player'].map(x => el('th', {}, x)))),
-      el('tbody', {}, rows.map(p => {
-        const owner = rosterOwnerName(p.roster_id, latest);
-        const player = p.metadata ? `${p.metadata.first_name || ''} ${p.metadata.last_name || ''} (${p.metadata.position || ''} - ${p.metadata.team || 'FA'})` : p.player_id;
-        return el('tr', {}, [el('td', {}, String(p.pick_no)), el('td', {}, String(p.round)), el('td', { class: 'owner-cell' }, owner), el('td', {}, player)]);
-      })),
-    ]);
-    h.appendChild(el('div', { class: 'table-wrap' }, table));
-  } catch (e) {
-    document.getElementById('draft2026Holder').innerHTML = '';
-    document.getElementById('draft2026Holder').appendChild(el('div', { class: 'status-msg error' }, 'Could not load draft data from Sleeper.'));
-  }
-}
-
-// ===========================================================
 // TAB 7: HEAD TO HEAD
 // ===========================================================
 async function renderH2H() {
@@ -711,19 +768,19 @@ function recordsTable(rows) {
 }
 
 // ===========================================================
-// TAB 9: DRAFT ANALYSIS
+// TAB 6: DRAFT (current board + browsable past drafts + pick analysis)
 // ===========================================================
-async function renderDraftAnalysis() {
-  const root = document.getElementById('tab-draftanalysis');
-  const panel = el('div', { class: 'panel', 'data-file-no': 'FILE 09' }, [
-    el('h2', { class: 'section-title' }, 'Draft Analysis'),
-    el('p', { class: 'section-desc' }, 'Pick position vs. how the manager\u2019s team actually finished that season (Sleeper-era drafts only).'),
-    el('div', { id: 'draftAnalysisHolder' }, el('div', { class: 'status-msg' }, ['Reviewing the intake photos', el('span', { class: 'blink' }, '...')])),
+async function renderDraft() {
+  const root = document.getElementById('tab-draft');
+  const panel = el('div', { class: 'panel', 'data-file-no': 'FILE 06' }, [
+    el('h2', { class: 'section-title' }, 'Draft'),
+    el('p', { class: 'section-desc' }, 'Current year\u2019s draft board, plus every browsable past Sleeper-era draft. Pick slot alongside the manager\u2019s eventual season record shows value returned per pick.'),
+    el('div', { id: 'draftHolder' }, el('div', { class: 'status-msg' }, ['Reviewing the intake photos', el('span', { class: 'blink' }, '...')])),
   ]);
   root.appendChild(panel);
   try {
     const seasons = await loadSleeperHistory();
-    const h = document.getElementById('draftAnalysisHolder');
+    const h = document.getElementById('draftHolder');
     h.innerHTML = '';
     const draftSeasons = seasons.filter(s => s.draft && s.picks && s.picks.length);
     if (!draftSeasons.length) {
@@ -742,7 +799,7 @@ async function renderDraftAnalysis() {
         const owner = rosterOwnerName(p.roster_id, season);
         const roster = season.rosters.find(r => r.roster_id === p.roster_id);
         const finishWins = roster ? (roster.settings?.wins || 0) : null;
-        const player = p.metadata ? `${p.metadata.first_name || ''} ${p.metadata.last_name || ''}` : p.player_id;
+        const player = p.metadata ? `${p.metadata.first_name || ''} ${p.metadata.last_name || ''} (${p.metadata.team || 'FA'})` : p.player_id;
         const pos = p.metadata ? p.metadata.position : '';
         return { pick: p.pick_no, round: p.round, owner, player, pos, finishWins };
       });
@@ -754,22 +811,22 @@ async function renderDraftAnalysis() {
         ]))),
       ]);
       tableHolder.appendChild(el('div', { class: 'table-wrap' }, table));
-      tableHolder.appendChild(el('p', { class: 'section-desc' }, 'Note: this shows draft slot alongside the manager\u2019s eventual season record. Player-level weekly scoring (true "value vs. ADP") requires per-player stats which can be layered in next.'));
+      tableHolder.appendChild(el('p', { class: 'section-desc' }, 'Note: "Manager Season Wins" shows draft slot value via the manager\u2019s eventual season record. Player-level weekly scoring (true points-vs-draft-position) requires per-player stats which can be layered in next.'));
     }
     select.addEventListener('change', () => renderForSeason(select.value));
     renderForSeason(draftSeasons[draftSeasons.length - 1].league.season);
   } catch (e) {
-    document.getElementById('draftAnalysisHolder').innerHTML = '';
-    document.getElementById('draftAnalysisHolder').appendChild(el('div', { class: 'status-msg error' }, 'Could not load draft analysis right now.'));
+    document.getElementById('draftHolder').innerHTML = '';
+    document.getElementById('draftHolder').appendChild(el('div', { class: 'status-msg error' }, 'Could not load draft data right now.'));
   }
 }
 
 // ===========================================================
-// TAB 10: TEAM / INMATE PAGES
+// TAB 9: TEAM / INMATE PAGES
 // ===========================================================
 function renderTeams() {
   const root = document.getElementById('tab-teams');
-  const gridPanel = el('div', { class: 'panel', 'data-file-no': 'FILE 10' }, [
+  const gridPanel = el('div', { class: 'panel', 'data-file-no': 'FILE 09' }, [
     el('h2', { class: 'section-title' }, 'Inmate Roster'),
     el('p', { class: 'section-desc' }, 'Select an inmate to view their full case file.'),
   ]);
@@ -834,12 +891,12 @@ function renderTeamDetail(owner) {
 }
 
 // ===========================================================
-// TAB 11: LIVE SCORES
+// TAB 10: LIVE SCORES
 // ===========================================================
 let liveScoresInterval = null;
 async function renderLive() {
   const root = document.getElementById('tab-live');
-  root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 11' }, [
+  root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 10' }, [
     el('h2', { class: 'section-title' }, [el('span', { class: 'live-dot' }), 'Live Scores']),
     el('p', { class: 'section-desc' }, 'Refreshes automatically every 30 seconds while this tab is open.'),
     el('div', { id: 'liveHolder' }, el('div', { class: 'status-msg' }, ['Checking the scoreboard', el('span', { class: 'blink' }, '...')])),
@@ -898,11 +955,11 @@ function matchupRow(name, pts, leading) {
 }
 
 // ===========================================================
-// TAB 12: WEEKLY RECAP (AI-generated, via GitHub Actions)
+// TAB 11: WEEKLY RECAP (AI-generated, via GitHub Actions)
 // ===========================================================
 async function renderRecap() {
   const root = document.getElementById('tab-recap');
-  const panel = el('div', { class: 'panel', 'data-file-no': 'FILE 12' }, [
+  const panel = el('div', { class: 'panel', 'data-file-no': 'FILE 11' }, [
     el('h2', { class: 'section-title' }, 'Weekly Recap'),
     el('p', { class: 'section-desc' }, 'AI-written recap, generated automatically each week.'),
     el('div', { id: 'recapHolder' }, el('div', { class: 'status-msg' }, ['Pulling the warden\u2019s weekly report', el('span', { class: 'blink' }, '...')])),
@@ -955,10 +1012,9 @@ const renderers = {
   seasons: renderSeasons,
   fame: renderFame,
   rules: renderRules,
-  draft2026: renderDraft2026,
+  draft: renderDraft,
   h2h: renderH2H,
   records: renderRecords,
-  draftanalysis: renderDraftAnalysis,
   teams: renderTeams,
   live: renderLive,
   recap: renderRecap,
