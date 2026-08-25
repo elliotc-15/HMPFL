@@ -54,6 +54,40 @@ function playerLabel(dir, pid) {
   return p.position ? `${name} (${p.position})` : name;
 }
 
+// Sleeper has no built-in win-probability figure, and there's no reliable
+// way from matchup data alone to tell "player hasn't played yet" apart from
+// "player played and scored zero" — so instead of pretending to model
+// remaining roster spots, this estimates win probability from the current
+// score margin against this league's own historical week-to-week scoring
+// spread (std dev of every recorded weekly score), via a logistic
+// approximation of the normal CDF for the difference of two such scores.
+let scoreStdDevCache = null;
+async function getScoreStdDev() {
+  if (scoreStdDevCache) return scoreStdDevCache;
+  try {
+    const seasons = await loadSleeperHistory();
+    const scores = [];
+    for (const season of seasons) {
+      const matchups = await loadMatchupsForSeason(season, 17);
+      matchups.forEach(week => {
+        (week || []).forEach(entry => {
+          if (typeof entry.points === 'number' && entry.points > 0) scores.push(entry.points);
+        });
+      });
+    }
+    if (scores.length < 10) { scoreStdDevCache = 35; return scoreStdDevCache; }
+    const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const variance = scores.reduce((a, b) => a + (b - mean) ** 2, 0) / scores.length;
+    scoreStdDevCache = Math.sqrt(variance) || 35;
+  } catch (e) { scoreStdDevCache = 35; }
+  return scoreStdDevCache;
+}
+function estimateWinProb(myPoints, theirPoints, stdDev) {
+  const margin = myPoints - theirPoints;
+  const z = margin / ((stdDev || 35) * Math.SQRT2);
+  return 1 / (1 + Math.exp(-1.702 * z));
+}
+
 // ---------- Sleeper history walker ----------
 // Walks previous_league_id chain to gather all Sleeper-era seasons for this league.
 let sleeperHistoryCache = null;
@@ -1697,6 +1731,7 @@ async function refreshLiveScores() {
       holder.appendChild(el('div', { class: 'status-msg' }, 'No matchups found for the current week yet.'));
       return;
     }
+    const stdDev = await getScoreStdDev();
     const grid = el('div', { class: 'mug-grid' });
     pairs.forEach(([a, b]) => {
       const nameA = rosterOwnerName(a.roster_id, current);
@@ -1704,15 +1739,19 @@ async function refreshLiveScores() {
       const ptsA = (a.points || 0).toFixed(2);
       const ptsB = (b.points || 0).toFixed(2);
       const leading = a.points > b.points ? nameA : (b.points > a.points ? nameB : null);
+      const probA = estimateWinProb(a.points || 0, b.points || 0, stdDev);
+      const pctA = Math.round(probA * 100), pctB = 100 - pctA;
       grid.appendChild(el('div', { class: 'mug-card', style: 'cursor:default' }, [
         el('div', { style: 'padding:16px;' }, [
           matchupRow(nameA, ptsA, leading === nameA),
           el('div', { style: 'text-align:center;color:var(--brass);font-family:IBM Plex Mono,monospace;font-size:10px;margin:6px 0;' }, 'VS'),
           matchupRow(nameB, ptsB, leading === nameB),
+          winProbBar(pctA, pctB),
         ]),
       ]));
     });
     holder.appendChild(grid);
+    holder.appendChild(el('p', { class: 'section-desc', style: 'margin-top:14px;' }, 'Win probability is an estimate from the current score margin against this league’s own historical week-to-week scoring spread — not a play-by-play model.'));
   } catch (e) {
     holder.innerHTML = '';
     holder.appendChild(el('div', { class: 'status-msg error' }, 'Could not load live scores right now.'));
@@ -1721,6 +1760,18 @@ async function refreshLiveScores() {
 function matchupRow(name, pts, leading) {
   return el('div', { style: `display:flex;justify-content:space-between;padding:4px 0;${leading ? 'color:var(--jumpsuit-bright);font-weight:600;' : ''}` }, [
     el('span', {}, name), el('span', { style: 'font-family:IBM Plex Mono,monospace;' }, pts),
+  ]);
+}
+function winProbBar(pctA, pctB) {
+  return el('div', { style: 'margin-top:10px;' }, [
+    el('div', { style: 'display:flex;justify-content:space-between;font-family:IBM Plex Mono,monospace;font-size:10px;color:var(--paper-dim);margin-bottom:3px;' }, [
+      el('span', {}, `${pctA}%`), el('span', {}, `${pctB}%`),
+    ]),
+    el('div', { style: 'height:6px;background:var(--line);display:flex;overflow:hidden;' }, [
+      el('div', { style: `width:${pctA}%;background:var(--jumpsuit-bright);` }),
+      el('div', { style: `width:${pctB}%;background:var(--brass);` }),
+    ]),
+    el('div', { style: 'text-align:center;font-family:IBM Plex Mono,monospace;font-size:9px;color:var(--paper-dim);margin-top:3px;letter-spacing:0.5px;' }, 'EST. WIN PROBABILITY'),
   ]);
 }
 
@@ -1757,6 +1808,21 @@ async function renderRecap() {
         const r = await fetch(`recaps/${file}`);
         const data = await r.json();
         recapHolder.innerHTML = '';
+        if (data.games && data.games.length) {
+          const games = data.games; // pre-sorted by margin ascending
+          const closest = games[0];
+          const blowout = games[games.length - 1];
+          let topScorer = null;
+          games.forEach(g => {
+            if (!topScorer || g.pts_a > topScorer.pts) topScorer = { owner: g.owner_a, pts: g.pts_a };
+            if (!topScorer || g.pts_b > topScorer.pts) topScorer = { owner: g.owner_b, pts: g.pts_b };
+          });
+          recapHolder.appendChild(el('div', { class: 'stat-grid' }, [
+            statCard(`${topScorer.owner} (${fmt(topScorer.pts)})`, 'Top Scorer This Week', true),
+            statCard(`${closest.winner} by ${fmt(closest.margin)}`, `Closest Game — ${closest.owner_a} ${fmt(closest.pts_a)} - ${fmt(closest.pts_b)} ${closest.owner_b}`, true),
+            statCard(`${blowout.winner} by ${fmt(blowout.margin)}`, `Biggest Blowout — ${blowout.owner_a} ${fmt(blowout.pts_a)} - ${fmt(blowout.pts_b)} ${blowout.owner_b}`, true),
+          ]));
+        }
         recapHolder.appendChild(el('div', { class: 'recap-prose' }, data.recap_text));
         if (data.top_performers && data.top_performers.length) {
           recapHolder.appendChild(el('h2', { class: 'section-title', style: 'font-size:14px;margin-top:20px;color:var(--brass)' }, 'Top Performers'));
