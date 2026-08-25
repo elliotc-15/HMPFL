@@ -1933,4 +1933,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (hdrSeasons) hdrSeasons.textContent = alltimeTotalSeasons();
   if (hdrInmates) hdrInmates.textContent = ALLTIME.length;
   activateTab('home');
+  // The header badge is outside the tab system and only ever set once here,
+  // so it needs its own live-data update — the static count (alltimeTotalSeasons)
+  // undercounts by however many seasons have happened since data.js was last
+  // exported from the spreadsheet (see ALLTIME_STATIC_THROUGH_YEAR).
+  getLiveAlltime().then(live => {
+    if (hdrSeasons) hdrSeasons.textContent = liveAlltimeTotalSeasons(live);
+  }).catch(() => { /* header keeps the static count if Sleeper is unreachable */ });
 });
