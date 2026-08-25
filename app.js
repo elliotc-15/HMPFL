@@ -94,7 +94,7 @@ async function buildPlayerSeasonStats(season) {
   if (playerSeasonStatsCache.has(season)) return playerSeasonStatsCache.get(season);
   const matchups = await loadMatchupsForSeason(season, 17);
   const stats = {};
-  const touch = (pid) => (stats[pid] = stats[pid] || { points: 0, starts: 0, startsInWins: 0 });
+  const touch = (pid) => (stats[pid] = stats[pid] || { points: 0, starts: 0, startsInWins: 0, pointsInWins: 0 });
   matchups.forEach(week => {
     if (!week || !week.length) return;
     const byMatch = {};
@@ -106,14 +106,15 @@ async function buildPlayerSeasonStats(season) {
       const pair = byMatch[entry.matchup_id] || [];
       const opp = pair.find(e => e !== entry);
       const won = !!opp && entry.points > opp.points;
-      Object.entries(entry.players_points || {}).forEach(([pid, pts]) => {
+      const playerPoints = entry.players_points || {};
+      Object.entries(playerPoints).forEach(([pid, pts]) => {
         touch(pid).points += pts || 0;
       });
       (entry.starters || []).forEach(pid => {
         if (!pid || pid === '0') return;
         const s = touch(pid);
         s.starts += 1;
-        if (won) s.startsInWins += 1;
+        if (won) { s.startsInWins += 1; s.pointsInWins += playerPoints[pid] || 0; }
       });
     });
   });
@@ -132,32 +133,41 @@ function rosterOwnerName(rosterId, season) {
 }
 
 // ---------- MANAGER NAME MAPPING ----------
-// Maps a spreadsheet owner's name (e.g. "Elliot") to the Sleeper display/team
-// name(s) they've used, so Sleeper-era data can be folded into the same
-// career totals rather than showing up as a separate "person".
-// Sourced from the manager/team-name spreadsheet (2023-2025 Sleeper-era team
-// names, plus known nicknames). Past players who left before the Sleeper
-// switch (Clarence, Callum, Pete, Midge) have no Sleeper-era names and are
-// intentionally omitted.
+// Maps a spreadsheet owner's name (e.g. "Elliot") to the Sleeper account(s)
+// (user_id) they've played under, so Sleeper-era data folds into the same
+// career totals rather than showing up as a separate "person" every time
+// they rename their team. Keyed by user_id rather than by team name: team
+// names on Sleeper have turned out to carry trailing spaces, curly quotes,
+// accents, emoji, and outright renames season to season, none of which
+// match reliably as strings — user_id is the one thing that stays constant.
+// Confirmed 2026-08-25 by cross-referencing every season's /users response.
+// Past players who left before the Sleeper switch (Clarence, Callum, Pete,
+// Midge) never had a Sleeper account and are intentionally omitted.
 const MANAGER_MAP = {
-  "Elliot": ["Deebo-Lution", "Steed MalBroncos", "Njoku and the Thief"],
-  "Josh": ["L.A. Knights (YEAH!)", "Skol Campbell", "Maydeday Parade"],
-  "Matthew": ["Deej", "Diamond Dallas Cowboys", "Vincent Tannehill", "Fleetwood Mack"],
-  "Ashley": ["The 619ers", "Michu in the Playoffs", "Green Day Packers"],
-  "James": ["Russelmania", "Titus BramBills", "My Chemical Romo"],
-  "Joe": ["Big Bosa Man", "Amon Ra Scott Brown", "Red Hot Jabrill Peppers"],
-  "Mike": ["Brock Bottom", "Dirk KuytBoys", "Koo Fighters"],
-  "Carter": ["Dan", "The Tribal Chiefs", "Papiss Demba Breece", "Born to Run the Damn Ball"],
-  "Dylan": ["Doc", "You Can't CeeDee Me", "Warnockin' the pocket", "System of a Brown"],
-  "Morgan": ["Binky", "Deandre the Giant", "LamArsenal", "Kmetallica"],
-  "Jack": ["Jev", "A real Religious Team", "David N'Gog Birds", "Manning Glory"],
-  "Rhys": ["Bearman", "Stone Cold Tavon Austin", "Green Ray Parlours", "Iron Jayden"],
+  "Elliot": ["618046678523531264"],
+  "Josh": ["923567366510911488"],
+  "Matthew": ["693943510151290880"],
+  "Ashley": ["708737121145389056"],
+  "James": ["923537333666795520"],
+  "Joe": ["919662314662539264"],
+  "Mike": ["925780460888764416"],
+  "Carter": ["328857076459646976"],
+  "Dylan": ["756155959528845312"],
+  "Morgan": ["693949884637736960"],
+  "Jack": ["705466277090631680"],
+  "Rhys": ["705451239244091392"],
 };
-function canonicalOwnerName(sleeperName) {
-  for (const [canonical, aliases] of Object.entries(MANAGER_MAP)) {
-    if (aliases.includes(sleeperName)) return canonical;
-  }
-  return sleeperName; // no mapping yet — use the raw Sleeper name as-is
+const USER_ID_TO_CANONICAL = {};
+for (const [canonical, ids] of Object.entries(MANAGER_MAP)) {
+  ids.forEach(id => { USER_ID_TO_CANONICAL[id] = canonical; });
+}
+// Prefer the stable user_id behind a roster; only unmapped Sleeper accounts
+// (not yet added to MANAGER_MAP) fall back to their raw team/display name.
+function canonicalOwnerNameForRoster(rosterId, season) {
+  const roster = season.rosters.find(r => r.roster_id === rosterId);
+  const ownerId = roster && roster.owner_id;
+  if (ownerId && USER_ID_TO_CANONICAL[ownerId]) return USER_ID_TO_CANONICAL[ownerId];
+  return rosterOwnerName(rosterId, season);
 }
 
 // ---------- LIVE SEASON MERGE ----------
@@ -177,7 +187,7 @@ async function ensureLiveSeasonMerged() {
 
     const entries = {};
     const standings = season.rosters.map(r => {
-      const name = canonicalOwnerName(rosterOwnerName(r.roster_id, season));
+      const name = canonicalOwnerNameForRoster(r.roster_id, season);
       const s = r.settings || {};
       return {
         name,
@@ -200,7 +210,7 @@ async function ensureLiveSeasonMerged() {
       const bracket = await sleeperFetch(`/league/${season.league.league_id}/winners_bracket`);
       const finalMatch = (bracket || []).find(m => m.p === 1);
       if (finalMatch && finalMatch.w) {
-        const champName = canonicalOwnerName(rosterOwnerName(finalMatch.w, season));
+        const champName = canonicalOwnerNameForRoster(finalMatch.w, season);
         if (entries[champName]) entries[champName].overall_winner = true;
       }
     } catch (e) { /* bracket may not exist yet if season is in progress */ }
@@ -730,8 +740,8 @@ async function renderH2H() {
         Object.values(byMatch).forEach(pair => {
           if (pair.length !== 2) return;
           const [a, b] = pair;
-          const nameA = rosterOwnerName(a.roster_id, season);
-          const nameB = rosterOwnerName(b.roster_id, season);
+          const nameA = canonicalOwnerNameForRoster(a.roster_id, season);
+          const nameB = canonicalOwnerNameForRoster(b.roster_id, season);
           nameSet.add(nameA); nameSet.add(nameB);
           const key = [nameA, nameB].sort().join('|');
           record[key] = record[key] || { [nameA]: 0, [nameB]: 0 };
@@ -789,7 +799,7 @@ async function renderRecords() {
         (week || []).forEach(entry => {
           if (typeof entry.points === 'number' && entry.points > 0) {
             weeklyScores.push({
-              owner: rosterOwnerName(entry.roster_id, season),
+              owner: canonicalOwnerNameForRoster(entry.roster_id, season),
               points: entry.points,
               week: wi + 1,
               season: season.league.season,
@@ -819,6 +829,138 @@ function recordsTable(rows) {
       el('td', { class: 'num-cell' }, fmt(r.points)), el('td', {}, String(r.week)), el('td', {}, String(r.season)),
     ]))),
   ]));
+}
+
+// ---------- DRAFT MANAGER ANALYSIS ----------
+// Rounds 1-3 count as "early"; the last 3 rounds of that year's draft count
+// as "late" (roster/round counts vary by season, so this is relative to
+// each draft rather than a fixed round number). Middle rounds count as
+// neither, so the early/late comparison isn't diluted by average picks.
+function draftRoundTier(round, maxRound) {
+  if (round <= 3) return 'early';
+  if (round > maxRound - 3) return 'late';
+  return 'mid';
+}
+async function buildDraftValueLeaderboard(draftSeasons) {
+  const byManager = {};
+  for (const season of draftSeasons) {
+    let stats;
+    try { stats = await buildPlayerSeasonStats(season); } catch (e) { continue; }
+    const maxRound = Math.max(...season.picks.map(p => p.round));
+    season.picks.forEach(p => {
+      const tier = draftRoundTier(p.round, maxRound);
+      if (tier === 'mid') return;
+      const manager = canonicalOwnerNameForRoster(p.roster_id, season);
+      const rec = byManager[manager] = byManager[manager] || { earlyPicks: 0, earlySum: 0, latePicks: 0, lateSum: 0 };
+      const contribution = stats[p.player_id] ? stats[p.player_id].pointsInWins : 0;
+      if (tier === 'early') { rec.earlyPicks++; rec.earlySum += contribution; }
+      else { rec.latePicks++; rec.lateSum += contribution; }
+    });
+  }
+  return Object.entries(byManager).map(([manager, r]) => ({
+    manager,
+    earlyPicks: r.earlyPicks, earlyAvg: r.earlyPicks ? r.earlySum / r.earlyPicks : null,
+    latePicks: r.latePicks, lateAvg: r.latePicks ? r.lateSum / r.latePicks : null,
+  }));
+}
+function renderDraftValueLeaderboardTable(rows) {
+  const withEarly = rows.filter(r => r.earlyPicks >= 2).sort((a, b) => (b.earlyAvg || 0) - (a.earlyAvg || 0));
+  const withLate = rows.filter(r => r.latePicks >= 2).sort((a, b) => (b.lateAvg || 0) - (a.lateAvg || 0));
+  const bestEarly = withEarly[0];
+  const bestLate = withLate[0];
+  const sorted = [...rows].sort((a, b) => (b.earlyAvg || 0) - (a.earlyAvg || 0));
+  return el('table', {}, [
+    el('thead', {}, el('tr', {}, ['Manager', 'Early Picks (Rd 1-3)', 'Avg Pts-in-Wins (Early)', 'Late Picks (Last 3 Rd)', 'Avg Pts-in-Wins (Late)'].map(x => el('th', {}, x)))),
+    el('tbody', {}, sorted.map(r => el('tr', {}, [
+      el('td', { class: 'owner-cell' }, [
+        r.manager,
+        bestEarly && r.manager === bestEarly.manager ? el('span', { class: 'pill pill-gold', style: 'margin-left:6px;white-space:nowrap;' }, '🥇 Best Early') : null,
+        bestLate && r.manager === bestLate.manager ? el('span', { class: 'pill pill-gold', style: 'margin-left:6px;white-space:nowrap;' }, '🌱 Best Late') : null,
+      ]),
+      el('td', { class: 'num-cell' }, String(r.earlyPicks)),
+      el('td', { class: 'num-cell' }, r.earlyAvg === null ? '—' : fmt(r.earlyAvg)),
+      el('td', { class: 'num-cell' }, String(r.latePicks)),
+      el('td', { class: 'num-cell' }, r.lateAvg === null ? '—' : fmt(r.lateAvg)),
+    ]))),
+  ]);
+}
+
+// ---------- DRAFT POSITION VS. FINISH ----------
+async function collectDraftVsFinish(draftSeasons) {
+  const points = [];
+  draftSeasons.forEach(season => {
+    const round1 = season.picks.filter(p => p.round === 1);
+    if (!round1.length) return;
+    const standings = season.rosters.map(r => {
+      const s = r.settings || {};
+      return { rosterId: r.roster_id, wins: s.wins || 0, pf: (s.fpts || 0) + (s.fpts_decimal || 0) / 100 };
+    }).sort((a, b) => b.wins - a.wins || b.pf - a.pf);
+    const finishByRoster = {};
+    standings.forEach((s, i) => { finishByRoster[s.rosterId] = i + 1; });
+    round1.forEach(p => {
+      const finish = finishByRoster[p.roster_id];
+      if (!finish) return;
+      const manager = canonicalOwnerNameForRoster(p.roster_id, season);
+      points.push({ season: season.league.season, manager, draftPos: p.pick_no, finish });
+    });
+  });
+  return points;
+}
+function pearsonCorrelation(points, xKey, yKey) {
+  const n = points.length;
+  if (n < 2) return null;
+  const xs = points.map(p => p[xKey]), ys = points.map(p => p[yKey]);
+  const mean = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
+  const mx = mean(xs), my = mean(ys);
+  let num = 0, dx2 = 0, dy2 = 0;
+  for (let i = 0; i < n; i++) { const dx = xs[i] - mx, dy = ys[i] - my; num += dx * dy; dx2 += dx * dx; dy2 += dy * dy; }
+  const denom = Math.sqrt(dx2 * dy2);
+  return denom === 0 ? 0 : num / denom;
+}
+function draftFinishScatterSVG(points) {
+  const w = 420, h = 420, pad = 46;
+  const maxX = Math.max(...points.map(p => p.draftPos));
+  const maxY = Math.max(...points.map(p => p.finish));
+  const sx = x => pad + (x - 1) / ((maxX - 1) || 1) * (w - 2 * pad);
+  const sy = y => pad + (y - 1) / ((maxY - 1) || 1) * (h - 2 * pad);
+  let dots = '';
+  points.forEach(p => {
+    dots += `<circle cx="${sx(p.draftPos).toFixed(1)}" cy="${sy(p.finish).toFixed(1)}" r="6" fill="#ff751f" opacity="0.7" stroke="#111018" stroke-width="1"><title>${p.manager} — ${p.season}: drafted #${p.draftPos}, finished #${p.finish}</title></circle>`;
+  });
+  const ref = `<line x1="${sx(1).toFixed(1)}" y1="${sy(1).toFixed(1)}" x2="${sx(maxX).toFixed(1)}" y2="${sy(maxX).toFixed(1)}" stroke="#454363" stroke-width="1.5" stroke-dasharray="5 5" />`;
+  const labels = `<text x="${w / 2}" y="${h - 10}" fill="#a9a6bb" font-size="11" text-anchor="middle" font-family="IBM Plex Mono, monospace">Draft position (round 1 pick #) →</text>
+    <text x="16" y="${h / 2}" fill="#a9a6bb" font-size="11" text-anchor="middle" font-family="IBM Plex Mono, monospace" transform="rotate(-90 16 ${h / 2})">← Final standing (1st place at top)</text>`;
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;max-width:460px;display:block;margin:0 auto;background:#211f30;border:1px solid #454363;">${ref}${dots}${labels}</svg>`;
+}
+async function renderDraftManagerAnalysis(draftSeasons, holder) {
+  holder.innerHTML = '';
+  holder.appendChild(el('div', { class: 'status-msg' }, ['Cross-referencing every draft on file', el('span', { class: 'blink' }, '...')]));
+  try {
+    const leaderboardRows = await buildDraftValueLeaderboard(draftSeasons);
+    const points = await collectDraftVsFinish(draftSeasons);
+    holder.innerHTML = '';
+
+    holder.appendChild(el('h2', { class: 'section-title', style: 'font-size:18px;margin-top:8px' }, 'Draft Value Leaderboard'));
+    holder.appendChild(el('p', { class: 'section-desc' }, 'Early-round picks are rounds 1-3; late-round picks are the last 3 rounds of that year’s draft. "Avg Pts-in-Wins" is how many fantasy points that pick’s player scored, on average, in games the manager’s team actually won — across every Sleeper-era draft on record.'));
+    holder.appendChild(el('div', { class: 'table-wrap' }, renderDraftValueLeaderboardTable(leaderboardRows)));
+
+    holder.appendChild(el('h2', { class: 'section-title', style: 'font-size:18px;margin-top:24px' }, 'Draft Position vs. Final Standing'));
+    const r = pearsonCorrelation(points, 'draftPos', 'finish');
+    let interp = 'Not enough data yet to say.';
+    if (r !== null) {
+      const strength = Math.abs(r) < 0.15 ? 'little to no' : Math.abs(r) < 0.4 ? 'a weak' : Math.abs(r) < 0.7 ? 'a moderate' : 'a strong';
+      const direction = r >= 0
+        ? 'early picks tend to finish better and late picks tend to finish worse'
+        : 'early picks tend to finish worse and late picks tend to finish better';
+      const rStr = r.toFixed(2) === '-0.00' ? '0.00' : r.toFixed(2);
+      interp = `Correlation coefficient: ${rStr} — ${strength} relationship. In plain terms: ${direction}.`;
+    }
+    holder.appendChild(el('p', { class: 'section-desc' }, `Round 1 draft slot vs. that season’s final regular-season standing, every Sleeper-era draft. ${interp}`));
+    holder.appendChild(el('div', { html: draftFinishScatterSVG(points) }));
+  } catch (e) {
+    holder.innerHTML = '';
+    holder.appendChild(el('div', { class: 'status-msg error' }, 'Could not compute draft analysis right now.'));
+  }
 }
 
 // ===========================================================
@@ -878,6 +1020,12 @@ async function renderDraft() {
     }
     select.addEventListener('change', () => renderForSeason(select.value));
     renderForSeason(draftSeasons[draftSeasons.length - 1].league.season);
+
+    h.appendChild(el('h2', { class: 'section-title', style: 'font-size:18px;margin-top:28px' }, 'Manager Draft Analysis'));
+    h.appendChild(el('p', { class: 'section-desc' }, 'Aggregated across every Sleeper-era draft on record — not just the season selected above.'));
+    const analysisHolder = el('div');
+    h.appendChild(analysisHolder);
+    renderDraftManagerAnalysis(draftSeasons, analysisHolder);
   } catch (e) {
     document.getElementById('draftHolder').innerHTML = '';
     document.getElementById('draftHolder').appendChild(el('div', { class: 'status-msg error' }, 'Could not load draft data right now.'));
