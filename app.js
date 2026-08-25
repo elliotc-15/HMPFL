@@ -93,10 +93,23 @@ function rosterOwnerName(rosterId, season) {
 // Maps a spreadsheet owner's name (e.g. "Elliot") to the Sleeper display/team
 // name(s) they've used, so Sleeper-era data can be folded into the same
 // career totals rather than showing up as a separate "person".
-// Fill this in once the manager/team-name spreadsheet is ready — until then,
-// Sleeper-only seasons (like 2025) are shown under their raw Sleeper names.
+// Sourced from the manager/team-name spreadsheet (2023-2025 Sleeper-era team
+// names, plus known nicknames). Past players who left before the Sleeper
+// switch (Clarence, Callum, Pete, Midge) have no Sleeper-era names and are
+// intentionally omitted.
 const MANAGER_MAP = {
-  // "Elliot": ["EC_Sleeper_Username", "Another Team Name They Used"],
+  "Elliot": ["Deebo-Lution", "Steed MalBroncos", "Njoku and the Thief"],
+  "Josh": ["L.A. Knights (YEAH!)", "Skol Campbell", "Maydeday Parade"],
+  "Matthew": ["Deej", "Diamond Dallas Cowboys", "Vincent Tannehill", "Fleetwood Mack"],
+  "Ashley": ["The 619ers", "Michu in the Playoffs", "Green Day Packers"],
+  "James": ["Russelmania", "Titus BramBills", "My Chemical Romo"],
+  "Joe": ["Big Bosa Man", "Amon Ra Scott Brown", "Red Hot Jabrill Peppers"],
+  "Mike": ["Brock Bottom", "Dirk KuytBoys", "Koo Fighters"],
+  "Carter": ["Dan", "The Tribal Chiefs", "Papiss Demba Breece", "Born to Run the Damn Ball"],
+  "Dylan": ["Doc", "You Can't CeeDee Me", "Warnockin' the pocket", "System of a Brown"],
+  "Morgan": ["Binky", "Deandre the Giant", "LamArsenal", "Kmetallica"],
+  "Jack": ["Jev", "A real Religious Team", "David N'Gog Birds", "Manning Glory"],
+  "Rhys": ["Bearman", "Stone Cold Tavon Austin", "Green Ray Parlours", "Iron Jayden"],
 };
 function canonicalOwnerName(sleeperName) {
   for (const [canonical, aliases] of Object.entries(MANAGER_MAP)) {
