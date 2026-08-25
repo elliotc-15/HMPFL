@@ -39,6 +39,20 @@ async function sleeperFetch(path) {
 function isRegularSeasonLive(state) {
   return !!state && state.season_type === 'regular';
 }
+// Sleeper's full player directory (~5MB, rarely changes) — only fetched
+// once per page session, the first time something needs to resolve a
+// player_id from matchup data into a human-readable name.
+let playerDirectoryPromise = null;
+function getPlayerDirectory() {
+  if (!playerDirectoryPromise) playerDirectoryPromise = sleeperFetch('/players/nfl').catch(() => ({}));
+  return playerDirectoryPromise;
+}
+function playerLabel(dir, pid) {
+  const p = dir && dir[pid];
+  if (!p) return pid;
+  const name = `${p.first_name || ''} ${p.last_name || ''}`.trim() || pid;
+  return p.position ? `${name} (${p.position})` : name;
+}
 
 // ---------- Sleeper history walker ----------
 // Walks previous_league_id chain to gather all Sleeper-era seasons for this league.
@@ -1112,10 +1126,15 @@ async function renderRecords() {
   ]);
   root.appendChild(panel);
   try {
+    await ensureLiveSeasonMerged();
     const seasons = await loadSleeperHistory();
     const h = document.getElementById('recordsHolder');
     h.innerHTML = '';
+    const playerDirPromise = getPlayerDirectory();
     const weeklyScores = [];
+    const allMargins = [];
+    const gameLog = {};
+    let topPlayerPerf = null;
     for (const season of seasons) {
       const matchups = await loadMatchupsForSeason(season, 17);
       matchups.forEach((week, wi) => {
@@ -1130,14 +1149,27 @@ async function renderRecords() {
           if (typeof a.points !== 'number' || typeof b.points !== 'number') return;
           [[a, b], [b, a]].forEach(([mine, theirs]) => {
             if (mine.points <= 0) return;
+            const ownerName = canonicalOwnerNameForRoster(mine.roster_id, season);
+            const result = mine.points > theirs.points ? 'W' : (mine.points < theirs.points ? 'L' : 'T');
             weeklyScores.push({
-              owner: canonicalOwnerNameForRoster(mine.roster_id, season),
-              points: mine.points,
-              opponent: canonicalOwnerNameForRoster(theirs.roster_id, season),
-              opponentPoints: theirs.points,
-              result: mine.points > theirs.points ? 'W' : (mine.points < theirs.points ? 'L' : 'T'),
-              week: wi + 1,
-              season: season.league.season,
+              owner: ownerName, points: mine.points,
+              opponent: canonicalOwnerNameForRoster(theirs.roster_id, season), opponentPoints: theirs.points,
+              result, week: wi + 1, season: season.league.season,
+            });
+            (gameLog[ownerName] = gameLog[ownerName] || []).push({ result, week: wi + 1, season: season.league.season });
+          });
+          const margin = Math.abs(a.points - b.points);
+          const winner = a.points > b.points ? a : b, loser = a.points > b.points ? b : a;
+          allMargins.push({
+            margin, week: wi + 1, season: season.league.season,
+            winner: canonicalOwnerNameForRoster(winner.roster_id, season), winnerPts: winner.points,
+            loser: canonicalOwnerNameForRoster(loser.roster_id, season), loserPts: loser.points,
+          });
+          [a, b].forEach(entry => {
+            Object.entries(entry.players_points || {}).forEach(([pid, pts]) => {
+              if (typeof pts === 'number' && (!topPlayerPerf || pts > topPlayerPerf.points)) {
+                topPlayerPerf = { pid, points: pts, owner: canonicalOwnerNameForRoster(entry.roster_id, season), week: wi + 1, season: season.league.season };
+              }
             });
           });
         });
@@ -1146,11 +1178,52 @@ async function renderRecords() {
     weeklyScores.sort((a, b) => b.points - a.points);
     const top10 = weeklyScores.slice(0, 10);
     const bottom10 = [...weeklyScores].sort((a, b) => a.points - b.points).slice(0, 10);
+    const wins = weeklyScores.filter(r => r.result === 'W');
+    const losses = weeklyScores.filter(r => r.result === 'L');
+    const lowestWin = wins.length ? [...wins].sort((a, b) => a.points - b.points)[0] : null;
+    const highestLoss = losses.length ? [...losses].sort((a, b) => b.points - a.points)[0] : null;
+    const biggestBlowout = allMargins.length ? [...allMargins].sort((a, b) => b.margin - a.margin)[0] : null;
+    const closestGame = allMargins.length ? [...allMargins].sort((a, b) => a.margin - b.margin)[0] : null;
+
+    let bestWinStreak = null, bestLossStreak = null;
+    Object.entries(gameLog).forEach(([owner, games]) => {
+      let curType = null, curLen = 0;
+      games.forEach(g => {
+        curLen = (g.result === curType) ? curLen + 1 : 1;
+        curType = g.result;
+        if (curType === 'W' && (!bestWinStreak || curLen > bestWinStreak.length)) bestWinStreak = { owner, length: curLen, week: g.week, season: g.season };
+        if (curType === 'L' && (!bestLossStreak || curLen > bestLossStreak.length)) bestLossStreak = { owner, length: curLen, week: g.week, season: g.season };
+      });
+    });
+
+    let mostSeasonPts = null, fewestSeasonPts = null;
+    Object.entries(SEASON_DATA).forEach(([year, data]) => {
+      Object.entries(data).forEach(([owner, s]) => {
+        if (typeof s.pf !== 'number' || !s.pf || (s.wins || 0) + (s.losses || 0) === 0) return;
+        if (!mostSeasonPts || s.pf > mostSeasonPts.pf) mostSeasonPts = { owner, year, pf: s.pf };
+        if (!fewestSeasonPts || s.pf < fewestSeasonPts.pf) fewestSeasonPts = { owner, year, pf: s.pf };
+      });
+    });
+
+    const playerDir = await playerDirPromise;
 
     h.appendChild(el('h2', { class: 'section-title', style: 'font-size:16px' }, 'Highest Single-Week Scores'));
     h.appendChild(recordsTable(top10));
     h.appendChild(el('h2', { class: 'section-title', style: 'font-size:16px;margin-top:24px' }, 'Lowest Single-Week Scores'));
     h.appendChild(recordsTable(bottom10));
+
+    h.appendChild(el('h2', { class: 'section-title', style: 'font-size:16px;margin-top:24px' }, 'More Records'));
+    const cards = [];
+    if (topPlayerPerf) cards.push(statCard(`${playerLabel(playerDir, topPlayerPerf.pid)} — ${fmt(topPlayerPerf.points)}`, `Best Individual Player Week — ${topPlayerPerf.owner}, Wk ${topPlayerPerf.week} ${topPlayerPerf.season}`, true));
+    if (lowestWin) cards.push(statCard(`${lowestWin.owner} (${fmt(lowestWin.points)})`, `Lowest Score in a Win — vs ${lowestWin.opponent} (${fmt(lowestWin.opponentPoints)}), Wk ${lowestWin.week} ${lowestWin.season}`, true));
+    if (highestLoss) cards.push(statCard(`${highestLoss.owner} (${fmt(highestLoss.points)})`, `Highest Score in a Loss — vs ${highestLoss.opponent} (${fmt(highestLoss.opponentPoints)}), Wk ${highestLoss.week} ${highestLoss.season}`, true));
+    if (biggestBlowout) cards.push(statCard(`${biggestBlowout.winner} d. ${biggestBlowout.loser} by ${fmt(biggestBlowout.margin)}`, `Biggest Blowout — Wk ${biggestBlowout.week} ${biggestBlowout.season}`, true));
+    if (closestGame) cards.push(statCard(`${closestGame.winner} d. ${closestGame.loser} by ${fmt(closestGame.margin)}`, `Closest Game — Wk ${closestGame.week} ${closestGame.season}`, true));
+    if (bestWinStreak) cards.push(statCard(`${bestWinStreak.owner} — ${bestWinStreak.length} games`, `Longest Win Streak — through Wk ${bestWinStreak.week} ${bestWinStreak.season}`, true));
+    if (bestLossStreak) cards.push(statCard(`${bestLossStreak.owner} — ${bestLossStreak.length} games`, `Longest Losing Streak — through Wk ${bestLossStreak.week} ${bestLossStreak.season}`, true));
+    if (mostSeasonPts) cards.push(statCard(`${mostSeasonPts.owner} (${fmt(mostSeasonPts.pf)})`, `Most Points in a Season — ${mostSeasonPts.year}`, true));
+    if (fewestSeasonPts) cards.push(statCard(`${fewestSeasonPts.owner} (${fmt(fewestSeasonPts.pf)})`, `Fewest Points in a Season — ${fewestSeasonPts.year}`, true));
+    if (cards.length) h.appendChild(el('div', { class: 'stat-grid' }, cards));
   } catch (e) {
     document.getElementById('recordsHolder').innerHTML = '';
     document.getElementById('recordsHolder').appendChild(el('div', { class: 'status-msg error' }, 'Could not load records right now.'));
