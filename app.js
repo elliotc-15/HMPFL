@@ -495,21 +495,36 @@ async function renderSeasons() {
   const root = document.getElementById('tab-seasons');
   const loadingMsg = el('div', { class: 'status-msg' }, ['Pulling the latest intake records', el('span', { class: 'blink' }, '...')]);
   root.appendChild(loadingMsg);
-  try { await ensureLiveSeasonMerged(); } catch (e) { /* fall back to spreadsheet-only years */ }
+  let sleeperSeasons = [];
+  try {
+    await ensureLiveSeasonMerged();
+    sleeperSeasons = await loadSleeperHistory();
+  } catch (e) { /* fall back to spreadsheet-only years */ }
   root.removeChild(loadingMsg);
+  const sleeperByYear = {};
+  sleeperSeasons.forEach(s => { sleeperByYear[String(s.league.season)] = s; });
 
   const years = Object.keys(SEASON_DATA).filter(y => Object.keys(SEASON_DATA[y]).length).sort((a, b) => b - a);
   const panel = el('div', { class: 'panel', 'data-file-no': 'FILE 03' }, [
     el('h2', { class: 'section-title' }, 'Season-by-Season History'),
-    el('p', { class: 'section-desc' }, 'Pick a season to view full standings for that year.'),
+    el('p', { class: 'section-desc' }, 'Pick a season to view full standings, playoff results, weekly scores, and highlights for that year.'),
   ]);
   const select = el('select', { id: 'seasonSelect' }, years.map(y => el('option', { value: y }, y)));
   panel.appendChild(el('div', { class: 'control-row' }, [el('label', {}, 'Season:'), select]));
   const tableHolder = el('div', { id: 'seasonTableHolder' });
   panel.appendChild(tableHolder);
+  const highlightsHolder = el('div', { id: 'seasonHighlightsHolder' });
+  panel.appendChild(highlightsHolder);
+  const playoffHolder = el('div', { id: 'seasonPlayoffHolder' });
+  panel.appendChild(playoffHolder);
+  const weeklyHolder = el('div', { id: 'seasonWeeklyHolder' });
+  panel.appendChild(weeklyHolder);
   root.appendChild(panel);
 
   function renderYear(y) {
+    renderSeasonHighlights(y, sleeperByYear[y], highlightsHolder);
+    renderSeasonPlayoffs(sleeperByYear[y], playoffHolder);
+    renderSeasonWeekly(sleeperByYear[y], weeklyHolder);
     tableHolder.innerHTML = '';
     const data = SEASON_DATA[y] || {};
     const rows = Object.entries(data).map(([owner, s]) => ({ owner, ...s }))
@@ -534,6 +549,165 @@ async function renderSeasons() {
   }
   select.addEventListener('change', () => renderYear(select.value));
   renderYear(years[0]);
+}
+
+async function renderSeasonHighlights(year, sleeperSeason, holder) {
+  holder.innerHTML = '';
+  holder.appendChild(el('h2', { class: 'section-title', style: 'font-size:16px;margin-top:20px' }, 'Season Highlights'));
+  const data = SEASON_DATA[year] || {};
+  const entries = Object.entries(data);
+  const champ = entries.find(([, s]) => s.overall_winner);
+  const scorer = entries.find(([, s]) => s.scoring_title);
+  const spoon = [...entries].sort((a, b) => (a[1].wins || 0) - (b[1].wins || 0) || (a[1].pf || 0) - (b[1].pf || 0))[0];
+  holder.appendChild(el('div', { class: 'stat-grid' }, [
+    statCard(champ ? champ[0] : '—', 'Champion', true),
+    statCard(scorer ? scorer[0] : '—', 'Scoring Leader', true),
+    statCard(spoon ? spoon[0] : '—', 'Wooden Spoon', true),
+  ]));
+
+  if (!sleeperSeason) {
+    holder.appendChild(el('p', { class: 'section-desc' }, 'Week-by-week highlights (biggest blowout, closest game, top individual score) are only available for Sleeper-era seasons (2023 onward).'));
+    return;
+  }
+  const loading = el('div', { class: 'status-msg' }, ['Digging through the week-by-week box scores', el('span', { class: 'blink' }, '...')]);
+  holder.appendChild(loading);
+  try {
+    const matchups = await loadMatchupsForSeason(sleeperSeason, 17);
+    let biggestBlowout = null, closestGame = null, topScore = null;
+    matchups.forEach((week, wi) => {
+      if (!week || !week.length) return;
+      const byMatch = {};
+      week.forEach(entry => {
+        if (entry.matchup_id === null || entry.matchup_id === undefined) return;
+        (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
+        if (typeof entry.points === 'number' && entry.points > 0 && (!topScore || entry.points > topScore.points)) {
+          topScore = { points: entry.points, owner: canonicalOwnerNameForRoster(entry.roster_id, sleeperSeason), week: wi + 1 };
+        }
+      });
+      Object.values(byMatch).forEach(pair => {
+        if (pair.length !== 2) return;
+        const [a, b] = pair;
+        if (typeof a.points !== 'number' || typeof b.points !== 'number' || (a.points === 0 && b.points === 0)) return;
+        const margin = Math.abs(a.points - b.points);
+        const winner = a.points > b.points ? a : b;
+        const loser = a.points > b.points ? b : a;
+        const detail = {
+          margin, week: wi + 1,
+          winnerName: canonicalOwnerNameForRoster(winner.roster_id, sleeperSeason), winnerPts: winner.points,
+          loserName: canonicalOwnerNameForRoster(loser.roster_id, sleeperSeason), loserPts: loser.points,
+        };
+        if (!biggestBlowout || margin > biggestBlowout.margin) biggestBlowout = detail;
+        if (!closestGame || margin < closestGame.margin) closestGame = detail;
+      });
+    });
+    holder.removeChild(loading);
+    const weekCards = [];
+    if (topScore) weekCards.push(statCard(`${topScore.owner} (${fmt(topScore.points)})`, `Top Score — Wk ${topScore.week}`, true));
+    if (biggestBlowout) weekCards.push(statCard(`${biggestBlowout.winnerName} d. ${biggestBlowout.loserName}`, `Biggest Blowout — Wk ${biggestBlowout.week} (+${fmt(biggestBlowout.margin)})`, true));
+    if (closestGame) weekCards.push(statCard(`${closestGame.winnerName} d. ${closestGame.loserName}`, `Closest Game — Wk ${closestGame.week} (+${fmt(closestGame.margin)})`, true));
+    if (weekCards.length) holder.appendChild(el('div', { class: 'stat-grid' }, weekCards));
+  } catch (e) {
+    holder.removeChild(loading);
+    holder.appendChild(el('div', { class: 'status-msg error' }, 'Could not load week-by-week highlights right now.'));
+  }
+}
+
+async function renderSeasonPlayoffs(sleeperSeason, holder) {
+  holder.innerHTML = '';
+  holder.appendChild(el('h2', { class: 'section-title', style: 'font-size:16px;margin-top:24px' }, 'Playoff Results'));
+  if (!sleeperSeason) {
+    holder.appendChild(el('p', { class: 'section-desc' }, 'Detailed playoff bracket results are only available for Sleeper-era seasons (2023 onward) — see the Playoffs column above for earlier years.'));
+    return;
+  }
+  const loading = el('div', { class: 'status-msg' }, ['Pulling the bracket', el('span', { class: 'blink' }, '...')]);
+  holder.appendChild(loading);
+  try {
+    const bracket = await sleeperFetch(`/league/${sleeperSeason.league.league_id}/winners_bracket`);
+    holder.removeChild(loading);
+    const matches = (bracket || []).filter(m => m.t1 && m.t2).sort((a, b) => a.r - b.r || a.m - b.m);
+    if (!matches.length) {
+      holder.appendChild(el('div', { class: 'status-msg' }, 'No playoff bracket found yet for this season.'));
+      return;
+    }
+    // Sleeper groups the championship and 3rd-place game under the same
+    // bracket round, so label individual matches by their placement (`p`)
+    // rather than grouping purely by round number.
+    const byGroup = {};
+    matches.forEach(m => {
+      const label = m.p === 1 ? 'Championship' : m.p === 3 ? '3rd Place Game' : `Round ${m.r}`;
+      (byGroup[label] = byGroup[label] || []).push(m);
+    });
+    const rank = label => label === 'Championship' ? 999 : label === '3rd Place Game' ? 998 : parseInt(label.replace('Round ', ''), 10);
+    Object.keys(byGroup).sort((a, b) => rank(a) - rank(b)).forEach(label => {
+      const isFinal = label === 'Championship';
+      holder.appendChild(el('h2', { class: 'section-title', style: 'font-size:13px;margin-top:14px;color:var(--brass)' }, label));
+      holder.appendChild(el('div', { class: 'era-list' }, byGroup[label].map(m => {
+        const t1 = canonicalOwnerNameForRoster(m.t1, sleeperSeason);
+        const t2 = canonicalOwnerNameForRoster(m.t2, sleeperSeason);
+        const winner = m.w ? canonicalOwnerNameForRoster(m.w, sleeperSeason) : null;
+        return el('div', { class: 'era-row' + (isFinal ? ' champion-row' : '') }, [
+          el('span', { class: 'who' }, `${t1} vs ${t2}`),
+          el('span', { class: 'rec' }, winner ? `${winner} won` : 'TBD'),
+        ]);
+      })));
+    });
+  } catch (e) {
+    holder.removeChild(loading);
+    holder.appendChild(el('div', { class: 'status-msg error' }, 'Could not load the playoff bracket right now.'));
+  }
+}
+
+async function renderSeasonWeekly(sleeperSeason, holder) {
+  holder.innerHTML = '';
+  holder.appendChild(el('h2', { class: 'section-title', style: 'font-size:16px;margin-top:24px' }, 'Weekly Matchup Scores'));
+  if (!sleeperSeason) {
+    holder.appendChild(el('p', { class: 'section-desc' }, 'Week-by-week matchup scores are only available for Sleeper-era seasons (2023 onward) — earlier seasons were tracked at final-standings level only.'));
+    return;
+  }
+  const loading = el('div', { class: 'status-msg' }, ['Pulling the box scores', el('span', { class: 'blink' }, '...')]);
+  holder.appendChild(loading);
+  try {
+    const matchups = await loadMatchupsForSeason(sleeperSeason, 17);
+    holder.removeChild(loading);
+    const weeksWithData = [];
+    matchups.forEach((week, wi) => { if (week && week.some(e => typeof e.points === 'number' && e.points > 0)) weeksWithData.push(wi + 1); });
+    if (!weeksWithData.length) {
+      holder.appendChild(el('div', { class: 'status-msg' }, 'No weekly scores recorded yet for this season.'));
+      return;
+    }
+    const weekSelect = el('select', {}, weeksWithData.map(w => el('option', { value: w }, `Week ${w}`)));
+    holder.appendChild(el('div', { class: 'control-row' }, [el('label', {}, 'Week:'), weekSelect]));
+    const weekTableHolder = el('div');
+    holder.appendChild(weekTableHolder);
+
+    function renderWeek(w) {
+      weekTableHolder.innerHTML = '';
+      const week = matchups[Number(w) - 1] || [];
+      const byMatch = {};
+      week.forEach(entry => {
+        if (entry.matchup_id === null || entry.matchup_id === undefined) return;
+        (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
+      });
+      const pairs = Object.values(byMatch).filter(p => p.length === 2).map(([a, b]) => ({
+        nameA: canonicalOwnerNameForRoster(a.roster_id, sleeperSeason), ptsA: a.points || 0,
+        nameB: canonicalOwnerNameForRoster(b.roster_id, sleeperSeason), ptsB: b.points || 0,
+      }));
+      const grid = el('div', { class: 'mug-grid' }, pairs.map(p => el('div', { class: 'mug-card', style: 'cursor:default' }, [
+        el('div', { style: 'padding:16px;' }, [
+          matchupRow(p.nameA, fmt(p.ptsA), p.ptsA > p.ptsB),
+          el('div', { style: 'text-align:center;color:var(--brass);font-family:IBM Plex Mono,monospace;font-size:10px;margin:6px 0;' }, 'VS'),
+          matchupRow(p.nameB, fmt(p.ptsB), p.ptsB > p.ptsA),
+        ]),
+      ])));
+      weekTableHolder.appendChild(grid);
+    }
+    weekSelect.addEventListener('change', () => renderWeek(weekSelect.value));
+    weekSelect.value = String(weeksWithData[weeksWithData.length - 1]);
+    renderWeek(weekSelect.value);
+  } catch (e) {
+    holder.removeChild(loading);
+    holder.appendChild(el('div', { class: 'status-msg error' }, 'Could not load weekly scores right now.'));
+  }
 }
 
 // ===========================================================
@@ -1019,7 +1193,8 @@ async function renderDraft() {
       tableHolder.appendChild(el('p', { class: 'section-desc' }, '"Season Pts" is the player\u2019s total fantasy points under this league\u2019s own scoring that season. "Starts" counts weeks they were in their manager\u2019s starting lineup; "Starts in Wins" counts how many of those starts came in a game that manager won. "Manager Season Wins" is separate \u2014 the drafting manager\u2019s overall record that year, regardless of this specific player.'));
     }
     select.addEventListener('change', () => renderForSeason(select.value));
-    renderForSeason(draftSeasons[draftSeasons.length - 1].league.season);
+    select.value = draftSeasons[draftSeasons.length - 1].league.season;
+    renderForSeason(select.value);
 
     h.appendChild(el('h2', { class: 'section-title', style: 'font-size:18px;margin-top:28px' }, 'Manager Draft Analysis'));
     h.appendChild(el('p', { class: 'section-desc' }, 'Aggregated across every Sleeper-era draft on record — not just the season selected above.'));
