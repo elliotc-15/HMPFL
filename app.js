@@ -713,11 +713,98 @@ async function renderSeasonWeekly(sleeperSeason, holder) {
 // ===========================================================
 // TAB 4: HALL OF FAME / WALL OF SHAME
 // ===========================================================
+// Playful, obviously-fictional "sentences" for the Wall of Shame — not real
+// league punishments. The actual house rules belong in the Rules tab once
+// the league constitution text is supplied (see project memory); this is
+// just flavor text, picked deterministically per year/owner so it doesn't
+// change on every render.
+const WOODEN_SPOON_SENTENCES = [
+  'naming the group chat for the year',
+  'buying the wings for Week 1 next season',
+  'mandatory victory lap in last year’s jersey',
+  'commissioner’s personal assistant for a week',
+  'writing next year’s season preview',
+  'last waiver priority AND first trash-talk target',
+  'a full year of "how’s the weather down there?"',
+];
+function woodenSpoonSentence(year, owner) {
+  const hash = String(year).split('').reduce((h, c) => h + c.charCodeAt(0), 0) + owner.length;
+  return WOODEN_SPOON_SENTENCES[hash % WOODEN_SPOON_SENTENCES.length];
+}
+
+async function computeFameExtras(seasons) {
+  let mostPointsInLoss = null, biggestBust = null, worstChampLossMargin = null;
+  for (const season of seasons) {
+    const matchups = await loadMatchupsForSeason(season, 17).catch(() => []);
+    matchups.forEach((week, wi) => {
+      if (!week || !week.length) return;
+      const byMatch = {};
+      week.forEach(entry => {
+        if (entry.matchup_id === null || entry.matchup_id === undefined) return;
+        (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
+      });
+      Object.values(byMatch).forEach(pair => {
+        if (pair.length !== 2) return;
+        const [a, b] = pair;
+        if (typeof a.points !== 'number' || typeof b.points !== 'number') return;
+        const loser = a.points < b.points ? a : (b.points < a.points ? b : null);
+        if (!loser || loser.points === 0) return;
+        if (!mostPointsInLoss || loser.points > mostPointsInLoss.points) {
+          mostPointsInLoss = { owner: canonicalOwnerNameForRoster(loser.roster_id, season), points: loser.points, week: wi + 1, season: season.league.season };
+        }
+      });
+    });
+
+    if (season.draft && season.picks && season.picks.length) {
+      const stats = await buildPlayerSeasonStats(season).catch(() => ({}));
+      season.picks.filter(p => p.round === 1).forEach(p => {
+        const s = stats[p.player_id];
+        const points = s ? s.points : 0;
+        if (!biggestBust || points < biggestBust.points) {
+          const playerName = p.metadata ? `${p.metadata.first_name || ''} ${p.metadata.last_name || ''}`.trim() : p.player_id;
+          biggestBust = {
+            player: playerName, pos: p.metadata ? p.metadata.position : '', pick: p.pick_no,
+            season: season.league.season, points, manager: canonicalOwnerNameForRoster(p.roster_id, season),
+          };
+        }
+      });
+    }
+
+    try {
+      const bracket = await sleeperFetch(`/league/${season.league.league_id}/winners_bracket`);
+      const final = (bracket || []).find(m => m.p === 1 && m.t1 && m.t2 && m.w);
+      const playoffStart = season.league.settings?.playoff_week_start;
+      if (final && playoffStart) {
+        const champWeek = playoffStart + final.r - 1;
+        const weekData = matchups[champWeek - 1];
+        const loserRosterId = final.t1 === final.w ? final.t2 : final.t1;
+        const winnerEntry = weekData && weekData.find(e => e.roster_id === final.w);
+        const loserEntry = weekData && weekData.find(e => e.roster_id === loserRosterId);
+        if (winnerEntry && loserEntry && typeof winnerEntry.points === 'number' && typeof loserEntry.points === 'number') {
+          const margin = winnerEntry.points - loserEntry.points;
+          if (!worstChampLossMargin || margin > worstChampLossMargin.margin) {
+            worstChampLossMargin = {
+              season: season.league.season,
+              winner: canonicalOwnerNameForRoster(final.w, season), winnerPts: winnerEntry.points,
+              loser: canonicalOwnerNameForRoster(loserRosterId, season), loserPts: loserEntry.points, margin,
+            };
+          }
+        }
+      }
+    } catch (e) { /* bracket may not exist yet for this season */ }
+  }
+  return { mostPointsInLoss, biggestBust, worstChampLossMargin };
+}
+
 async function renderFame() {
   const root = document.getElementById('tab-fame');
   const loadingMsg = el('div', { class: 'status-msg' }, ['Checking the latest bookings', el('span', { class: 'blink' }, '...')]);
   root.appendChild(loadingMsg);
-  try { await ensureLiveSeasonMerged(); } catch (e) { /* fall back to spreadsheet-only years */ }
+  let sleeperSeasons = [];
+  try {
+    await ensureLiveSeasonMerged();
+    sleeperSeasons = await loadSleeperHistory();
+  } catch (e) { /* fall back to spreadsheet-only years */ }
   root.removeChild(loadingMsg);
 
   const years = Object.keys(SEASON_DATA).filter(y => Object.keys(SEASON_DATA[y]).length).sort((a, b) => a - b);
@@ -728,8 +815,9 @@ async function renderFame() {
     const entries = Object.entries(data);
     const champ = entries.find(([, s]) => s.overall_winner);
     const worst = [...entries].sort((a, b) => (a[1].wins || 0) - (b[1].wins || 0) || (a[1].pf || 0) - (b[1].pf || 0))[0];
+    const gamesPlayed = entries.reduce((sum, [, s]) => sum + (s.wins || 0) + (s.losses || 0), 0);
     if (champ) hofRows.push({ year: y, owner: champ[0], wins: champ[1].wins, losses: champ[1].losses });
-    if (worst) wosRows.push({ year: y, owner: worst[0], wins: worst[1].wins, losses: worst[1].losses });
+    if (worst && gamesPlayed > 0) wosRows.push({ year: y, owner: worst[0], wins: worst[1].wins, losses: worst[1].losses });
   });
 
   root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 04A' }, [
@@ -742,11 +830,36 @@ async function renderFame() {
 
   root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 04B' }, [
     el('h2', { class: 'section-title' }, 'Wall of Shame — Bottom of the Cell Block'),
-    el('p', { class: 'section-desc' }, 'Lowest win total each season (ties broken by points for).'),
+    el('p', { class: 'section-desc' }, 'Lowest win total each season (ties broken by points for). Sentence subject to appeal (it won’t be granted).'),
     el('div', { class: 'era-list' }, wosRows.reverse().map(r => el('div', { class: 'era-row shame' }, [
-      el('span', { class: 'yr' }, r.year), el('span', { class: 'who' }, `⛓️ ${r.owner}`), el('span', { class: 'rec' }, `${fmtInt(r.wins)}-${fmtInt(r.losses)}`)
+      el('span', { class: 'yr' }, r.year),
+      el('span', { class: 'who' }, [
+        `⛓️ ${r.owner}`,
+        el('span', { class: 'pill pill-rust', style: 'margin-left:8px;white-space:normal;' }, `SENTENCED: ${woodenSpoonSentence(r.year, r.owner)}`),
+      ]),
+      el('span', { class: 'rec' }, `${fmtInt(r.wins)}-${fmtInt(r.losses)}`),
     ]))),
   ]));
+
+  const extrasHolder = el('div', { class: 'panel', 'data-file-no': 'FILE 04C' }, [
+    el('h2', { class: 'section-title' }, 'The Rest of the Rap Sheet'),
+    el('p', { class: 'section-desc' }, 'More records, pulled from every Sleeper-era box score on file.'),
+    el('div', { class: 'status-msg' }, ['Cross-referencing the evidence', el('span', { class: 'blink' }, '...')]),
+  ]);
+  root.appendChild(extrasHolder);
+  try {
+    const { mostPointsInLoss, biggestBust, worstChampLossMargin } = await computeFameExtras(sleeperSeasons);
+    extrasHolder.removeChild(extrasHolder.lastElementChild);
+    const cards = [];
+    if (mostPointsInLoss) cards.push(statCard(`${mostPointsInLoss.owner} (${fmt(mostPointsInLoss.points)})`, `Most Points in a Loss — Wk ${mostPointsInLoss.week}, ${mostPointsInLoss.season}`, true));
+    if (biggestBust) cards.push(statCard(`${biggestBust.player} (${biggestBust.pos || '—'})`, `Biggest Draft Bust — Pick #${biggestBust.pick}, ${biggestBust.season} · ${fmt(biggestBust.points)} pts for ${biggestBust.manager}`, true));
+    if (worstChampLossMargin) cards.push(statCard(`${worstChampLossMargin.loser} lost by ${fmt(worstChampLossMargin.margin)}`, `Worst Championship Loss — ${worstChampLossMargin.season} (${fmt(worstChampLossMargin.winnerPts)}-${fmt(worstChampLossMargin.loserPts)} vs. ${worstChampLossMargin.winner})`, true));
+    if (cards.length) extrasHolder.appendChild(el('div', { class: 'stat-grid' }, cards));
+    else extrasHolder.appendChild(el('div', { class: 'status-msg' }, 'Not enough Sleeper-era data yet for these records.'));
+  } catch (e) {
+    extrasHolder.removeChild(extrasHolder.lastElementChild);
+    extrasHolder.appendChild(el('div', { class: 'status-msg error' }, 'Could not load the extra records right now.'));
+  }
 }
 
 // ===========================================================
