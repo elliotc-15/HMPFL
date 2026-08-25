@@ -33,6 +33,12 @@ async function sleeperFetch(path) {
   if (!res.ok) throw new Error(`Sleeper API error ${res.status} on ${path}`);
   return res.json();
 }
+// NFL's /state/nfl endpoint keeps counting "week" through the preseason,
+// so a raw week number is meaningless without checking season_type first —
+// otherwise preseason week 3 reads as if the real Week 3 had already happened.
+function isRegularSeasonLive(state) {
+  return !!state && state.season_type === 'regular';
+}
 
 // ---------- Sleeper history walker ----------
 // Walks previous_league_id chain to gather all Sleeper-era seasons for this league.
@@ -79,6 +85,42 @@ async function loadMatchupsForSeason(seasonObj, maxWeek = 17) {
   return results;
 }
 
+// For every player who appeared in any lineup that season: total fantasy
+// points scored (per this league's own scoring, straight from Sleeper's
+// matchup data), how many weeks they started, and how many of those starts
+// were in a game their team won.
+let playerSeasonStatsCache = new WeakMap();
+async function buildPlayerSeasonStats(season) {
+  if (playerSeasonStatsCache.has(season)) return playerSeasonStatsCache.get(season);
+  const matchups = await loadMatchupsForSeason(season, 17);
+  const stats = {};
+  const touch = (pid) => (stats[pid] = stats[pid] || { points: 0, starts: 0, startsInWins: 0 });
+  matchups.forEach(week => {
+    if (!week || !week.length) return;
+    const byMatch = {};
+    week.forEach(entry => {
+      if (entry.matchup_id === null || entry.matchup_id === undefined) return;
+      (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
+    });
+    week.forEach(entry => {
+      const pair = byMatch[entry.matchup_id] || [];
+      const opp = pair.find(e => e !== entry);
+      const won = !!opp && entry.points > opp.points;
+      Object.entries(entry.players_points || {}).forEach(([pid, pts]) => {
+        touch(pid).points += pts || 0;
+      });
+      (entry.starters || []).forEach(pid => {
+        if (!pid || pid === '0') return;
+        const s = touch(pid);
+        s.starts += 1;
+        if (won) s.startsInWins += 1;
+      });
+    });
+  });
+  playerSeasonStatsCache.set(season, stats);
+  return stats;
+}
+
 function userDisplayName(u) {
   return (u.metadata && u.metadata.team_name) || u.display_name || u.username || 'Unknown';
 }
@@ -119,49 +161,52 @@ function canonicalOwnerName(sleeperName) {
 }
 
 // ---------- LIVE SEASON MERGE ----------
-// If the most recent Sleeper season isn't in the spreadsheet-derived
-// SEASON_DATA yet (e.g. 2025), compute it live from Sleeper and merge it in,
-// so the Seasons / Fame / Home tabs pick it up automatically.
+// Any Sleeper season not yet in the spreadsheet-derived SEASON_DATA (e.g. a
+// just-finished season, or the season currently in progress) gets computed
+// live from Sleeper and merged in, so the Home / Seasons / Fame / Inmates
+// tabs all pick it up automatically. Loops every Sleeper season rather than
+// just the latest, since more than one season can be missing at once (a
+// completed-but-unmerged season plus the new one already under way).
 let liveMergeDone = false;
 async function ensureLiveSeasonMerged() {
   if (liveMergeDone) return;
   const seasons = await loadSleeperHistory();
-  const latest = seasons[seasons.length - 1];
-  if (!latest) { liveMergeDone = true; return; }
-  const yr = String(latest.league.season);
-  if (SEASON_DATA[yr] && Object.keys(SEASON_DATA[yr]).length) { liveMergeDone = true; return; }
+  for (const season of seasons) {
+    const yr = String(season.league.season);
+    if (SEASON_DATA[yr] && Object.keys(SEASON_DATA[yr]).length) continue;
 
-  const entries = {};
-  const standings = latest.rosters.map(r => {
-    const name = canonicalOwnerName(rosterOwnerName(r.roster_id, latest));
-    const s = r.settings || {};
-    return {
-      name,
-      wins: s.wins || 0, losses: s.losses || 0,
-      pf: (s.fpts || 0) + (s.fpts_decimal || 0) / 100,
-      pa: (s.fpts_against || 0) + (s.fpts_against_decimal || 0) / 100,
-    };
-  }).sort((a, b) => b.wins - a.wins || b.pf - a.pf);
+    const entries = {};
+    const standings = season.rosters.map(r => {
+      const name = canonicalOwnerName(rosterOwnerName(r.roster_id, season));
+      const s = r.settings || {};
+      return {
+        name,
+        wins: s.wins || 0, losses: s.losses || 0,
+        pf: (s.fpts || 0) + (s.fpts_decimal || 0) / 100,
+        pa: (s.fpts_against || 0) + (s.fpts_against_decimal || 0) / 100,
+      };
+    }).sort((a, b) => b.wins - a.wins || b.pf - a.pf);
 
-  standings.forEach((s, i) => {
-    entries[s.name] = {
-      wins: s.wins, losses: s.losses, pf: s.pf, pa: s.pa,
-      league_winner: i === 0, // best regular-season record
-      overall_winner: false, scoring_title: false,
-      playoff_wins: null, playoff_losses: null,
-    };
-  });
+    standings.forEach((s, i) => {
+      entries[s.name] = {
+        wins: s.wins, losses: s.losses, pf: s.pf, pa: s.pa,
+        league_winner: i === 0, // best regular-season record
+        overall_winner: false, scoring_title: false,
+        playoff_wins: null, playoff_losses: null,
+      };
+    });
 
-  try {
-    const bracket = await sleeperFetch(`/league/${latest.league.league_id}/winners_bracket`);
-    const finalMatch = (bracket || []).find(m => m.p === 1);
-    if (finalMatch && finalMatch.w) {
-      const champName = canonicalOwnerName(rosterOwnerName(finalMatch.w, latest));
-      if (entries[champName]) entries[champName].overall_winner = true;
-    }
-  } catch (e) { /* bracket may not exist yet if season is in progress */ }
+    try {
+      const bracket = await sleeperFetch(`/league/${season.league.league_id}/winners_bracket`);
+      const finalMatch = (bracket || []).find(m => m.p === 1);
+      if (finalMatch && finalMatch.w) {
+        const champName = canonicalOwnerName(rosterOwnerName(finalMatch.w, season));
+        if (entries[champName]) entries[champName].overall_winner = true;
+      }
+    } catch (e) { /* bracket may not exist yet if season is in progress */ }
 
-  SEASON_DATA[yr] = entries;
+    SEASON_DATA[yr] = entries;
+  }
   liveMergeDone = true;
 }
 
@@ -253,7 +298,7 @@ async function renderHome() {
     el('div', { class: 'stat-grid' }, [
       statCard(alltimeTotalSeasons(), 'Seasons Served'),
       statCard(ALLTIME.length, 'Inmates Booked'),
-      statCard(reigningChampion(), 'Reigning Champion', true),
+      statCard('—', 'Reigning Champion', true, 'reigningChampionVal'),
       statCard('—', 'This Week’s Top Scorer', true, 'topScorerVal'),
     ]),
   ]));
@@ -270,6 +315,9 @@ async function renderHome() {
   ]));
 
   try {
+    await ensureLiveSeasonMerged();
+    const champVal = document.getElementById('reigningChampionVal');
+    if (champVal) champVal.textContent = reigningChampion();
     const seasons = await loadSleeperHistory();
     const latest = seasons[seasons.length - 1];
     renderHomeStandings(latest);
@@ -299,6 +347,13 @@ async function renderHomeMatchups(latest) {
   if (!latest) { holder.innerHTML = ''; holder.appendChild(el('div', { class: 'status-msg' }, 'No active season found.')); return; }
   try {
     const state = await sleeperFetch('/state/nfl');
+    holder.innerHTML = '';
+    if (!isRegularSeasonLive(state)) {
+      holder.appendChild(el('p', { class: 'section-desc' }, `${latest.league.season} season`));
+      holder.appendChild(el('div', { class: 'status-msg' }, 'Preseason — matchups begin once Week 1 kicks off.'));
+      updateTopScorer(null);
+      return;
+    }
     const week = state.week || 1;
     const matchups = await sleeperFetch(`/league/${latest.league.league_id}/matchups/${week}`);
     const byMatch = {};
@@ -307,7 +362,6 @@ async function renderHomeMatchups(latest) {
       (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
     });
     const pairs = Object.values(byMatch).filter(p => p.length === 2);
-    holder.innerHTML = '';
     holder.appendChild(el('p', { class: 'section-desc' }, `Week ${week} · ${latest.league.season}`));
     if (!pairs.length) {
       holder.appendChild(el('div', { class: 'status-msg' }, 'No matchups found for the current week yet.'));
@@ -792,8 +846,12 @@ async function renderDraft() {
     const tableHolder = el('div');
     h.appendChild(tableHolder);
 
-    function renderForSeason(seasonYear) {
+    async function renderForSeason(seasonYear) {
       const season = draftSeasons.find(s => s.league.season === seasonYear);
+      tableHolder.innerHTML = '';
+      tableHolder.appendChild(el('div', { class: 'status-msg' }, ['Pulling each player’s box scores', el('span', { class: 'blink' }, '...')]));
+      let playerStats = {};
+      try { playerStats = await buildPlayerSeasonStats(season); } catch (e) { /* fall back to draft-slot-only view */ }
       tableHolder.innerHTML = '';
       const rows = season.picks.sort((a, b) => a.pick_no - b.pick_no).map(p => {
         const owner = rosterOwnerName(p.roster_id, season);
@@ -801,17 +859,22 @@ async function renderDraft() {
         const finishWins = roster ? (roster.settings?.wins || 0) : null;
         const player = p.metadata ? `${p.metadata.first_name || ''} ${p.metadata.last_name || ''} (${p.metadata.team || 'FA'})` : p.player_id;
         const pos = p.metadata ? p.metadata.position : '';
-        return { pick: p.pick_no, round: p.round, owner, player, pos, finishWins };
+        const stats = playerStats[p.player_id];
+        return { pick: p.pick_no, round: p.round, owner, player, pos, finishWins, stats };
       });
       const table = el('table', {}, [
-        el('thead', {}, el('tr', {}, ['Pick', 'Rd', 'Manager', 'Player', 'Pos', 'Manager Season Wins'].map(x => el('th', {}, x)))),
+        el('thead', {}, el('tr', {}, ['Pick', 'Rd', 'Manager', 'Player', 'Pos', 'Season Pts', 'Starts', 'Starts in Wins', 'Manager Season Wins'].map(x => el('th', {}, x)))),
         el('tbody', {}, rows.map(r => el('tr', {}, [
           el('td', {}, String(r.pick)), el('td', {}, String(r.round)), el('td', { class: 'owner-cell' }, r.owner),
-          el('td', {}, r.player), el('td', {}, r.pos || '—'), el('td', { class: 'num-cell' }, r.finishWins === null ? '—' : String(r.finishWins)),
+          el('td', {}, r.player), el('td', {}, r.pos || '—'),
+          el('td', { class: 'num-cell' }, r.stats ? fmt(r.stats.points) : '—'),
+          el('td', { class: 'num-cell' }, r.stats ? String(r.stats.starts) : '—'),
+          el('td', { class: 'num-cell' }, r.stats ? String(r.stats.startsInWins) : '—'),
+          el('td', { class: 'num-cell' }, r.finishWins === null ? '—' : String(r.finishWins)),
         ]))),
       ]);
       tableHolder.appendChild(el('div', { class: 'table-wrap' }, table));
-      tableHolder.appendChild(el('p', { class: 'section-desc' }, 'Note: "Manager Season Wins" shows draft slot value via the manager\u2019s eventual season record. Player-level weekly scoring (true points-vs-draft-position) requires per-player stats which can be layered in next.'));
+      tableHolder.appendChild(el('p', { class: 'section-desc' }, '"Season Pts" is the player\u2019s total fantasy points under this league\u2019s own scoring that season. "Starts" counts weeks they were in their manager\u2019s starting lineup; "Starts in Wins" counts how many of those starts came in a game that manager won. "Manager Season Wins" is separate \u2014 the drafting manager\u2019s overall record that year, regardless of this specific player.'));
     }
     select.addEventListener('change', () => renderForSeason(select.value));
     renderForSeason(draftSeasons[draftSeasons.length - 1].league.season);
@@ -845,11 +908,14 @@ function renderTeams() {
   root.appendChild(gridPanel);
   root.appendChild(el('div', { id: 'teamDetailHolder' }));
 }
-function renderTeamDetail(owner) {
+async function renderTeamDetail(owner) {
   const holder = document.getElementById('teamDetailHolder');
   holder.innerHTML = '';
   const o = ALLTIME.find(x => x.owner === owner);
   if (!o) return;
+  holder.appendChild(el('div', { class: 'status-msg' }, ['Pulling the case file', el('span', { class: 'blink' }, '...')]));
+  try { await ensureLiveSeasonMerged(); } catch (e) { /* fall back to spreadsheet-only years */ }
+  holder.innerHTML = '';
 
   const years = Object.keys(SEASON_DATA).sort();
   const history = years.map(y => ({ year: y, ...(SEASON_DATA[y][owner] || {}) })).filter(r => r.wins !== undefined);
@@ -910,10 +976,16 @@ async function refreshLiveScores() {
   if (!holder) { clearInterval(liveScoresInterval); return; }
   try {
     const state = await sleeperFetch('/state/nfl');
-    const week = state.week || 1;
     const seasons = await loadSleeperHistory();
     const current = seasons[seasons.length - 1];
     if (!current) { holder.innerHTML = ''; holder.appendChild(el('div', { class: 'status-msg' }, 'No active season found.')); return; }
+    if (!isRegularSeasonLive(state)) {
+      holder.innerHTML = '';
+      holder.appendChild(el('p', { class: 'section-desc' }, `${current.league.season} season`));
+      holder.appendChild(el('div', { class: 'status-msg' }, 'Preseason — live scores begin once Week 1 kicks off.'));
+      return;
+    }
+    const week = state.week || 1;
     const matchups = await sleeperFetch(`/league/${current.league.league_id}/matchups/${week}`);
     const byMatch = {};
     (matchups || []).forEach(entry => {
