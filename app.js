@@ -1014,6 +1014,44 @@ async function renderRules() {
 // ===========================================================
 // TAB 7: HEAD TO HEAD
 // ===========================================================
+let h2hRecordsCache = null;
+async function buildH2HRecords() {
+  if (h2hRecordsCache) return h2hRecordsCache;
+  const seasons = await loadSleeperHistory();
+  const record = {}; // "A|B" -> {aWins, bWins, totalPoints, marginSum, meetings}
+  const nameSet = new Set();
+  for (const season of seasons) {
+    const maxWeek = season.league.settings?.playoff_week_start ? season.league.settings.playoff_week_start - 1 : 14;
+    const matchups = await loadMatchupsForSeason(season, Math.max(maxWeek, 14));
+    matchups.forEach(week => {
+      const byMatch = {};
+      (week || []).forEach(entry => {
+        if (!entry.matchup_id) return;
+        (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
+      });
+      Object.values(byMatch).forEach(pair => {
+        if (pair.length !== 2) return;
+        const [a, b] = pair;
+        const nameA = canonicalOwnerNameForRoster(a.roster_id, season);
+        const nameB = canonicalOwnerNameForRoster(b.roster_id, season);
+        nameSet.add(nameA); nameSet.add(nameB);
+        if (typeof a.points !== 'number' || typeof b.points !== 'number') return;
+        const key = [nameA, nameB].sort().join('|');
+        record[key] = record[key] || { [nameA]: 0, [nameB]: 0, totalPoints: 0, marginSum: 0, meetings: 0 };
+        record[key][nameA] = record[key][nameA] || 0;
+        record[key][nameB] = record[key][nameB] || 0;
+        if (a.points > b.points) record[key][nameA]++;
+        else if (b.points > a.points) record[key][nameB]++;
+        record[key].totalPoints += a.points + b.points;
+        record[key].marginSum += Math.abs(a.points - b.points);
+        record[key].meetings += 1;
+      });
+    });
+  }
+  h2hRecordsCache = { record, names: Array.from(nameSet).sort() };
+  return h2hRecordsCache;
+}
+
 async function renderH2H() {
   const root = document.getElementById('tab-h2h');
   const panel = el('div', { class: 'panel', 'data-file-no': 'FILE 07' }, [
@@ -1023,41 +1061,9 @@ async function renderH2H() {
   ]);
   root.appendChild(panel);
   try {
-    const seasons = await loadSleeperHistory();
     const h = document.getElementById('h2hHolder');
     h.innerHTML = '';
-    const record = {}; // "A|B" -> {aWins, bWins}
-    const nameSet = new Set();
-
-    for (const season of seasons) {
-      const maxWeek = season.league.settings?.playoff_week_start ? season.league.settings.playoff_week_start - 1 : 14;
-      const matchups = await loadMatchupsForSeason(season, Math.max(maxWeek, 14));
-      matchups.forEach(week => {
-        const byMatch = {};
-        (week || []).forEach(entry => {
-          if (!entry.matchup_id) return;
-          (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
-        });
-        Object.values(byMatch).forEach(pair => {
-          if (pair.length !== 2) return;
-          const [a, b] = pair;
-          const nameA = canonicalOwnerNameForRoster(a.roster_id, season);
-          const nameB = canonicalOwnerNameForRoster(b.roster_id, season);
-          nameSet.add(nameA); nameSet.add(nameB);
-          if (typeof a.points !== 'number' || typeof b.points !== 'number') return;
-          const key = [nameA, nameB].sort().join('|');
-          record[key] = record[key] || { [nameA]: 0, [nameB]: 0, totalPoints: 0, marginSum: 0, meetings: 0 };
-          record[key][nameA] = record[key][nameA] || 0;
-          record[key][nameB] = record[key][nameB] || 0;
-          if (a.points > b.points) record[key][nameA]++;
-          else if (b.points > a.points) record[key][nameB]++;
-          record[key].totalPoints += a.points + b.points;
-          record[key].marginSum += Math.abs(a.points - b.points);
-          record[key].meetings += 1;
-        });
-      });
-    }
-    const names = Array.from(nameSet).sort();
+    const { record, names } = await buildH2HRecords();
     if (!names.length) {
       h.appendChild(el('div', { class: 'status-msg' }, 'No matchup data available yet.'));
       return;
@@ -1466,7 +1472,23 @@ async function renderDraft() {
 // ===========================================================
 // TAB 9: TEAM / INMATE PAGES
 // ===========================================================
-function renderTeams() {
+// Sleeper avatar thumbnail for a canonical owner, from whichever season's
+// /users response is most recent for their account. Past players with no
+// Sleeper account (not in MANAGER_MAP) get null and keep the letter tile.
+async function getOwnerAvatarUrl(owner) {
+  const ids = MANAGER_MAP[owner];
+  if (!ids || !ids.length) return null;
+  try {
+    const seasons = await loadSleeperHistory();
+    for (let i = seasons.length - 1; i >= 0; i--) {
+      const user = seasons[i].users.find(u => ids.includes(u.user_id));
+      if (user && user.avatar) return `https://sleepercdn.com/avatars/thumbs/${user.avatar}`;
+    }
+  } catch (e) { /* fall back to letter tile */ }
+  return null;
+}
+
+async function renderTeams() {
   const root = document.getElementById('tab-teams');
   const gridPanel = el('div', { class: 'panel', 'data-file-no': 'FILE 09' }, [
     el('h2', { class: 'section-title' }, 'Inmate Roster'),
@@ -1475,18 +1497,45 @@ function renderTeams() {
   const grid = el('div', { class: 'mug-grid' });
   const sorted = [...ALLTIME].sort((a, b) => b.wins - a.wins);
   sorted.forEach((o, i) => {
+    const photo = el('div', { class: 'mug-photo' }, [el('div', { class: 'height-lines' }), o.owner.charAt(0)]);
     const card = el('div', { class: 'mug-card' }, [
-      el('div', { class: 'mug-photo' }, [el('div', { class: 'height-lines' }), o.owner.charAt(0)]),
+      photo,
       el('div', { class: 'mug-name' }, o.owner),
       el('div', { class: 'mug-sub' }, `# ${String(i + 1).padStart(3, '0')}`),
     ]);
     card.addEventListener('click', () => renderTeamDetail(o.owner));
     grid.appendChild(card);
+    getOwnerAvatarUrl(o.owner).then(url => {
+      if (!url) return;
+      const img = el('img', { src: url, alt: `${o.owner} avatar` });
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;';
+      img.addEventListener('error', () => img.remove());
+      photo.appendChild(img);
+    });
   });
   gridPanel.appendChild(grid);
   root.appendChild(gridPanel);
   root.appendChild(el('div', { id: 'teamDetailHolder' }));
 }
+function seasonBarChartSVG(history) {
+  const w = Math.max(360, history.length * 46), h = 200, pad = 32;
+  const maxWins = Math.max(...history.map(r => r.wins || 0), 1);
+  const slot = (w - 2 * pad) / history.length;
+  const barWidth = Math.min(slot * 0.6, 34);
+  let bars = '';
+  history.forEach((r, i) => {
+    const x = pad + i * slot + (slot - barWidth) / 2;
+    const barH = ((r.wins || 0) / maxWins) * (h - 2 * pad);
+    const y = h - pad - barH;
+    const color = r.overall_winner ? '#bfc1c2' : '#ff751f';
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barH.toFixed(1)}" fill="${color}"><title>${r.year}: ${fmtInt(r.wins)}-${fmtInt(r.losses)}${r.overall_winner ? ' — Champion' : ''}</title></rect>`;
+    bars += `<text x="${(x + barWidth / 2).toFixed(1)}" y="${h - pad + 16}" fill="#a9a6bb" font-size="10" text-anchor="middle" font-family="IBM Plex Mono, monospace">'${String(r.year).slice(2)}</text>`;
+    bars += `<text x="${(x + barWidth / 2).toFixed(1)}" y="${(y - 5).toFixed(1)}" fill="#f2efe9" font-size="10" text-anchor="middle" font-family="IBM Plex Mono, monospace">${fmtInt(r.wins)}</text>`;
+  });
+  const baseline = `<line x1="${pad}" y1="${h - pad}" x2="${w - pad}" y2="${h - pad}" stroke="#454363" stroke-width="1"/>`;
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;max-width:${w}px;display:block;">${baseline}${bars}</svg>`;
+}
+
 async function renderTeamDetail(owner) {
   const holder = document.getElementById('teamDetailHolder');
   holder.innerHTML = '';
@@ -1530,9 +1579,79 @@ async function renderTeamDetail(owner) {
     })),
   ]);
   panel.appendChild(el('h2', { class: 'section-title', style: 'font-size:16px;margin-top:10px' }, 'Season-by-Season'));
+  if (history.length) panel.appendChild(el('div', { html: seasonBarChartSVG(history) }));
   panel.appendChild(el('div', { class: 'table-wrap' }, table));
+
+  panel.appendChild(el('h2', { class: 'section-title', style: 'font-size:16px;margin-top:24px' }, 'Head-to-Head'));
+  const h2hHolder = el('div', {}, el('div', { class: 'status-msg' }, ['Cross-referencing the rap sheets', el('span', { class: 'blink' }, '...')]));
+  panel.appendChild(h2hHolder);
+
+  panel.appendChild(el('h2', { class: 'section-title', style: 'font-size:16px;margin-top:24px' }, 'Draft History'));
+  const draftHolder = el('div', {}, el('div', { class: 'status-msg' }, ['Pulling every draft card on file', el('span', { class: 'blink' }, '...')]));
+  panel.appendChild(draftHolder);
+
   holder.appendChild(panel);
   holder.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  try {
+    const { record, names } = await buildH2HRecords();
+    h2hHolder.innerHTML = '';
+    const opponents = names.filter(n => n !== owner);
+    if (!opponents.length) {
+      h2hHolder.appendChild(el('div', { class: 'status-msg' }, 'No Sleeper-era matchup data available yet.'));
+    } else {
+      const h2hTable = el('table', {}, [
+        el('thead', {}, el('tr', {}, ['Opponent', 'Record', 'Meetings', 'Combined Points', 'Avg Margin'].map(x => el('th', {}, x)))),
+        el('tbody', {}, opponents.map(opp => {
+          const key = [owner, opp].sort().join('|');
+          const rec = record[key];
+          if (!rec) return el('tr', {}, [el('td', { class: 'owner-cell' }, opp), el('td', {}, '—'), el('td', {}, '—'), el('td', {}, '—'), el('td', {}, '—')]);
+          const avgMargin = rec.meetings ? rec.marginSum / rec.meetings : 0;
+          return el('tr', {}, [
+            el('td', { class: 'owner-cell' }, opp),
+            el('td', {}, `${rec[owner] || 0}-${rec[opp] || 0}`),
+            el('td', { class: 'num-cell' }, String(rec.meetings)),
+            el('td', { class: 'num-cell' }, fmt(rec.totalPoints)),
+            el('td', { class: 'num-cell' }, fmt(avgMargin)),
+          ]);
+        })),
+      ]);
+      h2hHolder.appendChild(el('div', { class: 'table-wrap' }, h2hTable));
+    }
+  } catch (e) {
+    h2hHolder.innerHTML = '';
+    h2hHolder.appendChild(el('div', { class: 'status-msg error' }, 'Could not load head-to-head records right now.'));
+  }
+
+  try {
+    const seasons = await loadSleeperHistory();
+    draftHolder.innerHTML = '';
+    const picks = [];
+    seasons.forEach(season => {
+      if (!season.draft || !season.picks) return;
+      season.picks.forEach(p => {
+        if (canonicalOwnerNameForRoster(p.roster_id, season) !== owner) return;
+        const player = p.metadata ? `${p.metadata.first_name || ''} ${p.metadata.last_name || ''} (${p.metadata.team || 'FA'})` : p.player_id;
+        picks.push({ season: season.league.season, round: p.round, pick: p.pick_no, player, pos: p.metadata ? p.metadata.position : '' });
+      });
+    });
+    if (!picks.length) {
+      draftHolder.appendChild(el('div', { class: 'status-msg' }, 'No Sleeper-era draft picks on file for this inmate.'));
+    } else {
+      picks.sort((a, b) => b.season - a.season || a.pick - b.pick);
+      const draftTable = el('table', {}, [
+        el('thead', {}, el('tr', {}, ['Season', 'Rd', 'Pick', 'Player', 'Pos'].map(x => el('th', {}, x)))),
+        el('tbody', {}, picks.map(p => el('tr', {}, [
+          el('td', { class: 'owner-cell' }, String(p.season)), el('td', {}, String(p.round)), el('td', {}, String(p.pick)),
+          el('td', {}, p.player), el('td', {}, p.pos || '—'),
+        ]))),
+      ]);
+      draftHolder.appendChild(el('div', { class: 'table-wrap' }, draftTable));
+    }
+  } catch (e) {
+    draftHolder.innerHTML = '';
+    draftHolder.appendChild(el('div', { class: 'status-msg error' }, 'Could not load draft history right now.'));
+  }
 }
 
 // ===========================================================
