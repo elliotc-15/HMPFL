@@ -78,26 +78,28 @@ function playerLabel(dir, pid) {
 // score margin against this league's own historical week-to-week scoring
 // spread (std dev of every recorded weekly score), via a logistic
 // approximation of the normal CDF for the difference of two such scores.
-let scoreStdDevCache = null;
-async function getScoreStdDev() {
-  if (scoreStdDevCache) return scoreStdDevCache;
-  try {
-    const seasons = await loadSleeperHistory();
-    const scores = [];
-    for (const season of seasons) {
-      const matchups = await loadMatchupsForSeason(season, 17);
-      matchups.forEach(week => {
-        (week || []).forEach(entry => {
-          if (typeof entry.points === 'number' && entry.points > 0) scores.push(entry.points);
+let scoreStdDevPromise = null;
+function getScoreStdDev() {
+  if (scoreStdDevPromise) return scoreStdDevPromise;
+  scoreStdDevPromise = (async () => {
+    try {
+      const seasons = await loadSleeperHistory();
+      const scores = [];
+      for (const season of seasons) {
+        const matchups = await loadMatchupsForSeason(season, 17);
+        matchups.forEach(week => {
+          (week || []).forEach(entry => {
+            if (typeof entry.points === 'number' && entry.points > 0) scores.push(entry.points);
+          });
         });
-      });
-    }
-    if (scores.length < 10) { scoreStdDevCache = 35; return scoreStdDevCache; }
-    const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
-    const variance = scores.reduce((a, b) => a + (b - mean) ** 2, 0) / scores.length;
-    scoreStdDevCache = Math.sqrt(variance) || 35;
-  } catch (e) { scoreStdDevCache = 35; }
-  return scoreStdDevCache;
+      }
+      if (scores.length < 10) return 35;
+      const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+      const variance = scores.reduce((a, b) => a + (b - mean) ** 2, 0) / scores.length;
+      return Math.sqrt(variance) || 35;
+    } catch (e) { return 35; }
+  })();
+  return scoreStdDevPromise;
 }
 function estimateWinProb(myPoints, theirPoints, stdDev) {
   const margin = myPoints - theirPoints;
@@ -107,36 +109,44 @@ function estimateWinProb(myPoints, theirPoints, stdDev) {
 
 // ---------- Sleeper history walker ----------
 // Walks previous_league_id chain to gather all Sleeper-era seasons for this league.
-let sleeperHistoryCache = null;
-async function loadSleeperHistory() {
-  if (sleeperHistoryCache) return sleeperHistoryCache;
-  const seasons = [];
-  let currentId = SLEEPER_LEAGUE_ID;
-  let hops = 0;
-  while (currentId && hops < 8) {
-    hops++;
-    let league;
-    try {
-      league = await sleeperFetch(`/league/${currentId}`);
-    } catch (e) {
-      break;
+// Cache the in-flight PROMISE, not just the resolved value: several places on
+// page load (the header badge, Home's own render) call this concurrently, and
+// caching only the final value let concurrent callers race into duplicate
+// independent fetches instead of sharing one — which could leave one caller
+// seeing an incomplete/stale result if its own duplicate fetch hit a hiccup.
+let sleeperHistoryPromise = null;
+function loadSleeperHistory() {
+  if (sleeperHistoryPromise) return sleeperHistoryPromise;
+  sleeperHistoryPromise = (async () => {
+    const seasons = [];
+    let currentId = SLEEPER_LEAGUE_ID;
+    let hops = 0;
+    while (currentId && hops < 8) {
+      hops++;
+      let league;
+      try {
+        league = await sleeperFetch(`/league/${currentId}`);
+      } catch (e) {
+        break;
+      }
+      if (!league || !league.league_id) break;
+      const [users, rosters] = await Promise.all([
+        sleeperFetch(`/league/${currentId}/users`).catch(() => []),
+        sleeperFetch(`/league/${currentId}/rosters`).catch(() => []),
+      ]);
+      let draft = null, picks = [];
+      if (league.draft_id) {
+        draft = await sleeperFetch(`/draft/${league.draft_id}`).catch(() => null);
+        picks = await sleeperFetch(`/draft/${league.draft_id}/picks`).catch(() => []);
+      }
+      seasons.push({ league, users, rosters, draft, picks, matchups: null });
+      currentId = league.previous_league_id || null;
     }
-    if (!league || !league.league_id) break;
-    const [users, rosters] = await Promise.all([
-      sleeperFetch(`/league/${currentId}/users`).catch(() => []),
-      sleeperFetch(`/league/${currentId}/rosters`).catch(() => []),
-    ]);
-    let draft = null, picks = [];
-    if (league.draft_id) {
-      draft = await sleeperFetch(`/draft/${league.draft_id}`).catch(() => null);
-      picks = await sleeperFetch(`/draft/${league.draft_id}/picks`).catch(() => []);
-    }
-    seasons.push({ league, users, rosters, draft, picks, matchups: null });
-    currentId = league.previous_league_id || null;
-  }
-  seasons.sort((a, b) => Number(a.league.season) - Number(b.league.season));
-  sleeperHistoryCache = seasons;
-  return seasons;
+    seasons.sort((a, b) => Number(a.league.season) - Number(b.league.season));
+    return seasons;
+  })();
+  sleeperHistoryPromise.catch(() => { sleeperHistoryPromise = null; });
+  return sleeperHistoryPromise;
 }
 
 async function loadMatchupsForSeason(seasonObj, maxWeek = 17) {
@@ -155,36 +165,39 @@ async function loadMatchupsForSeason(seasonObj, maxWeek = 17) {
 // matchup data), how many weeks they started, and how many of those starts
 // were in a game their team won.
 let playerSeasonStatsCache = new WeakMap();
-async function buildPlayerSeasonStats(season) {
+function buildPlayerSeasonStats(season) {
   if (playerSeasonStatsCache.has(season)) return playerSeasonStatsCache.get(season);
-  const matchups = await loadMatchupsForSeason(season, 17);
-  const stats = {};
-  const touch = (pid) => (stats[pid] = stats[pid] || { points: 0, starts: 0, startsInWins: 0, pointsInWins: 0 });
-  matchups.forEach(week => {
-    if (!week || !week.length) return;
-    const byMatch = {};
-    week.forEach(entry => {
-      if (entry.matchup_id === null || entry.matchup_id === undefined) return;
-      (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
-    });
-    week.forEach(entry => {
-      const pair = byMatch[entry.matchup_id] || [];
-      const opp = pair.find(e => e !== entry);
-      const won = !!opp && entry.points > opp.points;
-      const playerPoints = entry.players_points || {};
-      Object.entries(playerPoints).forEach(([pid, pts]) => {
-        touch(pid).points += pts || 0;
+  const promise = (async () => {
+    const matchups = await loadMatchupsForSeason(season, 17);
+    const stats = {};
+    const touch = (pid) => (stats[pid] = stats[pid] || { points: 0, starts: 0, startsInWins: 0, pointsInWins: 0 });
+    matchups.forEach(week => {
+      if (!week || !week.length) return;
+      const byMatch = {};
+      week.forEach(entry => {
+        if (entry.matchup_id === null || entry.matchup_id === undefined) return;
+        (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
       });
-      (entry.starters || []).forEach(pid => {
-        if (!pid || pid === '0') return;
-        const s = touch(pid);
-        s.starts += 1;
-        if (won) { s.startsInWins += 1; s.pointsInWins += playerPoints[pid] || 0; }
+      week.forEach(entry => {
+        const pair = byMatch[entry.matchup_id] || [];
+        const opp = pair.find(e => e !== entry);
+        const won = !!opp && entry.points > opp.points;
+        const playerPoints = entry.players_points || {};
+        Object.entries(playerPoints).forEach(([pid, pts]) => {
+          touch(pid).points += pts || 0;
+        });
+        (entry.starters || []).forEach(pid => {
+          if (!pid || pid === '0') return;
+          const s = touch(pid);
+          s.starts += 1;
+          if (won) { s.startsInWins += 1; s.pointsInWins += playerPoints[pid] || 0; }
+        });
       });
     });
-  });
-  playerSeasonStatsCache.set(season, stats);
-  return stats;
+    return stats;
+  })();
+  playerSeasonStatsCache.set(season, promise);
+  return promise;
 }
 
 function userDisplayName(u) {
@@ -242,47 +255,52 @@ function canonicalOwnerNameForRoster(rosterId, season) {
 // tabs all pick it up automatically. Loops every Sleeper season rather than
 // just the latest, since more than one season can be missing at once (a
 // completed-but-unmerged season plus the new one already under way).
-let liveMergeDone = false;
-async function ensureLiveSeasonMerged() {
-  if (liveMergeDone) return;
-  const seasons = await loadSleeperHistory();
-  for (const season of seasons) {
-    const yr = String(season.league.season);
-    if (SEASON_DATA[yr] && Object.keys(SEASON_DATA[yr]).length) continue;
+// Cache the in-flight PROMISE (see loadSleeperHistory) — concurrent callers
+// share one run instead of racing independent duplicate merges.
+let liveMergePromise = null;
+function ensureLiveSeasonMerged() {
+  if (liveMergePromise) return liveMergePromise;
+  liveMergePromise = (async () => {
+    const seasons = await loadSleeperHistory();
+    for (const season of seasons) {
+      const yr = String(season.league.season);
+      if (SEASON_DATA[yr] && Object.keys(SEASON_DATA[yr]).length) continue;
 
-    const entries = {};
-    const standings = season.rosters.map(r => {
-      const name = canonicalOwnerNameForRoster(r.roster_id, season);
-      const s = r.settings || {};
-      return {
-        name,
-        wins: s.wins || 0, losses: s.losses || 0,
-        pf: (s.fpts || 0) + (s.fpts_decimal || 0) / 100,
-        pa: (s.fpts_against || 0) + (s.fpts_against_decimal || 0) / 100,
-      };
-    }).sort((a, b) => b.wins - a.wins || b.pf - a.pf);
+      const entries = {};
+      const standings = season.rosters.map(r => {
+        const name = canonicalOwnerNameForRoster(r.roster_id, season);
+        const s = r.settings || {};
+        return {
+          name,
+          wins: s.wins || 0, losses: s.losses || 0,
+          pf: (s.fpts || 0) + (s.fpts_decimal || 0) / 100,
+          pa: (s.fpts_against || 0) + (s.fpts_against_decimal || 0) / 100,
+        };
+      }).sort((a, b) => b.wins - a.wins || b.pf - a.pf);
 
-    standings.forEach((s, i) => {
-      entries[s.name] = {
-        wins: s.wins, losses: s.losses, pf: s.pf, pa: s.pa,
-        league_winner: i === 0, // best regular-season record
-        overall_winner: false, scoring_title: false,
-        playoff_wins: null, playoff_losses: null,
-      };
-    });
+      standings.forEach((s, i) => {
+        entries[s.name] = {
+          wins: s.wins, losses: s.losses, pf: s.pf, pa: s.pa,
+          league_winner: i === 0, // best regular-season record
+          overall_winner: false, scoring_title: false,
+          playoff_wins: null, playoff_losses: null,
+        };
+      });
 
-    try {
-      const bracket = await sleeperFetch(`/league/${season.league.league_id}/winners_bracket`);
-      const finalMatch = (bracket || []).find(m => m.p === 1);
-      if (finalMatch && finalMatch.w) {
-        const champName = canonicalOwnerNameForRoster(finalMatch.w, season);
-        if (entries[champName]) entries[champName].overall_winner = true;
-      }
-    } catch (e) { /* bracket may not exist yet if season is in progress */ }
+      try {
+        const bracket = await sleeperFetch(`/league/${season.league.league_id}/winners_bracket`);
+        const finalMatch = (bracket || []).find(m => m.p === 1);
+        if (finalMatch && finalMatch.w) {
+          const champName = canonicalOwnerNameForRoster(finalMatch.w, season);
+          if (entries[champName]) entries[champName].overall_winner = true;
+        }
+      } catch (e) { /* bracket may not exist yet if season is in progress */ }
 
-    SEASON_DATA[yr] = entries;
-  }
-  liveMergeDone = true;
+      SEASON_DATA[yr] = entries;
+    }
+  })();
+  liveMergePromise.catch(() => { liveMergePromise = null; });
+  return liveMergePromise;
 }
 
 // ---------- TAB ROUTING ----------
@@ -484,34 +502,37 @@ function alltimeTotalSeasons() {
 // points) quietly go stale the moment someone wins it. Caught 2026-08-25:
 // Rhys's 2025 championship wasn't reflected in All-Time/Inmates totals.
 const ALLTIME_STATIC_THROUGH_YEAR = 2024;
-let liveAlltimeCache = null;
-async function getLiveAlltime() {
-  if (liveAlltimeCache) return liveAlltimeCache;
-  try { await ensureLiveSeasonMerged(); } catch (e) { /* fall back to static-only totals */ }
-  const byOwner = {};
-  ALLTIME.forEach(o => { byOwner[o.owner] = { ...o }; });
-  Object.entries(SEASON_DATA).forEach(([year, data]) => {
-    if (Number(year) <= ALLTIME_STATIC_THROUGH_YEAR) return;
-    Object.entries(data).forEach(([owner, s]) => {
-      if ((s.wins || 0) + (s.losses || 0) === 0) return; // in-progress/no-games season
-      const o = byOwner[owner] = byOwner[owner] || {
-        owner, seasons: 0, wins: 0, losses: 0, scoring_titles: 0,
-        league_winner: 0, overall_winner: 0, pf: 0, pa: 0, playoff_wins: 0, playoff_losses: 0,
-      };
-      o.seasons = (o.seasons || 0) + 1;
-      o.wins = (o.wins || 0) + (s.wins || 0);
-      o.losses = (o.losses || 0) + (s.losses || 0);
-      o.pf = (o.pf || 0) + (s.pf || 0);
-      o.pa = (o.pa || 0) + (s.pa || 0);
-      if (s.overall_winner) o.overall_winner = (o.overall_winner || 0) + 1;
-      if (s.league_winner) o.league_winner = (o.league_winner || 0) + 1;
-      if (s.scoring_title) o.scoring_titles = (o.scoring_titles || 0) + 1;
-      if (typeof s.playoff_wins === 'number') o.playoff_wins = (o.playoff_wins || 0) + s.playoff_wins;
-      if (typeof s.playoff_losses === 'number') o.playoff_losses = (o.playoff_losses || 0) + s.playoff_losses;
+let liveAlltimePromise = null;
+function getLiveAlltime() {
+  if (liveAlltimePromise) return liveAlltimePromise;
+  liveAlltimePromise = (async () => {
+    try { await ensureLiveSeasonMerged(); } catch (e) { /* fall back to static-only totals */ }
+    const byOwner = {};
+    ALLTIME.forEach(o => { byOwner[o.owner] = { ...o }; });
+    Object.entries(SEASON_DATA).forEach(([year, data]) => {
+      if (Number(year) <= ALLTIME_STATIC_THROUGH_YEAR) return;
+      Object.entries(data).forEach(([owner, s]) => {
+        if ((s.wins || 0) + (s.losses || 0) === 0) return; // in-progress/no-games season
+        const o = byOwner[owner] = byOwner[owner] || {
+          owner, seasons: 0, wins: 0, losses: 0, scoring_titles: 0,
+          league_winner: 0, overall_winner: 0, pf: 0, pa: 0, playoff_wins: 0, playoff_losses: 0,
+        };
+        o.seasons = (o.seasons || 0) + 1;
+        o.wins = (o.wins || 0) + (s.wins || 0);
+        o.losses = (o.losses || 0) + (s.losses || 0);
+        o.pf = (o.pf || 0) + (s.pf || 0);
+        o.pa = (o.pa || 0) + (s.pa || 0);
+        if (s.overall_winner) o.overall_winner = (o.overall_winner || 0) + 1;
+        if (s.league_winner) o.league_winner = (o.league_winner || 0) + 1;
+        if (s.scoring_title) o.scoring_titles = (o.scoring_titles || 0) + 1;
+        if (typeof s.playoff_wins === 'number') o.playoff_wins = (o.playoff_wins || 0) + s.playoff_wins;
+        if (typeof s.playoff_losses === 'number') o.playoff_losses = (o.playoff_losses || 0) + s.playoff_losses;
+      });
     });
-  });
-  liveAlltimeCache = Object.values(byOwner);
-  return liveAlltimeCache;
+    return Object.values(byOwner);
+  })();
+  liveAlltimePromise.catch(() => { liveAlltimePromise = null; });
+  return liveAlltimePromise;
 }
 function liveAlltimeTotalSeasons(liveAlltime) {
   return Math.max(...liveAlltime.map(o => o.seasons || 0));
@@ -1109,42 +1130,45 @@ async function renderRules() {
 // ===========================================================
 // TAB 7: HEAD TO HEAD
 // ===========================================================
-let h2hRecordsCache = null;
-async function buildH2HRecords() {
-  if (h2hRecordsCache) return h2hRecordsCache;
-  const seasons = await loadSleeperHistory();
-  const record = {}; // "A|B" -> {aWins, bWins, totalPoints, marginSum, meetings}
-  const nameSet = new Set();
-  for (const season of seasons) {
-    const maxWeek = season.league.settings?.playoff_week_start ? season.league.settings.playoff_week_start - 1 : 14;
-    const matchups = await loadMatchupsForSeason(season, Math.max(maxWeek, 14));
-    matchups.forEach(week => {
-      const byMatch = {};
-      (week || []).forEach(entry => {
-        if (!entry.matchup_id) return;
-        (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
+let h2hRecordsPromise = null;
+function buildH2HRecords() {
+  if (h2hRecordsPromise) return h2hRecordsPromise;
+  h2hRecordsPromise = (async () => {
+    const seasons = await loadSleeperHistory();
+    const record = {}; // "A|B" -> {aWins, bWins, totalPoints, marginSum, meetings}
+    const nameSet = new Set();
+    for (const season of seasons) {
+      const maxWeek = season.league.settings?.playoff_week_start ? season.league.settings.playoff_week_start - 1 : 14;
+      const matchups = await loadMatchupsForSeason(season, Math.max(maxWeek, 14));
+      matchups.forEach(week => {
+        const byMatch = {};
+        (week || []).forEach(entry => {
+          if (!entry.matchup_id) return;
+          (byMatch[entry.matchup_id] = byMatch[entry.matchup_id] || []).push(entry);
+        });
+        Object.values(byMatch).forEach(pair => {
+          if (pair.length !== 2) return;
+          const [a, b] = pair;
+          const nameA = canonicalOwnerNameForRoster(a.roster_id, season);
+          const nameB = canonicalOwnerNameForRoster(b.roster_id, season);
+          nameSet.add(nameA); nameSet.add(nameB);
+          if (typeof a.points !== 'number' || typeof b.points !== 'number') return;
+          const key = [nameA, nameB].sort().join('|');
+          record[key] = record[key] || { [nameA]: 0, [nameB]: 0, totalPoints: 0, marginSum: 0, meetings: 0 };
+          record[key][nameA] = record[key][nameA] || 0;
+          record[key][nameB] = record[key][nameB] || 0;
+          if (a.points > b.points) record[key][nameA]++;
+          else if (b.points > a.points) record[key][nameB]++;
+          record[key].totalPoints += a.points + b.points;
+          record[key].marginSum += Math.abs(a.points - b.points);
+          record[key].meetings += 1;
+        });
       });
-      Object.values(byMatch).forEach(pair => {
-        if (pair.length !== 2) return;
-        const [a, b] = pair;
-        const nameA = canonicalOwnerNameForRoster(a.roster_id, season);
-        const nameB = canonicalOwnerNameForRoster(b.roster_id, season);
-        nameSet.add(nameA); nameSet.add(nameB);
-        if (typeof a.points !== 'number' || typeof b.points !== 'number') return;
-        const key = [nameA, nameB].sort().join('|');
-        record[key] = record[key] || { [nameA]: 0, [nameB]: 0, totalPoints: 0, marginSum: 0, meetings: 0 };
-        record[key][nameA] = record[key][nameA] || 0;
-        record[key][nameB] = record[key][nameB] || 0;
-        if (a.points > b.points) record[key][nameA]++;
-        else if (b.points > a.points) record[key][nameB]++;
-        record[key].totalPoints += a.points + b.points;
-        record[key].marginSum += Math.abs(a.points - b.points);
-        record[key].meetings += 1;
-      });
-    });
-  }
-  h2hRecordsCache = { record, names: Array.from(nameSet).sort() };
-  return h2hRecordsCache;
+    }
+    return { record, names: Array.from(nameSet).sort() };
+  })();
+  h2hRecordsPromise.catch(() => { h2hRecordsPromise = null; });
+  return h2hRecordsPromise;
 }
 
 async function renderH2H() {
