@@ -1,0 +1,83 @@
+{
+  "season": "2026",
+  "week": 1,
+  "generated_at": "2026-09-08T11:16:53.888158+00:00",
+  "recap_text": "HMPFL WEEK 1 RECAP: LOCKDOWN EDITION\n\nWell, gentlemen, welcome to another sentence \u2014 er, season \u2014 of His Majesty's Prison Fantasy League. And what a way to kick things off: the entire cell block got slapped with a full lockdown before a single point hit the board. Every scoreboard in the yard reads 0-0. Nobody's move. Nobody's fed. Nobody's fantasy points.\n\nTHE CLOSEST GAME (AND ALSO THE BIGGEST BLOWOUT)\n\nIn a stunning twist of prison logic, every single matchup this week ended in an exact, dead-even tie \u2014 which technically makes it the closest game of the week AND the biggest blowout, depending on which guard you ask. The ConVicks and Ruggs, Drugs and TDs stared each other down 0-0. OJ's Denver Bronco and Rice, Rice Baby \u2728 refused to blink, also 0-0. The Adrian BeatHisSons and System of a Brown settled their beef the same way prison arbitration always does: nothing happened. Smack My Diggs Up and Hernandez Hitmen, The Massage Boys and Glove Don't Fit Blitz, and DUIiiiiiiii Dont Know Jim vs. Steve Ruggs all followed suit. Total chaos. Total silence.\n\nSTANDOUT PERFORMANCES\n\nSomehow, The ConVicks' entire death row lineup \u2014 Jonathon Brooks, Marvin Harrison, Cam Little, George Holani, Woody Marks, Emeka Egbuka, Luther Burden, Tyler Shough, Christian McCaffrey, and even Patrick Mahomes himself \u2014 combined for a grand total of zero points. Ten players, zero production. That's not a bye week, that's solitary confinement. Whether this is a scheduling mixup, a system-wide \"count time\" freeze, or the warden simply forgot to unlock the field, The ConVicks are technically undefeated AND unscored-upon, which in prison terms basically makes them the toughest gang in the yard.\n\nSTORYLINES TO WATCH\n\nIs this the calm before the riot? A full week of 0-0 ties smells less like bad luck and more like every inmate in HMPFL is sizing up the competition before the real violence starts in Week 2. Somewhere, a warden (commissioner) is furiously checking the lineup lock times, mumbling about \"processing delays\" and \"the system is down again.\"\n\nOne thing's for certain: nobody made parole this week. Every single manager remains locked at .500, staring at the same blank scoreboard, waiting for the actual games to start counting. Week 2 can't come soon enough \u2014 the yard is restless, and somebody's about to get shanked in the standings.",
+  "games": [
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 0,
+      "owner_b": "Ruggs, Drugs and TDs",
+      "pts_b": 0,
+      "margin": 0,
+      "winner": "Tie"
+    },
+    {
+      "owner_a": "OJ\u2019s Denver Bronco",
+      "pts_a": 0,
+      "owner_b": "Rice, Rice Baby \u2728",
+      "pts_b": 0,
+      "margin": 0,
+      "winner": "Tie"
+    },
+    {
+      "owner_a": "The Adrian BeatHisSons",
+      "pts_a": 0,
+      "owner_b": "System of a brown ",
+      "pts_b": 0,
+      "margin": 0,
+      "winner": "Tie"
+    },
+    {
+      "owner_a": "Smack my Diggs up ",
+      "pts_a": 0,
+      "owner_b": "Hernandez Hitmen",
+      "pts_b": 0,
+      "margin": 0,
+      "winner": "Tie"
+    },
+    {
+      "owner_a": "The Massage Boys",
+      "pts_a": 0,
+      "owner_b": "Glove Don\u2019t Fit, Blitz",
+      "pts_b": 0,
+      "margin": 0,
+      "winner": "Tie"
+    },
+    {
+      "owner_a": "DUIiiiiiiii dont know jim",
+      "pts_a": 0,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 0,
+      "margin": 0,
+      "winner": "Tie"
+    }
+  ],
+  "top_performers": [
+    {
+      "owner": "The ConVicks",
+      "player": "Jonathon Brooks (RB-CAR)",
+      "points": 0
+    },
+    {
+      "owner": "The ConVicks",
+      "player": "Marvin Harrison (WR-ARI)",
+      "points": 0
+    },
+    {
+      "owner": "The ConVicks",
+      "player": "Cam Little (K-JAX)",
+      "points": 0
+    },
+    {
+      "owner": "The ConVicks",
+      "player": "George Holani (RB-SEA)",
+      "points": 0
+    },
+    {
+      "owner": "The ConVicks",
+      "player": "Woody Marks (RB-HOU)",
+      "points": 0
+    }
+  ]
+}
