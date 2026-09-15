@@ -1,83 +1,83 @@
 {
   "season": "2026",
   "week": 1,
-  "generated_at": "2026-09-08T11:16:53.888158+00:00",
-  "recap_text": "HMPFL WEEK 1 RECAP: LOCKDOWN EDITION\n\nWell, gentlemen, welcome to another sentence \u2014 er, season \u2014 of His Majesty's Prison Fantasy League. And what a way to kick things off: the entire cell block got slapped with a full lockdown before a single point hit the board. Every scoreboard in the yard reads 0-0. Nobody's move. Nobody's fed. Nobody's fantasy points.\n\nTHE CLOSEST GAME (AND ALSO THE BIGGEST BLOWOUT)\n\nIn a stunning twist of prison logic, every single matchup this week ended in an exact, dead-even tie \u2014 which technically makes it the closest game of the week AND the biggest blowout, depending on which guard you ask. The ConVicks and Ruggs, Drugs and TDs stared each other down 0-0. OJ's Denver Bronco and Rice, Rice Baby \u2728 refused to blink, also 0-0. The Adrian BeatHisSons and System of a Brown settled their beef the same way prison arbitration always does: nothing happened. Smack My Diggs Up and Hernandez Hitmen, The Massage Boys and Glove Don't Fit Blitz, and DUIiiiiiiii Dont Know Jim vs. Steve Ruggs all followed suit. Total chaos. Total silence.\n\nSTANDOUT PERFORMANCES\n\nSomehow, The ConVicks' entire death row lineup \u2014 Jonathon Brooks, Marvin Harrison, Cam Little, George Holani, Woody Marks, Emeka Egbuka, Luther Burden, Tyler Shough, Christian McCaffrey, and even Patrick Mahomes himself \u2014 combined for a grand total of zero points. Ten players, zero production. That's not a bye week, that's solitary confinement. Whether this is a scheduling mixup, a system-wide \"count time\" freeze, or the warden simply forgot to unlock the field, The ConVicks are technically undefeated AND unscored-upon, which in prison terms basically makes them the toughest gang in the yard.\n\nSTORYLINES TO WATCH\n\nIs this the calm before the riot? A full week of 0-0 ties smells less like bad luck and more like every inmate in HMPFL is sizing up the competition before the real violence starts in Week 2. Somewhere, a warden (commissioner) is furiously checking the lineup lock times, mumbling about \"processing delays\" and \"the system is down again.\"\n\nOne thing's for certain: nobody made parole this week. Every single manager remains locked at .500, staring at the same blank scoreboard, waiting for the actual games to start counting. Week 2 can't come soon enough \u2014 the yard is restless, and somebody's about to get shanked in the standings.",
+  "generated_at": "2026-09-15T11:16:15.880540+00:00",
+  "recap_text": "# HMPFL Week 1 Recap: Lockdown Begins\n\nCell doors slammed shut on Week 1, and let me tell you, some inmates came out swinging while others are already filing grievances with the warden. Welcome to another year in the yard, gentlemen.\n\n## The Nail-Biter\n\nIn a shootout that came down to the final whistle, **Steve Ruggs** narrowly escaped **DUIiiiiiiii dont know jim** by the slimmest of margins, 245.15 to 243.75. That's a 1.4-point margin \u2014 basically a coin flip decided by a rounding error. Jim can appeal this to the parole board, but the final score is the final score. Sorry, pal, that's hard time.\n\n## The Massacre\n\nIf you thought prison yards could get brutal, wait until you see what **Rice, Rice Baby \u2728** did to **OJ's Denver Bronco**. A jaw-dropping 366.65 points obliterated OJ's respectable-on-any-other-week 177.35, for a margin of **189.3 points**. That's not a beatdown, that's a full-on riot with one side never even getting out of their cell. OJ, buddy, this one's going in the history books \u2014 and not in a good way.\n\nHonorable mention to **Glove Don't Fit, Blitz**, who nearly matched that energy by dropping 320.95 on **The Massage Boys**, winning by 111.5. Two teams put up 320+ this week and somehow both were involved in blowouts of historic proportions. The warden might need to check these lineups for contraband.\n\n## Standout Performances\n\nThe QB position went full warden-mode this week. **Josh Allen** torched the league for 73.0 points to power **System of a brown**, while **Caleb Williams** wasn't far behind with 72.9 for Rice, Rice Baby. Both signal-callers were basically running the yard like they own the place.\n\nOn the ground, **Kenneth Walker** (71.2) and **Derrick Henry** (69.1) proved that some inmates just don't wait for anyone \u2014 they bulldoze straight through the fence. Rookie **Ashton Jeanty** also flashed serious upside with 59.9 points, putting the league on notice early.\n\n## Storylines to Watch\n\n**Rice, Rice Baby \u2728** didn't just win \u2014 they had THREE players in the top 10 performers (Williams, Swift, Watson) and still somehow only used a fraction of that damage to bury OJ. Book 'em, they're already the team to beat.\n\nMeanwhile, **The ConVicks** and **The Massage Boys** are already looking at long sentences if they don't tighten up. Week 2, the yard awaits.",
   "games": [
     {
-      "owner_a": "The ConVicks",
-      "pts_a": 0,
-      "owner_b": "Ruggs, Drugs and TDs",
-      "pts_b": 0,
-      "margin": 0,
-      "winner": "Tie"
-    },
-    {
-      "owner_a": "OJ\u2019s Denver Bronco",
-      "pts_a": 0,
-      "owner_b": "Rice, Rice Baby \u2728",
-      "pts_b": 0,
-      "margin": 0,
-      "winner": "Tie"
-    },
-    {
-      "owner_a": "The Adrian BeatHisSons",
-      "pts_a": 0,
-      "owner_b": "System of a brown ",
-      "pts_b": 0,
-      "margin": 0,
-      "winner": "Tie"
+      "owner_a": "DUIiiiiiiii dont know jim",
+      "pts_a": 243.75,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 245.15,
+      "margin": 1.4,
+      "winner": "Steve Ruggs"
     },
     {
       "owner_a": "Smack my Diggs up ",
-      "pts_a": 0,
+      "pts_a": 162.35,
       "owner_b": "Hernandez Hitmen",
-      "pts_b": 0,
-      "margin": 0,
-      "winner": "Tie"
+      "pts_b": 167.0,
+      "margin": 4.65,
+      "winner": "Hernandez Hitmen"
+    },
+    {
+      "owner_a": "The Adrian BeatHisSons",
+      "pts_a": 237.35,
+      "owner_b": "System of a brown ",
+      "pts_b": 257.85,
+      "margin": 20.5,
+      "winner": "System of a brown "
+    },
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 210.8,
+      "owner_b": "Ruggs, Drugs and TDs",
+      "pts_b": 261.1,
+      "margin": 50.3,
+      "winner": "Ruggs, Drugs and TDs"
     },
     {
       "owner_a": "The Massage Boys",
-      "pts_a": 0,
+      "pts_a": 209.45,
       "owner_b": "Glove Don\u2019t Fit, Blitz",
-      "pts_b": 0,
-      "margin": 0,
-      "winner": "Tie"
+      "pts_b": 320.95,
+      "margin": 111.5,
+      "winner": "Glove Don\u2019t Fit, Blitz"
     },
     {
-      "owner_a": "DUIiiiiiiii dont know jim",
-      "pts_a": 0,
-      "owner_b": "Steve Ruggs",
-      "pts_b": 0,
-      "margin": 0,
-      "winner": "Tie"
+      "owner_a": "OJ\u2019s Denver Bronco",
+      "pts_a": 177.35,
+      "owner_b": "Rice, Rice Baby \u2728",
+      "pts_b": 366.65,
+      "margin": 189.3,
+      "winner": "Rice, Rice Baby \u2728"
     }
   ],
   "top_performers": [
     {
-      "owner": "The ConVicks",
-      "player": "Jonathon Brooks (RB-CAR)",
-      "points": 0
+      "owner": "System of a brown ",
+      "player": "Josh Allen (QB-BUF)",
+      "points": 73.0
     },
     {
-      "owner": "The ConVicks",
-      "player": "Marvin Harrison (WR-ARI)",
-      "points": 0
+      "owner": "Rice, Rice Baby \u2728",
+      "player": "Caleb Williams (QB-CHI)",
+      "points": 72.9
     },
     {
-      "owner": "The ConVicks",
-      "player": "Cam Little (K-JAX)",
-      "points": 0
+      "owner": "Glove Don\u2019t Fit, Blitz",
+      "player": "Kenneth Walker (RB-KC)",
+      "points": 71.2
     },
     {
-      "owner": "The ConVicks",
-      "player": "George Holani (RB-SEA)",
-      "points": 0
+      "owner": "System of a brown ",
+      "player": "Derrick Henry (RB-BAL)",
+      "points": 69.1
     },
     {
-      "owner": "The ConVicks",
-      "player": "Woody Marks (RB-HOU)",
-      "points": 0
+      "owner": "DUIiiiiiiii dont know jim",
+      "player": "Jahmyr Gibbs (RB-DET)",
+      "points": 64.7
     }
   ]
 }
