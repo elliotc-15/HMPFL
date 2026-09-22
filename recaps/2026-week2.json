@@ -1,0 +1,83 @@
+{
+  "season": "2026",
+  "week": 2,
+  "generated_at": "2026-09-22T11:16:12.747658+00:00",
+  "recap_text": "# HMPFL Week 2 Recap: Cell Block Chaos\n\nThe bars rattled and the warden's whistle blew all weekend long as HMPFL Week 2 delivered drama, a shootout for the ages, and at least one inmate who should probably be placed on suicide watch after this beatdown.\n\n## The Nail-Biter: Rice, Rice Baby Escapes by a Hair\n\nIn the tightest cell check of the week, **Rice, Rice Baby \u2728** narrowly avoided lockdown, edging **Hernandez Hitmen** 191.1 to 190.35 \u2014 a margin of just 0.75 points. That's the fantasy equivalent of sneaking a shiv past the metal detector. Davante Adams (67.0) and CeeDee Lamb (58.6) both balled out for Hernandez, but it wasn't enough to spring them from this one. Somewhere, a guard is writing up a disciplinary report for \"insufficient bench depth.\"\n\n## The Blowout: Massage Boys Give OJ's Bronco the Full Treatment\n\n**The Massage Boys** put **OJ's Denver Bronco** in a chokehold, winning 194.0 to 163.4 \u2014 a 30.6-point margin that's the largest of the week. Jaxon Smith-Njigba exploded for a ridiculous 73.5 points, essentially doing all the heavy lifting himself while OJ's roster sat there like it was waiting for a parole hearing that's never coming.\n\n## Honorable Mention Beatdown: The Shootout Nobody Saw Coming\n\nWhile the numbers say Massage Boys' win was the biggest gap, the real war crime happened between **Ruggs, Drugs and TDs** and **Glove Don't Fit, Blitz**, who combined for a jaw-dropping 525.9 points. Glove Don't Fit prevailed 278.2\u2013247.7, propelled by Amon-Ra St. Brown's 56.9-point outing, even as Ruggs, Drugs and TDs got a two-QB showcase from Dak Prescott (60.1) and Jared Goff (59.1) that would win most weeks \u2014 just not this one.\n\n## The Big House MVP: Josh Allen Breaks Out of Solitary\n\nNo performance this week deserves a full pardon more than **Josh Allen**, who dropped a preposterous 78.6 points for Josh Allen's Prison Cell. Unfortunately, even a QB1 overall performance for the ages wasn't enough \u2014 his squad still fell 207.75\u2013226.55 to Steve Ruggs, who got just enough from Brock Purdy (59.7) to survive. Allen's stat line should honestly come with a \"time served\" reduction.\n\n## Around the Yard",
+  "games": [
+    {
+      "owner_a": "Rice, Rice Baby \u2728",
+      "pts_a": 191.1,
+      "owner_b": "Hernandez Hitmen",
+      "pts_b": 190.35,
+      "margin": 0.75,
+      "winner": "Rice, Rice Baby \u2728"
+    },
+    {
+      "owner_a": "Josh Allen\u2019s Prison Cell",
+      "pts_a": 207.75,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 226.55,
+      "margin": 18.8,
+      "winner": "Steve Ruggs"
+    },
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 200.2,
+      "owner_b": "The Adrian BeatHisSons",
+      "pts_b": 177.7,
+      "margin": 22.5,
+      "winner": "The ConVicks"
+    },
+    {
+      "owner_a": "Smack my Diggs up ",
+      "pts_a": 178.38,
+      "owner_b": "DUIiiiiiiii dont know jim",
+      "pts_b": 205.6,
+      "margin": 27.22,
+      "winner": "DUIiiiiiiii dont know jim"
+    },
+    {
+      "owner_a": "Ruggs, Drugs and TDs",
+      "pts_a": 247.7,
+      "owner_b": "Glove Don\u2019t Fit, Blitz",
+      "pts_b": 278.2,
+      "margin": 30.5,
+      "winner": "Glove Don\u2019t Fit, Blitz"
+    },
+    {
+      "owner_a": "OJ\u2019s Denver Bronco",
+      "pts_a": 163.4,
+      "owner_b": "The Massage Boys",
+      "pts_b": 194.0,
+      "margin": 30.6,
+      "winner": "The Massage Boys"
+    }
+  ],
+  "top_performers": [
+    {
+      "owner": "Josh Allen\u2019s Prison Cell",
+      "player": "Josh Allen (QB-BUF)",
+      "points": 78.6
+    },
+    {
+      "owner": "The Massage Boys",
+      "player": "Jaxon Smith-Njigba (WR-SEA)",
+      "points": 73.5
+    },
+    {
+      "owner": "Hernandez Hitmen",
+      "player": "Davante Adams (WR-LAR)",
+      "points": 67.0
+    },
+    {
+      "owner": "The ConVicks",
+      "player": "Patrick Mahomes (QB-KC)",
+      "points": 66.1
+    },
+    {
+      "owner": "Ruggs, Drugs and TDs",
+      "player": "Dak Prescott (QB-DAL)",
+      "points": 60.1
+    }
+  ]
+}
