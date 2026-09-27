@@ -2017,6 +2017,7 @@ function accaSlip(w) {
   ]);
   return el('div', {}, [
     el('div', { class: 'acca-summary' }, [el('span', {}, summary), betResultPill(w.result)]),
+    w.note ? el('p', { class: 'bet-leg-note', style: 'max-width:none;margin:0 0 12px;' }, `⚠ ${w.note}`) : null,
     el('div', { class: 'table-wrap' }, table),
     w.sat_out && w.sat_out.length ? el('p', { class: 'section-desc', style: 'margin-top:10px;' }, `Sat out: ${w.sat_out.join(', ')}`) : null,
     w.result === 'lost' && lost.length
