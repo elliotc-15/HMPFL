@@ -1964,6 +1964,17 @@ function decimalToFrac(dec) {
   });
   return best === '1/1' ? 'Evens' : best;
 }
+// Display a stored price as a clean fraction: "1/1" -> "Evens", and a
+// bookmaker-style decimal numerator like "1146.75/1" -> whole-number "1147/1".
+function displayOdds(odds) {
+  if (!odds) return '—';
+  const dec = fracToDecimal(odds);
+  if (!dec) return String(odds);
+  if (dec === 2) return 'Evens';
+  const m = String(odds).match(/^([\d.]+)\s*\/\s*([\d.]+)$/);
+  if (m && (!Number.isInteger(+m[1]) || !Number.isInteger(+m[2]))) return `${Math.round(dec - 1)}/1`;
+  return String(odds);
+}
 function betResultPill(result) {
   const r = result || 'pending';
   const labels = { won: '✓ WON', lost: '✗ LOST', void: 'VOID', pending: 'PENDING' };
@@ -2012,7 +2023,7 @@ function accaSlip(w) {
   const lost = w.legs.filter(l => l.result === 'lost');
   const summary = w.odds
     ? [
-      `${w.legs.length}-fold @ ${w.odds}`,
+      `${w.legs.length}-fold @ ${displayOdds(w.odds)}`,
       `Stake ${fmtMoney(w.stake)}`,
       w.result === 'won' ? `Returned ${fmtMoney(w.returns ?? w.potential_returns)}` : `Potential ${fmtMoney(w.potential_returns)}`,
     ].join(' · ')
@@ -2024,7 +2035,7 @@ function accaSlip(w) {
       el('td', {}, leg.game),
       el('td', {}, leg.pick),
       el('td', {}, leg.type),
-      el('td', { class: 'num-cell' }, leg.odds || '—'),
+      el('td', { class: 'num-cell' }, displayOdds(leg.odds)),
       el('td', {}, betResultPill(leg.result)),
       el('td', { style: 'color:var(--paper-dim);' }, [
         leg.actual || '—',
