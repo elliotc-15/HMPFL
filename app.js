@@ -1947,6 +1947,23 @@ function fracToDecimal(odds) {
   const m = s.match(/^([\d.]+)\s*\/\s*([\d.]+)$/);
   return m ? 1 + parseFloat(m[1]) / parseFloat(m[2]) : null;
 }
+// Standard UK bookmaker price ladder, used to show an averaged price as the
+// nearest familiar fraction rather than an arbitrary one like 187/100.
+const FRACTIONAL_LADDER = [
+  '1/10', '1/8', '1/7', '1/6', '1/5', '2/9', '1/4', '2/7', '3/10', '1/3', '4/11', '2/5', '4/9', '1/2',
+  '8/15', '4/7', '8/13', '4/6', '8/11', '4/5', '5/6', '10/11', '1/1', '11/10', '6/5', '5/4', '11/8',
+  '6/4', '13/8', '7/4', '15/8', '2/1', '9/4', '5/2', '11/4', '3/1', '10/3', '7/2', '4/1', '9/2',
+  '5/1', '11/2', '6/1', '13/2', '7/1', '15/2', '8/1', '9/1', '10/1',
+];
+function decimalToFrac(dec) {
+  if (!dec) return '—';
+  if (dec > 11) return `${Math.round(dec - 1)}/1`;
+  let best = FRACTIONAL_LADDER[0];
+  FRACTIONAL_LADDER.forEach(f => {
+    if (Math.abs(fracToDecimal(f) - dec) < Math.abs(fracToDecimal(best) - dec)) best = f;
+  });
+  return best === '1/1' ? 'Evens' : best;
+}
 function betResultPill(result) {
   const r = result || 'pending';
   const labels = { won: '✓ WON', lost: '✗ LOST', void: 'VOID', pending: 'PENDING' };
@@ -2007,7 +2024,7 @@ function accaSlip(w) {
       el('td', {}, leg.game),
       el('td', {}, leg.pick),
       el('td', {}, leg.type),
-      el('td', { class: 'num-cell' }, leg.odds),
+      el('td', { class: 'num-cell' }, leg.odds || '—'),
       el('td', {}, betResultPill(leg.result)),
       el('td', { style: 'color:var(--paper-dim);' }, [
         leg.actual || '—',
@@ -2041,7 +2058,7 @@ function accaOwnerTable(rows) {
         el('td', { class: 'num-cell' }, r.won),
         el('td', { class: 'num-cell' }, r.lost),
         el('td', { class: 'num-cell' }, hit === null ? '—' : hit.toFixed(0) + '%'),
-        el('td', { class: 'num-cell' }, avg ? fmt(avg, 2) : '—'),
+        el('td', { class: 'num-cell' }, avg ? decimalToFrac(avg) : el('span', { title: 'No odds recorded for these legs yet', style: 'color:var(--paper-dim);' }, 'n/a')),
         el('td', { class: 'num-cell' }, r.satOut),
       ]);
       Object.assign(tr.dataset, { owner: r.key, legs: r.legs, won: r.won, lost: r.lost, hit: hit ?? -1, avgodds: avg ?? 0, satout: r.satOut });
@@ -2067,7 +2084,7 @@ function accaTypeTable(rows) {
         el('td', { class: 'num-cell' }, r.won),
         el('td', { class: 'num-cell' }, r.lost),
         el('td', { class: 'num-cell' }, hit === null ? '—' : hit.toFixed(0) + '%'),
-        el('td', { class: 'num-cell' }, avg ? fmt(avg, 2) : '—'),
+        el('td', { class: 'num-cell' }, avg ? decimalToFrac(avg) : el('span', { title: 'No odds recorded for these legs yet', style: 'color:var(--paper-dim);' }, 'n/a')),
       ]);
       Object.assign(tr.dataset, { type: r.key, legs: r.legs, won: r.won, lost: r.lost, hit: hit ?? -1, avgodds: avg ?? 0 });
       return tr;
@@ -2136,12 +2153,12 @@ async function renderAcca() {
   const settledNote = stats.legsWon + stats.legsLost ? '' : ' Results are still pending, so hit rates fill in once legs are settled.';
   root.appendChild(el('div', { class: 'panel' }, [
     el('h2', { class: 'section-title' }, 'Leg Leaderboard'),
-    el('p', { class: 'section-desc' }, `Who actually lands their leg. "Lost" doubles as the number of times that inmate sank the acca. Click a column header to sort.${settledNote}`),
+    el('p', { class: 'section-desc' }, `Who actually lands their leg. "Lost" doubles as the number of times that inmate sank the acca. Avg Odds only counts legs where the price was recorded. Click a column header to sort.${settledNote}`),
     accaOwnerTable(owners),
   ]));
   root.appendChild(el('div', { class: 'panel' }, [
     el('h2', { class: 'section-title' }, 'What’s Working'),
-    el('p', { class: 'section-desc' }, `Hit rate by type of pick — are anytime TDs worth it, or are the safe yardage overs doing the heavy lifting?${settledNote}`),
+    el('p', { class: 'section-desc' }, `Hit rate by type of pick — are anytime TDs worth it, or are the safe yardage overs doing the heavy lifting? Avg Odds only counts legs where the price was recorded.${settledNote}`),
     accaTypeTable(types),
   ]));
 }
