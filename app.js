@@ -1935,6 +1935,211 @@ async function renderRecap() {
   }
 }
 
+// ===========================================================
+// TAB 12: THE ACCA (weekly group prop-bet accumulator)
+// Data lives in bets/<season>-week<N>.json, one file per week, listed in
+// bets/index.json. Each leg's result is 'won' | 'lost' | 'void' | 'pending'.
+// ===========================================================
+function fracToDecimal(odds) {
+  if (!odds) return null;
+  const s = String(odds).trim().toLowerCase();
+  if (s === 'evens' || s === 'evs') return 2;
+  const m = s.match(/^([\d.]+)\s*\/\s*([\d.]+)$/);
+  return m ? 1 + parseFloat(m[1]) / parseFloat(m[2]) : null;
+}
+function betResultPill(result) {
+  const r = result || 'pending';
+  const labels = { won: '✓ WON', lost: '✗ LOST', void: 'VOID', pending: 'PENDING' };
+  return el('span', { class: `pill pill-bet-${r}` }, labels[r] || r.toUpperCase());
+}
+function accaOwnerLink(owner) {
+  const link = el('span', { class: 'owner-link' }, owner);
+  link.addEventListener('click', () => { activateTab('teams'); renderTeamDetail(owner); });
+  return link;
+}
+function fmtMoney(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return '£' + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function hitRate(won, lost) {
+  return won + lost ? (won / (won + lost)) * 100 : null;
+}
+
+function buildAccaStats(weeks) {
+  const byOwner = {}, byType = {};
+  let legsWon = 0, legsLost = 0, staked = 0, returned = 0, landed = 0, settledWeeks = 0;
+  const bump = (map, key) => (map[key] = map[key] || { key, legs: 0, won: 0, lost: 0, pending: 0, satOut: 0, oddsSum: 0, oddsN: 0 });
+  weeks.forEach(w => {
+    staked += w.stake || 0;
+    if (w.result === 'won') { landed++; returned += w.returns ?? w.potential_returns ?? 0; }
+    if (w.result === 'won' || w.result === 'lost') settledWeeks++;
+    (w.sat_out || []).forEach(o => bump(byOwner, o).satOut++);
+    w.legs.forEach(leg => {
+      const o = bump(byOwner, leg.owner), t = bump(byType, leg.type || 'Other');
+      const dec = fracToDecimal(leg.odds);
+      [o, t].forEach(s => {
+        s.legs++;
+        if (leg.result === 'won') s.won++;
+        else if (leg.result === 'lost') s.lost++;
+        else if (leg.result !== 'void') s.pending++;
+        if (dec) { s.oddsSum += dec; s.oddsN++; }
+      });
+      if (leg.result === 'won') legsWon++;
+      if (leg.result === 'lost') legsLost++;
+    });
+  });
+  return { byOwner: Object.values(byOwner), byType: Object.values(byType), legsWon, legsLost, staked, returned, landed, settledWeeks };
+}
+
+function accaSlip(w) {
+  const lost = w.legs.filter(l => l.result === 'lost');
+  const summary = [
+    `${w.legs.length}-fold @ ${w.odds || '—'}`,
+    `Stake ${fmtMoney(w.stake)}`,
+    w.result === 'won' ? `Returned ${fmtMoney(w.returns ?? w.potential_returns)}` : `Potential ${fmtMoney(w.potential_returns)}`,
+  ].join(' · ');
+  const table = el('table', {}, [
+    el('thead', {}, el('tr', {}, ['Inmate', 'Game', 'Pick', 'Type', 'Odds', 'Result', 'Actual'].map(h => el('th', {}, h)))),
+    el('tbody', {}, w.legs.map(leg => el('tr', { class: leg.result === 'lost' ? 'bet-leg-lost' : '' }, [
+      el('td', { class: 'owner-cell' }, accaOwnerLink(leg.owner)),
+      el('td', {}, leg.game),
+      el('td', {}, leg.pick),
+      el('td', {}, leg.type),
+      el('td', { class: 'num-cell' }, leg.odds),
+      el('td', {}, betResultPill(leg.result)),
+      el('td', { style: 'color:var(--paper-dim);' }, leg.actual || '—'),
+    ]))),
+  ]);
+  return el('div', {}, [
+    el('div', { class: 'acca-summary' }, [el('span', {}, summary), betResultPill(w.result)]),
+    el('div', { class: 'table-wrap' }, table),
+    w.sat_out && w.sat_out.length ? el('p', { class: 'section-desc', style: 'margin-top:10px;' }, `Sat out: ${w.sat_out.join(', ')}`) : null,
+    w.result === 'lost' && lost.length
+      ? el('p', { class: 'section-desc', style: 'margin-top:6px;color:var(--rust-bright);' }, `Acca sunk by: ${lost.map(l => l.owner).join(', ')}`)
+      : null,
+  ]);
+}
+
+function accaOwnerTable(rows) {
+  const table = el('table', {}, [
+    el('thead', {}, el('tr', {}, [
+      th('Inmate', 'owner', 'str'), th('Legs', 'legs'), th('Won', 'won'), th('Lost', 'lost'),
+      th('Hit %', 'hit'), th('Avg Odds', 'avgodds'), th('Sat Out', 'satout'),
+    ])),
+    el('tbody', {}, rows.map(r => {
+      const hit = hitRate(r.won, r.lost);
+      const avg = r.oddsN ? r.oddsSum / r.oddsN : null;
+      const tr = el('tr', {}, [
+        el('td', { class: 'owner-cell' }, accaOwnerLink(r.key)),
+        el('td', { class: 'num-cell' }, r.legs),
+        el('td', { class: 'num-cell' }, r.won),
+        el('td', { class: 'num-cell' }, r.lost),
+        el('td', { class: 'num-cell' }, hit === null ? '—' : hit.toFixed(0) + '%'),
+        el('td', { class: 'num-cell' }, avg ? fmt(avg, 2) : '—'),
+        el('td', { class: 'num-cell' }, r.satOut),
+      ]);
+      Object.assign(tr.dataset, { owner: r.key, legs: r.legs, won: r.won, lost: r.lost, hit: hit ?? -1, avgodds: avg ?? 0, satout: r.satOut });
+      return tr;
+    })),
+  ]);
+  makeSortable(table);
+  return el('div', { class: 'table-wrap' }, table);
+}
+
+function accaTypeTable(rows) {
+  const table = el('table', {}, [
+    el('thead', {}, el('tr', {}, [
+      th('Bet Type', 'type', 'str'), th('Legs', 'legs'), th('Won', 'won'), th('Lost', 'lost'),
+      th('Hit %', 'hit'), th('Avg Odds', 'avgodds'),
+    ])),
+    el('tbody', {}, rows.map(r => {
+      const hit = hitRate(r.won, r.lost);
+      const avg = r.oddsN ? r.oddsSum / r.oddsN : null;
+      const tr = el('tr', {}, [
+        el('td', { class: 'owner-cell' }, r.key),
+        el('td', { class: 'num-cell' }, r.legs),
+        el('td', { class: 'num-cell' }, r.won),
+        el('td', { class: 'num-cell' }, r.lost),
+        el('td', { class: 'num-cell' }, hit === null ? '—' : hit.toFixed(0) + '%'),
+        el('td', { class: 'num-cell' }, avg ? fmt(avg, 2) : '—'),
+      ]);
+      Object.assign(tr.dataset, { type: r.key, legs: r.legs, won: r.won, lost: r.lost, hit: hit ?? -1, avgodds: avg ?? 0 });
+      return tr;
+    })),
+  ]);
+  makeSortable(table);
+  return el('div', { class: 'table-wrap' }, table);
+}
+
+async function renderAcca() {
+  const root = document.getElementById('tab-acca');
+  const holder = el('div', {}, el('div', { class: 'status-msg' }, ['Counting the commissary', el('span', { class: 'blink' }, '...')]));
+  root.appendChild(el('div', { class: 'panel', 'data-file-no': 'FILE 12' }, [
+    el('h2', { class: 'section-title' }, 'The Acca'),
+    el('p', { class: 'section-desc' }, 'Every inmate is assigned a game and picks one prop from it. The legs get stacked into one accumulator — if every leg lands, the pot gets split. One bad leg and the whole block goes hungry.'),
+    holder,
+  ]));
+
+  let weeks;
+  try {
+    const res = await fetch('bets/index.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('no index');
+    const index = await res.json();
+    weeks = await Promise.all(index.map(async e => {
+      const r = await fetch(`bets/${e.file}`, { cache: 'no-cache' });
+      if (!r.ok) throw new Error(`missing ${e.file}`);
+      return r.json();
+    }));
+  } catch (e) {
+    holder.innerHTML = '';
+    holder.appendChild(el('div', { class: 'status-msg' }, 'No bet slips on file yet.'));
+    return;
+  }
+  holder.innerHTML = '';
+  if (!weeks.length) {
+    holder.appendChild(el('div', { class: 'status-msg' }, 'No bet slips on file yet.'));
+    return;
+  }
+  weeks.sort((a, b) => (b.season - a.season) || (b.week - a.week));
+
+  const stats = buildAccaStats(weeks);
+  const legHit = hitRate(stats.legsWon, stats.legsLost);
+  holder.appendChild(el('div', { class: 'stat-grid' }, [
+    statCard(weeks.length, 'Weeks on File'),
+    statCard(`${stats.landed} / ${stats.settledWeeks}`, 'Accas Landed', true),
+    statCard(legHit === null ? '—' : legHit.toFixed(0) + '%', 'Leg Hit Rate', true),
+    statCard(fmtMoney(stats.staked), 'Total Staked', true),
+    statCard(fmtMoney(stats.returned), 'Total Returned', true),
+  ]));
+
+  // --- Weekly slip browser ---
+  const select = el('select', {}, weeks.map((w, i) => el('option', { value: i }, `${w.season} — Week ${w.week}`)));
+  const slipHolder = el('div');
+  const showSlip = () => { slipHolder.innerHTML = ''; slipHolder.appendChild(accaSlip(weeks[select.value])); };
+  select.addEventListener('change', showSlip);
+  root.appendChild(el('div', { class: 'panel' }, [
+    el('h2', { class: 'section-title' }, 'The Slip'),
+    el('div', { class: 'control-row' }, [el('label', {}, 'Week:'), select]),
+    slipHolder,
+  ]));
+  showSlip();
+
+  // --- Leaderboards ---
+  const owners = stats.byOwner.sort((a, b) => (hitRate(b.won, b.lost) ?? -1) - (hitRate(a.won, a.lost) ?? -1) || b.won - a.won || a.key.localeCompare(b.key));
+  const types = stats.byType.sort((a, b) => b.legs - a.legs || a.key.localeCompare(b.key));
+  const settledNote = stats.legsWon + stats.legsLost ? '' : ' Results are still pending, so hit rates fill in once legs are settled.';
+  root.appendChild(el('div', { class: 'panel' }, [
+    el('h2', { class: 'section-title' }, 'Leg Leaderboard'),
+    el('p', { class: 'section-desc' }, `Who actually lands their leg. "Lost" doubles as the number of times that inmate sank the acca. Click a column header to sort.${settledNote}`),
+    accaOwnerTable(owners),
+  ]));
+  root.appendChild(el('div', { class: 'panel' }, [
+    el('h2', { class: 'section-title' }, 'What’s Working'),
+    el('p', { class: 'section-desc' }, `Hit rate by type of pick — are anytime TDs worth it, or are the safe yardage overs doing the heavy lifting?${settledNote}`),
+    accaTypeTable(types),
+  ]));
+}
+
 // ---------- REGISTER RENDERERS ----------
 const renderers = {
   home: renderHome,
@@ -1948,6 +2153,7 @@ const renderers = {
   teams: renderTeams,
   live: renderLive,
   recap: renderRecap,
+  acca: renderAcca,
 };
 
 // ---------- INIT ----------

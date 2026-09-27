@@ -248,6 +248,12 @@ tbody tr:hover{background:rgba(255,122,31,0.06);}
   border-radius:2px; font-family:'IBM Plex Mono',monospace; letter-spacing:0.5px;
 }
 .pill-gold{background:rgba(160,138,78,0.25); color:var(--brass); border:1px solid var(--brass);}
+.pill-bet-won{background:rgba(76,175,122,0.18); color:#6fd49b; border:1px solid #4caf7a;}
+.pill-bet-lost{background:rgba(204,29,0,0.2); color:var(--rust-bright); border:1px solid var(--rust-bright);}
+.pill-bet-pending{background:transparent; color:var(--paper-dim); border:1px dashed var(--line);}
+.pill-bet-void{background:transparent; color:var(--paper-dim); border:1px solid var(--line); text-decoration:line-through;}
+tr.bet-leg-lost td{background:rgba(204,29,0,0.08);}
+.acca-summary{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--brass); margin-bottom:12px;}
 .pill-rust{background:rgba(184,68,47,0.2); color:var(--rust-bright); border:1px solid var(--rust-bright);}
 
 /* ===== STAT CARDS ===== */
@@ -395,6 +401,7 @@ footer{
     <li><button class="overlay-btn" data-tab="teams"><span class="num">09</span>Inmates</button></li>
     <li><button class="overlay-btn" data-tab="live"><span class="num">10</span>Live Scores</button></li>
     <li><button class="overlay-btn" data-tab="recap"><span class="num">11</span>Weekly Recap</button></li>
+    <li><button class="overlay-btn" data-tab="acca"><span class="num">12</span>The Acca</button></li>
   </ul>
 </nav>
 
@@ -410,6 +417,7 @@ footer{
   <section id="tab-teams" class="tab-content"></section>
   <section id="tab-live" class="tab-content"></section>
   <section id="tab-recap" class="tab-content"></section>
+  <section id="tab-acca" class="tab-content"></section>
 </main>
 
 <footer>HMPFL DEPT. OF CORRECTIONS · RECORDS DIVISION · DATA FROM SLEEPER API + LEAGUE ARCHIVES</footer>
