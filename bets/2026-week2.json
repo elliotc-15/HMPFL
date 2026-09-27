@@ -1,0 +1,24 @@
+{
+  "season": "2026",
+  "week": 2,
+  "placed": "2026-09-20",
+  "bookmaker": "Sky Bet",
+  "stake": 1.00,
+  "odds": "1146.75/1",
+  "potential_returns": 1147.75,
+  "result": "lost",
+  "sat_out": ["Dylan"],
+  "legs": [
+    { "owner": "Ashley",  "game": "Panthers @ Falcons",  "pick": "Darren Waller over 16.5 receiving yds", "type": "Receiving Yds",  "odds": "5/6",  "result": "won",  "actual": "33 rec yds (3 rec, 2 TD)" },
+    { "owner": "Elliot",  "game": "Browns @ Buccaneers", "pick": "Deshaun Watson over 0.5 interceptions",  "type": "Interceptions",  "odds": "4/6",  "result": "lost", "actual": "0 INT (24/30, 238 yds, 2 TD)" },
+    { "owner": "James",   "game": "Packers @ Jets",      "pick": "Breece Hall anytime TD",                 "type": "Anytime TD",     "odds": "1/1",  "result": "lost", "actual": "No TD (29 rush yds, 63 rec yds)" },
+    { "owner": "Joe",     "game": "Vikings @ Bears",     "pick": "D'Andre Swift over 60.5 rushing yds",    "type": "Rushing Yds",    "odds": "5/6",  "result": "lost", "actual": "45 rush yds (16 car)" },
+    { "owner": "Josh",    "game": "Saints @ Ravens",     "pick": "Alvin Kamara over 12.5 receiving yds",   "type": "Receiving Yds",  "odds": "5/6",  "result": "lost", "actual": "7 rec yds (5 rec)" },
+    { "owner": "Matthew", "game": "Eagles @ Titans",     "pick": "Cam Ward over 0.5 passing TDs",          "type": "Passing TDs",    "odds": "1/2",  "result": "lost", "actual": "0 pass TD (2 rushing TDs)" },
+    { "owner": "Mike",    "game": "Steelers @ Patriots", "pick": "TreVeyon Henderson anytime TD",          "type": "Anytime TD",     "odds": "5/2",  "result": "won",  "actual": "39-yd rushing TD (76 yds)" },
+    { "owner": "Morgan",  "game": "Jaguars @ Broncos",   "pick": "Trevor Lawrence over 222.5 passing yds", "type": "Passing Yds",    "odds": "5/6",  "result": "lost", "actual": "189 pass yds" },
+    { "owner": "Jack",    "game": "Raiders @ Chargers",  "pick": "Ashton Jeanty over 16.5 rush attempts",  "type": "Rush Attempts",  "odds": "5/6",  "result": "won",  "actual": "21 carries" },
+    { "owner": "Carter",  "game": "Dolphins @ 49ers",    "pick": "Deebo Samuel over 5.5 rushing yds",      "type": "Rushing Yds",    "odds": "8/11", "result": "lost", "actual": "4 rush yds (1 car)" },
+    { "owner": "Rhys",    "game": "Seahawks @ Cardinals","pick": "Trey McBride over 60.5 receiving yds",   "type": "Receiving Yds",  "odds": "5/6",  "result": "lost", "actual": "41 rec yds (8 rec, 1 TD)" }
+  ]
+}

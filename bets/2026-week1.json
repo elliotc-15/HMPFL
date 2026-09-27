@@ -1,0 +1,108 @@
+{
+  "season": "2026",
+  "week": 1,
+  "placed": "2026-09-13",
+  "bookmaker": "Sky Bet",
+  "stake": null,
+  "odds": null,
+  "potential_returns": null,
+  "result": "lost",
+  "note": "Sky Bet slip not available for this week, so over/under lines are estimated from other sportsbooks' published props.",
+  "sat_out": [
+    "Ashley",
+    "Dylan"
+  ],
+  "legs": [
+    {
+      "owner": "Carter",
+      "game": "Lions v Saints",
+      "pick": "Jahmyr Gibbs 2+ TDs",
+      "type": "2+ TDs",
+      "odds": null,
+      "result": "won",
+      "actual": "2 TDs (156 rush yds)"
+    },
+    {
+      "owner": "Elliot",
+      "game": "Buccaneers @ Bengals",
+      "pick": "Baker Mayfield over 21.5 completions",
+      "type": "Completions",
+      "odds": null,
+      "result": "won",
+      "actual": "23 completions (23/28, 216 yds)"
+    },
+    {
+      "owner": "Josh",
+      "game": "Ravens @ Colts",
+      "pick": "Lamar Jackson over 36.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": null,
+      "result": "won",
+      "actual": "40 rush yds (7 car, 1 TD)",
+      "note": "Estimated line: other books had 36.5, 37.5 and 45.5. Settled as won on the majority."
+    },
+    {
+      "owner": "Matthew",
+      "game": "Jaguars v Browns",
+      "pick": "Deshaun Watson 18.5+ completions",
+      "type": "Completions",
+      "odds": null,
+      "result": "lost",
+      "actual": "16 completions (16/22, 205 yds)"
+    },
+    {
+      "owner": "James",
+      "game": "Jets @ Titans",
+      "pick": "Garrett Wilson over 60.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": null,
+      "result": "won",
+      "actual": "79 rec yds (6 rec)"
+    },
+    {
+      "owner": "Joe",
+      "game": "Bills @ Texans",
+      "pick": "David Montgomery over 54.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": null,
+      "result": "won",
+      "actual": "70 rush yds (26 car, 2 TD)"
+    },
+    {
+      "owner": "Morgan",
+      "game": "Falcons @ Steelers",
+      "pick": "Kyle Pitts anytime TD",
+      "type": "Anytime TD",
+      "odds": null,
+      "result": "lost",
+      "actual": "No TD (0 rec on 1 target)"
+    },
+    {
+      "owner": "Mike",
+      "game": "Bears @ Panthers",
+      "pick": "Caleb Williams over 1.5 passing TDs",
+      "type": "Passing TDs",
+      "odds": null,
+      "result": "won",
+      "actual": "2 pass TDs (+2 rushing TDs)"
+    },
+    {
+      "owner": "Jack",
+      "game": "Vikings @ Packers",
+      "pick": "Tucker Kraft anytime TD",
+      "type": "Anytime TD",
+      "odds": null,
+      "result": "lost",
+      "actual": "No TD (3 rec, 65 yds)"
+    },
+    {
+      "owner": "Rhys",
+      "game": "Eagles v Commanders",
+      "pick": "Jalen Hurts over 26.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": null,
+      "result": "won",
+      "actual": "46 rush yds"
+    }
+  ]
+}
