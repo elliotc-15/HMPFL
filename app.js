@@ -1993,11 +1993,13 @@ function buildAccaStats(weeks) {
 
 function accaSlip(w) {
   const lost = w.legs.filter(l => l.result === 'lost');
-  const summary = [
-    `${w.legs.length}-fold @ ${w.odds || '—'}`,
-    `Stake ${fmtMoney(w.stake)}`,
-    w.result === 'won' ? `Returned ${fmtMoney(w.returns ?? w.potential_returns)}` : `Potential ${fmtMoney(w.potential_returns)}`,
-  ].join(' · ');
+  const summary = w.odds
+    ? [
+      `${w.legs.length}-fold @ ${w.odds}`,
+      `Stake ${fmtMoney(w.stake)}`,
+      w.result === 'won' ? `Returned ${fmtMoney(w.returns ?? w.potential_returns)}` : `Potential ${fmtMoney(w.potential_returns)}`,
+    ].join(' · ')
+    : `${w.legs.length}-fold · odds & stake not recorded`;
   const table = el('table', {}, [
     el('thead', {}, el('tr', {}, ['Inmate', 'Game', 'Pick', 'Type', 'Odds', 'Result', 'Actual'].map(h => el('th', {}, h)))),
     el('tbody', {}, w.legs.map(leg => el('tr', { class: leg.result === 'lost' ? 'bet-leg-lost' : '' }, [
@@ -2007,7 +2009,10 @@ function accaSlip(w) {
       el('td', {}, leg.type),
       el('td', { class: 'num-cell' }, leg.odds),
       el('td', {}, betResultPill(leg.result)),
-      el('td', { style: 'color:var(--paper-dim);' }, leg.actual || '—'),
+      el('td', { style: 'color:var(--paper-dim);' }, [
+        leg.actual || '—',
+        leg.note ? el('div', { class: 'bet-leg-note' }, `⚠ ${leg.note}`) : null,
+      ]),
     ]))),
   ]);
   return el('div', {}, [
