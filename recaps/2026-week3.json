@@ -1,0 +1,83 @@
+{
+  "season": "2026",
+  "week": 3,
+  "generated_at": "2026-09-29T16:51:21.789883+00:00",
+  "recap_text": "# HMPFL WEEK 3: LOCKDOWN RECAP\n\nThe cell doors slammed shut on another wild week in His Majesty's Prison Fantasy League, and somebody needs to check on the warden because a few of these scorelines are criminal.\n\n## The Great Escape: DUIiiiiiiii Torches the Yard\n\nLet's start with the headline: **DUIiiiiiiii dont know jim** didn't just beat Rice, Rice Baby \u2728, he staged a full-blown prison break, dropping a jaw-dropping **367.45 points** in a **113.4-point blowout**. That's not a win, that's a warden's confession that the whole facility is being run by inmates now. Jahmyr Gibbs (72.8) and Drake London (47.3) both went full riot mode, and the Minnesota defense chipped in a stunning 49.45 points, because apparently everyone on this roster got the memo to show up big. Rice, Rice Baby's 254.05 points would've won most other matchups this week \u2014 instead it just got buried under an avalanche.\n\n## Squeaker of the Week\n\nWhile DUIiiiiiiii was out here setting the yard on fire, **Ruggs, Drugs and TDs** and **The Massage Boys** were fighting it out in the closest scrap of the week. The Massage Boys survived, 182.8\u2013164.2, thanks in large part to Sam Darnold (62.4) and Jaxon Smith-Njigba (56.0) doing double duty in what might be the quietest 18.6-point margin of the season \u2014 still a W, still counts on the books.\n\n## Cellblock Standouts\n\nBijan Robinson put on a clinic for **The Adrian BeatHisSons**, exploding for 73.1 points \u2014 the single best individual outing of the week \u2014 and pairing with Matthew Stafford's 47.6 to help fend off a scrappy **Glove Don't Fit, Blitz** squad, 249.7\u2013227.7, in a game that had shootout energy from kickoff to final whistle.\n\nMeanwhile, **Steve Ruggs** rode Brock Purdy's 70-point gem (plus Joe Burrow chipping in 46.3 \u2014 yes, two elite QBs on one roster, that should be illegal) to a 235.85\u2013206.05 win over The ConVicks, whose Tyler Shough tried valiantly with 44.2 points but couldn't spring the upset.\n\n## Other Notes From the Block\n\n**Smack My Diggs Up** handled business against Josh Allen's Prison Cell, 147.9\u2013127.7, while **Hernandez Hitmen** put together a workmanlike 201.45\u2013142 win over OJ's Denver Bronco. No fireworks, just quiet time served.\n\nBook 'em, Week 3. Week 4's already looking like it needs its own warden.",
+  "games": [
+    {
+      "owner_a": "Ruggs, Drugs and TDs",
+      "pts_a": 164.2,
+      "owner_b": "The Massage Boys",
+      "pts_b": 182.8,
+      "margin": 18.6,
+      "winner": "The Massage Boys"
+    },
+    {
+      "owner_a": "Smack my Diggs up ",
+      "pts_a": 147.9,
+      "owner_b": "Josh Allen\u2019s Prison Cell",
+      "pts_b": 127.7,
+      "margin": 20.2,
+      "winner": "Smack my Diggs up "
+    },
+    {
+      "owner_a": "The Adrian BeatHisSons",
+      "pts_a": 249.7,
+      "owner_b": "Glove Don\u2019t Fit, Blitz",
+      "pts_b": 227.7,
+      "margin": 22.0,
+      "winner": "The Adrian BeatHisSons"
+    },
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 206.05,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 235.85,
+      "margin": 29.8,
+      "winner": "Steve Ruggs"
+    },
+    {
+      "owner_a": "OJ\u2019s Denver Bronco",
+      "pts_a": 142.0,
+      "owner_b": "Hernandez Hitmen",
+      "pts_b": 201.45,
+      "margin": 59.45,
+      "winner": "Hernandez Hitmen"
+    },
+    {
+      "owner_a": "DUIiiiiiiii dont know jim",
+      "pts_a": 367.45,
+      "owner_b": "Rice, Rice Baby \u2728",
+      "pts_b": 254.05,
+      "margin": 113.4,
+      "winner": "DUIiiiiiiii dont know jim"
+    }
+  ],
+  "top_performers": [
+    {
+      "owner": "The Adrian BeatHisSons",
+      "player": "Bijan Robinson (RB-ATL)",
+      "points": 73.1
+    },
+    {
+      "owner": "DUIiiiiiiii dont know jim",
+      "player": "Jahmyr Gibbs (RB-DET)",
+      "points": 72.8
+    },
+    {
+      "owner": "Steve Ruggs",
+      "player": "Brock Purdy (QB-SF)",
+      "points": 70.0
+    },
+    {
+      "owner": "The Massage Boys",
+      "player": "Sam Darnold (QB-SEA)",
+      "points": 62.4
+    },
+    {
+      "owner": "The Massage Boys",
+      "player": "Jaxon Smith-Njigba (WR-SEA)",
+      "points": 56.0
+    }
+  ]
+}
