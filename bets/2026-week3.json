@@ -1,0 +1,122 @@
+{
+  "season": "2026",
+  "week": 3,
+  "placed": "2026-09-27",
+  "bookmaker": "Sky Bet",
+  "stake": 1.0,
+  "odds": "1714.83/1",
+  "potential_returns": 1715.83,
+  "result": "lost",
+  "note": "Stake not shown on the slip screenshot, so £1 is assumed (as in Week 2); acca odds are calculated from the leg prices.",
+  "sat_out": [],
+  "legs": [
+    {
+      "owner": "James",
+      "game": "Chiefs @ Dolphins",
+      "pick": "Kenneth Walker III over 82.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "5/6",
+      "result": "lost",
+      "actual": "70 rush yds (18 car, 2 TD)"
+    },
+    {
+      "owner": "Matthew",
+      "game": "Panthers @ Browns",
+      "pick": "AJ Dillon over 14.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "5/6",
+      "result": "won",
+      "actual": "16 rush yds (4 car)"
+    },
+    {
+      "owner": "Elliot",
+      "game": "Titans @ Giants",
+      "pick": "Cam Skattebo longest rush over 12.5 yds",
+      "type": "Longest Rush",
+      "odds": "1/1",
+      "result": "won",
+      "actual": "Longest rush 13 yds (20 car, 60 yds)"
+    },
+    {
+      "owner": "Joe",
+      "game": "Patriots @ Jaguars",
+      "pick": "Parker Washington over 70.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": "5/6",
+      "result": "lost",
+      "actual": "40 rec yds (3 rec, 1 TD)"
+    },
+    {
+      "owner": "Mike",
+      "game": "Chargers @ Bills",
+      "pick": "Josh Allen over 32.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "5/6",
+      "result": "lost",
+      "actual": "22 rush yds (8 car, 2 TD)"
+    },
+    {
+      "owner": "Morgan",
+      "game": "Jets @ Lions",
+      "pick": "Jahmyr Gibbs over 89.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "5/6",
+      "result": "won",
+      "actual": "99 rush yds (20 car, 2 TD)"
+    },
+    {
+      "owner": "Dylan",
+      "game": "Texans @ Colts",
+      "pick": "C.J. Stroud over 239.5 passing yds",
+      "type": "Passing Yds",
+      "odds": "5/6",
+      "result": "lost",
+      "actual": "167 pass yds (16/27, 1 TD)"
+    },
+    {
+      "owner": "Ashley",
+      "game": "Seahawks @ Commanders",
+      "pick": "Jaxon Smith-Njigba over 6.5 receptions",
+      "type": "Receptions",
+      "odds": "5/6",
+      "result": "won",
+      "actual": "10 rec (128 yds, 2 TD)"
+    },
+    {
+      "owner": "Josh",
+      "game": "Cardinals @ 49ers",
+      "pick": "Jacoby Brissett over 33.5 pass attempts",
+      "type": "Pass Attempts",
+      "odds": "5/6",
+      "result": "won",
+      "actual": "52 attempts (38/52, 280 yds)"
+    },
+    {
+      "owner": "Rhys",
+      "game": "Vikings @ Buccaneers",
+      "pick": "Baker Mayfield over 18.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "5/6",
+      "result": "lost",
+      "actual": "6 rush yds (2 car)"
+    },
+    {
+      "owner": "Jack",
+      "game": "Raiders @ Saints",
+      "pick": "Kirk Cousins over 20.5 completions",
+      "type": "Completions",
+      "odds": "1/1",
+      "result": "won",
+      "actual": "22 completions (22/33, 248 yds, 3 TD)"
+    },
+    {
+      "owner": "Carter",
+      "game": "Ravens @ Cowboys",
+      "pick": "Dak Prescott over 11.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "5/6",
+      "result": "won",
+      "actual": "19 rush yds (4 car)"
+    }
+  ]
+}
