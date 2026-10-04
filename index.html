@@ -251,6 +251,27 @@ tbody tr:hover{background:rgba(255,122,31,0.06);}
 .pill-bet-won{background:rgba(76,175,122,0.18); color:#6fd49b; border:1px solid #4caf7a;}
 .pill-bet-lost{background:rgba(204,29,0,0.2); color:var(--rust-bright); border:1px solid var(--rust-bright);}
 .pill-bet-pending{background:transparent; color:var(--paper-dim); border:1px dashed var(--line);}
+.pill-bet-live{background:rgba(255,117,31,0.15); color:var(--jumpsuit-bright); border:1px solid var(--jumpsuit-bright);}
+.acca-tracker{border:1px solid var(--line); background:var(--concrete); padding:12px 14px; margin-bottom:14px;}
+.acca-tracker-head{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--paper-dim); margin-bottom:8px;}
+.acca-tracker-title{font-family:'Oswald',sans-serif; font-size:17px; letter-spacing:1px; color:var(--paper);}
+.acca-tracker-title.down{color:var(--rust-bright);}
+.acca-tracker-title.down .live-dot{background:var(--rust-bright); box-shadow:none; animation:none;}
+.acca-tracker-bar{display:flex; gap:3px; height:14px;}
+.acca-seg{flex:1; background:var(--line); transition:background .4s;}
+.acca-seg.seg-won{background:#4caf7a;}
+.acca-seg.seg-lost{background:var(--rust-bright);}
+.acca-seg.seg-live{background:var(--jumpsuit-bright); animation:blink 1.4s infinite;}
+.acca-seg.seg-void{background:var(--paper-dim);}
+.acca-tracker-foot{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--paper-dim); margin-top:8px;}
+.live-leg{min-width:150px;}
+.live-leg-top{display:flex; justify-content:space-between; gap:8px; font-size:11.5px; color:var(--paper); white-space:nowrap;}
+.live-leg-clock{color:var(--paper-dim); font-size:10px;}
+.live-leg-bar{height:5px; background:var(--line); margin-top:4px; overflow:hidden;}
+.live-leg-fill{height:100%; background:var(--paper-dim); transition:width .6s ease;}
+.live-leg-fill.fill-live{background:var(--jumpsuit-bright);}
+.live-leg-fill.fill-won{background:#4caf7a;}
+.live-leg-fill.fill-lost{background:var(--rust-bright);}
 .pill-bet-void{background:transparent; color:var(--paper-dim); border:1px solid var(--line); text-decoration:line-through;}
 .bet-leg-note{font-size:10.5px; color:var(--jumpsuit-bright); margin-top:4px; max-width:260px;}
 tr.bet-leg-lost td{background:rgba(204,29,0,0.08);}
