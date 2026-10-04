@@ -1,6 +1,11 @@
 [
   {
     "season": "2026",
+    "week": 4,
+    "file": "2026-week4.json"
+  },
+  {
+    "season": "2026",
     "week": 3,
     "file": "2026-week3.json"
   },

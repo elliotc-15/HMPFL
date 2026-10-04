@@ -1,0 +1,109 @@
+{
+  "season": "2026",
+  "week": 4,
+  "placed": "2026-10-04",
+  "bookmaker": "Sky Bet",
+  "stake": 1.0,
+  "odds": "2322.52/1",
+  "potential_returns": 2323.52,
+  "result": "pending",
+  "sat_out": [],
+  "legs": [
+    {
+      "owner": "Matthew",
+      "game": "Colts @ Commanders (London)",
+      "pick": "Daniel Jones longest pass over 33.5 yds",
+      "type": "Longest Pass",
+      "odds": "5/6",
+      "result": "pending"
+    },
+    {
+      "owner": "James",
+      "game": "Cardinals @ Giants",
+      "pick": "Jeremiyah Love over 87.5 rushing + receiving yds",
+      "type": "Rush + Rec Yds",
+      "odds": "5/6",
+      "result": "pending"
+    },
+    {
+      "owner": "Morgan",
+      "game": "Patriots @ Bills",
+      "pick": "Josh Allen over 31.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "5/6",
+      "result": "pending"
+    },
+    {
+      "owner": "Dylan",
+      "game": "Jets @ Bears",
+      "pick": "Braelon Allen over 56.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "5/6",
+      "result": "pending"
+    },
+    {
+      "owner": "Elliot",
+      "game": "Cowboys @ Texans",
+      "pick": "Jake Ferguson over 23.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": "5/6",
+      "result": "pending"
+    },
+    {
+      "owner": "Carter",
+      "game": "Rams @ Eagles",
+      "pick": "Kyren Williams over 13.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": "5/6",
+      "result": "pending"
+    },
+    {
+      "owner": "Joe",
+      "game": "Packers @ Buccaneers",
+      "pick": "Bucky Irving over 55.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "5/6",
+      "result": "pending"
+    },
+    {
+      "owner": "Josh",
+      "game": "Titans @ Ravens",
+      "pick": "Derrick Henry 2+ TDs",
+      "type": "2+ TDs",
+      "odds": "9/4",
+      "result": "pending"
+    },
+    {
+      "owner": "Mike",
+      "game": "Jaguars @ Bengals",
+      "pick": "Ja'Marr Chase over 81.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": "5/6",
+      "result": "pending"
+    },
+    {
+      "owner": "Jack",
+      "game": "Dolphins @ Vikings",
+      "pick": "Ollie Gordon II over 7.5 rush attempts",
+      "type": "Rush Attempts",
+      "odds": "5/6",
+      "result": "pending"
+    },
+    {
+      "owner": "Rhys",
+      "game": "Chiefs @ Raiders",
+      "pick": "Patrick Mahomes over 238.5 passing yds",
+      "type": "Passing Yds",
+      "odds": "5/6",
+      "result": "pending"
+    },
+    {
+      "owner": "Ashley",
+      "game": "Chargers @ Seahawks",
+      "pick": "Jaxon Smith-Njigba over 6.5 receptions",
+      "type": "Receptions",
+      "odds": "4/6",
+      "result": "pending"
+    }
+  ]
+}
