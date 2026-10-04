@@ -2019,7 +2019,147 @@ function buildAccaStats(weeks) {
   return { byOwner: Object.values(byOwner), byType: Object.values(byType), legsWon, legsLost, staked, returned, landed, settledWeeks };
 }
 
-function accaSlip(w) {
+// ---------- LIVE ACCA TRACKER (ESPN public scoreboard/box scores) ----------
+// Legs that carry a `live: { player, stat, line }` spec are tracked live from
+// ESPN while their result in the bets file is still 'pending'. Recorded results
+// always win; live status is display-only until the week is settled.
+const ESPN_NFL_API = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl';
+const ACCA_LIVE_REFRESH_MS = 60000;
+let accaLiveTimer = null;
+
+function normName(s) {
+  return String(s || '').toLowerCase().replace(/[.'’]/g, '').replace(/\b(jr|sr|ii|iii|iv)\b/g, '').replace(/[^a-z]+/g, ' ').trim();
+}
+function num(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+
+// Flatten an ESPN summary box score into { normName: { team, passing, rushing, receiving } }.
+function parseEspnBox(summary) {
+  const players = {};
+  ((summary.boxscore && summary.boxscore.players) || []).forEach(teamBlock => {
+    const team = teamBlock.team && teamBlock.team.id;
+    (teamBlock.statistics || []).forEach(cat => {
+      (cat.athletes || []).forEach(a => {
+        const key = normName(a.athlete && a.athlete.displayName);
+        if (!key) return;
+        const rec = players[key] = players[key] || { team };
+        const vals = {};
+        (cat.keys || []).forEach((k, i) => { vals[k] = (a.stats || [])[i]; });
+        rec[cat.name] = vals;
+      });
+    });
+  });
+  return players;
+}
+
+// Current value of a leg's stat from a parsed box score (0 if the player has no line yet).
+function legStatValue(box, player, stat) {
+  const p = box[normName(player)] || {};
+  const pass = p.passing || {}, rush = p.rushing || {}, recv = p.receiving || {};
+  const cmpAtt = String(pass['completions/passingAttempts'] || '0/0').split('/');
+  switch (stat) {
+    case 'pass_yds': return num(pass.passingYards);
+    case 'pass_cmp': return num(cmpAtt[0]);
+    case 'pass_att': return num(cmpAtt[1]);
+    case 'pass_td': return num(pass.passingTouchdowns);
+    case 'int': return num(pass.interceptions);
+    case 'rush_yds': return num(rush.rushingYards);
+    case 'rush_att': return num(rush.rushingAttempts);
+    case 'rush_long': return num(rush.longRushing);
+    case 'rec_yds': return num(recv.receivingYards);
+    case 'rec': return num(recv.receptions);
+    case 'rush_rec_yds': return num(rush.rushingYards) + num(recv.receivingYards);
+    case 'tds': return num(rush.rushingTouchdowns) + num(recv.receivingTouchdowns);
+    case 'longest_pass': {
+      // ESPN has no per-QB longest completion, so use the longest catch by the QB's team.
+      let best = 0;
+      Object.values(box).forEach(o => { if (o.team === p.team && o.receiving) best = Math.max(best, num(o.receiving.longReception)); });
+      return best;
+    }
+    default: return null;
+  }
+}
+
+function findEspnEvent(events, gameLabel) {
+  const label = String(gameLabel).toLowerCase();
+  return events.find(ev => {
+    const comps = (ev.competitions && ev.competitions[0] && ev.competitions[0].competitors) || [];
+    return comps.length === 2 && comps.every(c => label.includes(String((c.team && (c.team.name || c.team.shortDisplayName)) || '???').toLowerCase()));
+  });
+}
+
+// Returns an array (one entry per leg) of { state, detail, value, status }, or null if ESPN is unreachable.
+async function fetchAccaLive(w) {
+  try {
+    const sb = await fetch(`${ESPN_NFL_API}/scoreboard?seasontype=2&week=${w.week}&dates=${w.season}`, { cache: 'no-store' });
+    if (!sb.ok) return null;
+    const events = (await sb.json()).events || [];
+    const boxes = {};
+    const needed = new Set();
+    const legEvents = w.legs.map(leg => {
+      if (!leg.live || leg.result !== 'pending') return null;
+      const ev = findEspnEvent(events, leg.game);
+      if (ev && ev.status && ev.status.type && ev.status.type.state !== 'pre') needed.add(ev.id);
+      return ev || null;
+    });
+    await Promise.all([...needed].map(async id => {
+      const r = await fetch(`${ESPN_NFL_API}/summary?event=${id}`, { cache: 'no-store' });
+      if (r.ok) boxes[id] = parseEspnBox(await r.json());
+    }));
+    return w.legs.map((leg, i) => {
+      const ev = legEvents[i];
+      if (!ev) return null;
+      const type = ev.status.type;
+      const state = type.state; // 'pre' | 'in' | 'post'
+      const detail = state === 'pre'
+        ? new Date(ev.date).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false })
+        : (type.shortDetail || type.detail || '');
+      const value = boxes[ev.id] ? legStatValue(boxes[ev.id], leg.live.player, leg.live.stat) : (state === 'pre' ? 0 : null);
+      let status = 'pending';
+      if (value !== null && value > leg.live.line) status = 'won';
+      else if (state === 'post' && value !== null) status = 'lost';
+      else if (state === 'in') status = 'live';
+      return { state, detail, value, status };
+    });
+  } catch (e) {
+    return null; // CORS/network failure: slip just shows without live data
+  }
+}
+
+function accaTrackerBar(w, live) {
+  const statuses = w.legs.map((leg, i) => leg.result !== 'pending' ? leg.result : ((live && live[i] && live[i].status) || 'pending'));
+  const won = statuses.filter(s => s === 'won').length;
+  const lost = statuses.filter(s => s === 'lost').length;
+  const inPlay = statuses.filter(s => s === 'live').length;
+  const pct = Math.round((won / w.legs.length) * 100);
+  const headline = lost
+    ? `ACCA DOWN — ${lost} leg${lost === 1 ? '' : 's'} missed`
+    : won === w.legs.length ? 'ACCA LANDED!' : 'ACCA ALIVE';
+  return el('div', { class: 'acca-tracker' }, [
+    el('div', { class: 'acca-tracker-head' }, [
+      el('span', { class: `acca-tracker-title ${lost ? 'down' : 'alive'}` }, [el('span', { class: 'live-dot' }), headline]),
+      el('span', {}, `${won} / ${w.legs.length} legs landed · ${pct}%${inPlay ? ` · ${inPlay} in play` : ''}`),
+    ]),
+    el('div', { class: 'acca-tracker-bar' }, statuses.map((s, i) => el('div', {
+      class: `acca-seg seg-${s}`, title: `${w.legs[i].owner}: ${w.legs[i].pick} — ${s.toUpperCase()}`,
+    }))),
+    el('div', { class: 'acca-tracker-foot' }, 'Live stats via ESPN, refreshed every minute while games are on. Official results are confirmed after the final whistle.'),
+  ]);
+}
+
+function liveLegCell(leg, lv) {
+  const line = leg.live.line;
+  const value = lv.value;
+  const pct = value === null ? 0 : Math.min(100, (value / line) * 100);
+  return el('div', { class: 'live-leg' }, [
+    el('div', { class: 'live-leg-top' }, [
+      el('span', {}, value === null ? '—' : `${value} / ${line}`),
+      el('span', { class: 'live-leg-clock' }, lv.state === 'pre' ? `KO ${lv.detail}` : lv.detail),
+    ]),
+    el('div', { class: 'live-leg-bar' }, el('div', { class: `live-leg-fill fill-${lv.status}`, style: `width:${pct}%;` })),
+  ]);
+}
+
+function accaSlip(w, live) {
   const lost = w.legs.filter(l => l.result === 'lost');
   const summary = w.odds
     ? [
@@ -2030,21 +2170,27 @@ function accaSlip(w) {
     : `${w.legs.length}-fold · odds & stake not recorded`;
   const table = el('table', {}, [
     el('thead', {}, el('tr', {}, ['Inmate', 'Game', 'Pick', 'Type', 'Odds', 'Result', 'Actual'].map(h => el('th', {}, h)))),
-    el('tbody', {}, w.legs.map(leg => el('tr', { class: leg.result === 'lost' ? 'bet-leg-lost' : '' }, [
-      el('td', { class: 'owner-cell' }, accaOwnerLink(leg.owner)),
-      el('td', {}, leg.game),
-      el('td', {}, leg.pick),
-      el('td', {}, leg.type),
-      el('td', { class: 'num-cell' }, displayOdds(leg.odds)),
-      el('td', {}, betResultPill(leg.result)),
-      el('td', { style: 'color:var(--paper-dim);' }, [
-        leg.actual || '—',
-        leg.note ? el('div', { class: 'bet-leg-note' }, `⚠ ${leg.note}`) : null,
-      ]),
-    ]))),
+    el('tbody', {}, w.legs.map((leg, i) => {
+      const lv = leg.result === 'pending' && live ? live[i] : null;
+      const shown = lv ? lv.status : leg.result;
+      return el('tr', { class: shown === 'lost' ? 'bet-leg-lost' : '' }, [
+        el('td', { class: 'owner-cell' }, accaOwnerLink(leg.owner)),
+        el('td', {}, leg.game),
+        el('td', {}, leg.pick),
+        el('td', {}, leg.type),
+        el('td', { class: 'num-cell' }, displayOdds(leg.odds)),
+        el('td', {}, lv ? betResultPill(lv.status) : betResultPill(leg.result)),
+        el('td', { style: 'color:var(--paper-dim);' }, [
+          lv ? liveLegCell(leg, lv) : (leg.actual || '—'),
+          leg.note ? el('div', { class: 'bet-leg-note' }, `⚠ ${leg.note}`) : null,
+        ]),
+      ]);
+    })),
   ]);
+  const tracked = w.result === 'pending' && w.legs.some(l => l.live);
   return el('div', {}, [
     el('div', { class: 'acca-summary' }, [el('span', {}, summary), betResultPill(w.result)]),
+    tracked ? accaTrackerBar(w, live) : null,
     w.note ? el('p', { class: 'bet-leg-note', style: 'max-width:none;margin:0 0 12px;' }, `⚠ ${w.note}`) : null,
     el('div', { class: 'table-wrap' }, table),
     w.sat_out && w.sat_out.length ? el('p', { class: 'section-desc', style: 'margin-top:10px;' }, `Sat out: ${w.sat_out.join(', ')}`) : null,
@@ -2149,7 +2295,26 @@ async function renderAcca() {
   // --- Weekly slip browser ---
   const select = el('select', {}, weeks.map((w, i) => el('option', { value: i }, `${w.season} — Week ${w.week}`)));
   const slipHolder = el('div');
-  const showSlip = () => { slipHolder.innerHTML = ''; slipHolder.appendChild(accaSlip(weeks[select.value])); };
+  const showSlip = () => {
+    const w = weeks[select.value];
+    clearInterval(accaLiveTimer); accaLiveTimer = null;
+    slipHolder.innerHTML = '';
+    slipHolder.appendChild(accaSlip(w));
+    if (w.result !== 'pending' || !w.legs.some(l => l.live && l.result === 'pending')) return;
+    const refresh = async () => {
+      const tab = document.getElementById('tab-acca');
+      if (!tab.classList.contains('active') || weeks[select.value] !== w) return;
+      const live = await fetchAccaLive(w);
+      if (!live || weeks[select.value] !== w) return;
+      slipHolder.innerHTML = '';
+      slipHolder.appendChild(accaSlip(w, live));
+      if (!live.some(l => l && l.state === 'in') && live.every(l => !l || l.state === 'post')) {
+        clearInterval(accaLiveTimer); accaLiveTimer = null; // everything final: stop polling
+      }
+    };
+    refresh();
+    accaLiveTimer = setInterval(refresh, ACCA_LIVE_REFRESH_MS);
+  };
   select.addEventListener('change', showSlip);
   root.appendChild(el('div', { class: 'panel' }, [
     el('h2', { class: 'section-title' }, 'The Slip'),

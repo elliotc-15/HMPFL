@@ -15,7 +15,12 @@
       "pick": "Daniel Jones longest pass over 33.5 yds",
       "type": "Longest Pass",
       "odds": "5/6",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Daniel Jones",
+        "stat": "longest_pass",
+        "line": 33.5
+      }
     },
     {
       "owner": "James",
@@ -23,7 +28,12 @@
       "pick": "Jeremiyah Love over 87.5 rushing + receiving yds",
       "type": "Rush + Rec Yds",
       "odds": "5/6",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Jeremiyah Love",
+        "stat": "rush_rec_yds",
+        "line": 87.5
+      }
     },
     {
       "owner": "Morgan",
@@ -31,7 +41,12 @@
       "pick": "Josh Allen over 31.5 rushing yds",
       "type": "Rushing Yds",
       "odds": "5/6",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Josh Allen",
+        "stat": "rush_yds",
+        "line": 31.5
+      }
     },
     {
       "owner": "Dylan",
@@ -39,7 +54,12 @@
       "pick": "Braelon Allen over 56.5 rushing yds",
       "type": "Rushing Yds",
       "odds": "5/6",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Braelon Allen",
+        "stat": "rush_yds",
+        "line": 56.5
+      }
     },
     {
       "owner": "Elliot",
@@ -47,7 +67,12 @@
       "pick": "Jake Ferguson over 23.5 receiving yds",
       "type": "Receiving Yds",
       "odds": "5/6",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Jake Ferguson",
+        "stat": "rec_yds",
+        "line": 23.5
+      }
     },
     {
       "owner": "Carter",
@@ -55,7 +80,12 @@
       "pick": "Kyren Williams over 13.5 receiving yds",
       "type": "Receiving Yds",
       "odds": "5/6",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Kyren Williams",
+        "stat": "rec_yds",
+        "line": 13.5
+      }
     },
     {
       "owner": "Joe",
@@ -63,7 +93,12 @@
       "pick": "Bucky Irving over 55.5 rushing yds",
       "type": "Rushing Yds",
       "odds": "5/6",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Bucky Irving",
+        "stat": "rush_yds",
+        "line": 55.5
+      }
     },
     {
       "owner": "Josh",
@@ -71,7 +106,12 @@
       "pick": "Derrick Henry 2+ TDs",
       "type": "2+ TDs",
       "odds": "9/4",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Derrick Henry",
+        "stat": "tds",
+        "line": 1.5
+      }
     },
     {
       "owner": "Mike",
@@ -79,7 +119,12 @@
       "pick": "Ja'Marr Chase over 81.5 receiving yds",
       "type": "Receiving Yds",
       "odds": "5/6",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Ja'Marr Chase",
+        "stat": "rec_yds",
+        "line": 81.5
+      }
     },
     {
       "owner": "Jack",
@@ -87,7 +132,12 @@
       "pick": "Ollie Gordon II over 7.5 rush attempts",
       "type": "Rush Attempts",
       "odds": "5/6",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Ollie Gordon II",
+        "stat": "rush_att",
+        "line": 7.5
+      }
     },
     {
       "owner": "Rhys",
@@ -95,7 +145,12 @@
       "pick": "Patrick Mahomes over 238.5 passing yds",
       "type": "Passing Yds",
       "odds": "5/6",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Patrick Mahomes",
+        "stat": "pass_yds",
+        "line": 238.5
+      }
     },
     {
       "owner": "Ashley",
@@ -103,7 +158,12 @@
       "pick": "Jaxon Smith-Njigba over 6.5 receptions",
       "type": "Receptions",
       "odds": "4/6",
-      "result": "pending"
+      "result": "pending",
+      "live": {
+        "player": "Jaxon Smith-Njigba",
+        "stat": "rec",
+        "line": 6.5
+      }
     }
   ]
 }
