@@ -1,0 +1,83 @@
+{
+  "season": "2026",
+  "week": 4,
+  "generated_at": "2026-10-06T17:07:36.072077+00:00",
+  "recap_text": "# HMPFL Week 4 Recap: Lockdown, Lineups, and a Little Light Brutality\n\nAnother week behind bars, another round of inmates proving they either belong in general population or deserve to be shipped straight to solitary. Let's run the block.\n\n## The Closest Call: A Razor-Thin Transfer\n\n**The Adrian BeatHisSons** vs. **Ruggs, Drugs and TDs** had the whole cell block pressed against the bars. Just 6.23 points separated these two, with Ruggs, Drugs and TDs sneaking out 244.80\u2013238.57. Jared Goff's 57.2-point outing was basically the shiv that won this one \u2014 quiet, efficient, and lethal when nobody expected it.\n\nNot to be outdone, **OJ's Denver Bronco** and **DUIiiiiiiii dont know jim** matched that drama almost point for point, with DUIiiiiiiii escaping 245.45\u2013238.70. OJ got a career night from Tetairoa McMillan (67.4 \u2014 the single highest score of the week) and still lost. That's not bad luck, inmates, that's a rigged commissary.\n\n## The Biggest Blowout: Cruel and Unusual Punishment\n\nIf you're **The Massage Boys**, you may want to request a cellmate transfer after this one. The **Hernandez Hitmen** dropped a 54.58-point beatdown, winning 238.85\u2013184.27. CeeDee Lamb (59.1) and C.J. Stroud (54.6) combined to basically run the yard unsupervised while the guards looked the other way. This wasn't a loss, it was a strip search.\n\nHonorable mention to **The ConVicks**, who put a 29.15-point hurting on **Smack my Diggs up**, powered by Kyren Williams torching the depth chart for 60.4.\n\n## Standout Performances\n\nBeyond McMillan's league-best outburst, **Kenneth Walker** (62.3) helped **Glove Don't Fit, Blitz** survive a shootout against Steve Ruggs, who got a rare QB/RB double-dip himself \u2014 Joe Burrow and Kyle Monangai both going for 57.5 apiece. Unfortunately for Steve, that still wasn't enough; Glove Don't Fit, Blitz held on 260.60\u2013253.05 in a genuine track meet.\n\n## Other Yard Talk\n\nJosh Allen's Prison Cell squeaked past Rice, Rice Baby \u2728 by 8.07, proving that sometimes surviving the week is its own kind of parole hearing.\n\nLights out, inmates. Set your lineups \u2014 the warden doesn't accept excuses, only waiver claims.",
+  "games": [
+    {
+      "owner_a": "The Adrian BeatHisSons",
+      "pts_a": 238.57,
+      "owner_b": "Ruggs, Drugs and TDs",
+      "pts_b": 244.8,
+      "margin": 6.23,
+      "winner": "Ruggs, Drugs and TDs"
+    },
+    {
+      "owner_a": "OJ\u2019s Denver Bronco",
+      "pts_a": 238.7,
+      "owner_b": "DUIiiiiiiii dont know jim",
+      "pts_b": 245.45,
+      "margin": 6.75,
+      "winner": "DUIiiiiiiii dont know jim"
+    },
+    {
+      "owner_a": "Glove Don\u2019t Fit, Blitz",
+      "pts_a": 260.6,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 253.05,
+      "margin": 7.55,
+      "winner": "Glove Don\u2019t Fit, Blitz"
+    },
+    {
+      "owner_a": "Rice, Rice Baby \u2728",
+      "pts_a": 202.4,
+      "owner_b": "Josh Allen\u2019s Prison Cell",
+      "pts_b": 210.47,
+      "margin": 8.07,
+      "winner": "Josh Allen\u2019s Prison Cell"
+    },
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 191.15,
+      "owner_b": "Smack my Diggs up ",
+      "pts_b": 162.0,
+      "margin": 29.15,
+      "winner": "The ConVicks"
+    },
+    {
+      "owner_a": "The Massage Boys",
+      "pts_a": 184.27,
+      "owner_b": "Hernandez Hitmen",
+      "pts_b": 238.85,
+      "margin": 54.58,
+      "winner": "Hernandez Hitmen"
+    }
+  ],
+  "top_performers": [
+    {
+      "owner": "OJ\u2019s Denver Bronco",
+      "player": "Tetairoa McMillan (WR-CAR)",
+      "points": 67.4
+    },
+    {
+      "owner": "Glove Don\u2019t Fit, Blitz",
+      "player": "Kenneth Walker (RB-KC)",
+      "points": 62.3
+    },
+    {
+      "owner": "The ConVicks",
+      "player": "Kyren Williams (RB-LAR)",
+      "points": 60.4
+    },
+    {
+      "owner": "The Adrian BeatHisSons",
+      "player": "Bijan Robinson (RB-ATL)",
+      "points": 59.9
+    },
+    {
+      "owner": "Hernandez Hitmen",
+      "player": "CeeDee Lamb (WR-DAL)",
+      "points": 59.1
+    }
+  ]
+}
