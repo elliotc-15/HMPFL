@@ -1,0 +1,36 @@
+name: Settle Accas
+
+on:
+  schedule:
+    # Monday mornings: 05:00 UTC is 06:00 UK during British Summer Time; the
+    # 06:00 UTC run covers 06:00 UK in winter (GMT) and acts as a retry in summer.
+    # Already-settled legs are skipped, so the second run is a no-op.
+    - cron: '0 5 * * 1'
+    - cron: '0 6 * * 1'
+  workflow_dispatch: {}   # lets you trigger this manually from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  settle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Settle pending accas from ESPN box scores
+        run: python scripts/settle_accas.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "HMPFL Acca Bot"
+          git config user.email "actions@github.com"
+          git add bets/
+          git diff --quiet && git diff --staged --quiet || git commit -m "Acca: auto-settle results from ESPN"
+          git push
