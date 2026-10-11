@@ -1,0 +1,169 @@
+{
+  "season": "2026",
+  "week": 5,
+  "placed": "2026-10-11",
+  "bookmaker": null,
+  "stake": 1.0,
+  "odds": "2031.17/1",
+  "potential_returns": 2032.17,
+  "result": "pending",
+  "sat_out": [],
+  "legs": [
+    {
+      "owner": "Joe",
+      "game": "Eagles @ Jaguars",
+      "pick": "Will Shipley over 36.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Will Shipley",
+        "stat": "rush_yds",
+        "line": 36.5
+      }
+    },
+    {
+      "owner": "Morgan",
+      "game": "Browns @ Jets",
+      "pick": "Quinshon Judkins over 55.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Quinshon Judkins",
+        "stat": "rush_yds",
+        "line": 55.5
+      }
+    },
+    {
+      "owner": "Matthew",
+      "game": "Bears @ Packers",
+      "pick": "Over 46.5 total points",
+      "type": "Game Total",
+      "odds": "100/109",
+      "result": "pending",
+      "live": {
+        "stat": "game_total",
+        "line": 46.5
+      }
+    },
+    {
+      "owner": "James",
+      "game": "Bengals @ Dolphins",
+      "pick": "Bengals -3.5",
+      "type": "Spread",
+      "odds": "50/91",
+      "result": "pending",
+      "live": {
+        "stat": "spread",
+        "team": "Bengals",
+        "line": -3.5
+      }
+    },
+    {
+      "owner": "Elliot",
+      "game": "Raiders @ Patriots",
+      "pick": "TreVeyon Henderson over 58.5 rushing + receiving yds",
+      "type": "Rush + Rec Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "TreVeyon Henderson",
+        "stat": "rush_rec_yds",
+        "line": 58.5
+      }
+    },
+    {
+      "owner": "Josh",
+      "game": "Vikings @ Saints",
+      "pick": "Chris Olave longest reception over 25.5 yds",
+      "type": "Longest Reception",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Chris Olave",
+        "stat": "rec_long",
+        "line": 25.5
+      }
+    },
+    {
+      "owner": "Carter",
+      "game": "Texans @ Titans",
+      "pick": "David Montgomery over 5.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": "5/6",
+      "result": "pending",
+      "live": {
+        "player": "David Montgomery",
+        "stat": "rec_yds",
+        "line": 5.5
+      }
+    },
+    {
+      "owner": "Rhys",
+      "game": "Giants @ Commanders",
+      "pick": "Jameis Winston under 197.5 passing yds",
+      "type": "Passing Yds (Under)",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Jameis Winston",
+        "stat": "pass_yds",
+        "line": 197.5,
+        "side": "under"
+      }
+    },
+    {
+      "owner": "Jack",
+      "game": "Colts @ Steelers",
+      "pick": "Darnell Washington over 2.5 receptions",
+      "type": "Receptions",
+      "odds": "5/4",
+      "result": "pending",
+      "live": {
+        "player": "Darnell Washington",
+        "stat": "rec",
+        "line": 2.5
+      }
+    },
+    {
+      "owner": "Ashley",
+      "game": "Broncos @ Chargers",
+      "pick": "RJ Harvey over 4.5 receptions",
+      "type": "Receptions",
+      "odds": "6/5",
+      "result": "pending",
+      "live": {
+        "player": "RJ Harvey",
+        "stat": "rec",
+        "line": 4.5
+      }
+    },
+    {
+      "owner": "Dylan",
+      "game": "Lions @ Cardinals",
+      "pick": "Sione Vaki longest reception over 3.5 yds",
+      "type": "Longest Reception",
+      "odds": "4/5",
+      "result": "pending",
+      "live": {
+        "player": "Sione Vaki",
+        "stat": "rec_long",
+        "line": 3.5
+      }
+    },
+    {
+      "owner": "Mike",
+      "game": "49ers @ Seahawks",
+      "pick": "Jaxon Smith-Njigba anytime TD",
+      "type": "Anytime TD",
+      "odds": "5/6",
+      "result": "pending",
+      "live": {
+        "player": "Jaxon Smith-Njigba",
+        "stat": "tds",
+        "line": 0.5
+      }
+    }
+  ]
+}

@@ -2066,6 +2066,7 @@ function legStatValue(box, player, stat) {
     case 'rush_att': return num(rush.rushingAttempts);
     case 'rush_long': return num(rush.longRushing);
     case 'rec_yds': return num(recv.receivingYards);
+    case 'rec_long': return num(recv.longReception);
     case 'rec': return num(recv.receptions);
     case 'rush_rec_yds': return num(rush.rushingYards) + num(recv.receivingYards);
     case 'tds': return num(rush.rushingTouchdowns) + num(recv.receivingTouchdowns);
@@ -2113,11 +2114,29 @@ async function fetchAccaLive(w) {
       const detail = state === 'pre'
         ? new Date(ev.date).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false })
         : (type.shortDetail || type.detail || '');
-      const value = boxes[ev.id] ? legStatValue(boxes[ev.id], leg.live.player, leg.live.stat) : (state === 'pre' ? 0 : null);
-      let status = 'pending';
-      if (value !== null && value > leg.live.line) status = 'won';
-      else if (state === 'post' && value !== null) status = 'lost';
-      else if (state === 'in') status = 'live';
+      const spec = leg.live;
+      const comps = ev.competitions[0].competitors;
+      const score = c => num(c.score);
+      let value;
+      if (spec.stat === 'game_total') value = comps.reduce((s, c) => s + score(c), 0);
+      else if (spec.stat === 'spread') {
+        // value = backed team's margin; the leg covers when margin + line > 0
+        const mine = comps.find(c => String(c.team.name).toLowerCase() === String(spec.team).toLowerCase());
+        const theirs = comps.find(c => c !== mine);
+        value = mine && theirs ? score(mine) - score(theirs) : null;
+      } else {
+        value = boxes[ev.id] ? legStatValue(boxes[ev.id], spec.player, spec.stat) : (state === 'pre' ? 0 : null);
+      }
+      let status = state === 'in' ? 'live' : 'pending';
+      if (value !== null) {
+        if (spec.stat === 'spread') {
+          if (state === 'post') status = value + spec.line > 0 ? 'won' : 'lost';
+        } else if (spec.side === 'under') {
+          if (value > spec.line) status = 'lost';
+          else if (state === 'post') status = 'won';
+        } else if (value > spec.line) status = 'won';
+        else if (state === 'post') status = 'lost';
+      }
       return { state, detail, value, status };
     });
   } catch (e) {
@@ -2147,12 +2166,22 @@ function accaTrackerBar(w, live) {
 }
 
 function liveLegCell(leg, lv) {
-  const line = leg.live.line;
+  const spec = leg.live;
+  const line = spec.line;
   const value = lv.value;
-  const pct = value === null ? 0 : Math.min(100, (value / line) * 100);
+  let label, pct;
+  if (spec.stat === 'spread') {
+    // Bar shows how far the margin is from covering, centred on the line.
+    const cover = value === null ? 0 : value + line;
+    label = value === null ? '—' : `${spec.team} ${value > 0 ? '+' : ''}${value} (need ${-line > 0 ? '+' : ''}${-line})`;
+    pct = value === null ? 0 : Math.max(0, Math.min(100, 50 + cover * 5));
+  } else {
+    label = value === null ? '—' : `${value} / ${spec.side === 'under' ? 'under ' : ''}${line}`;
+    pct = value === null ? 0 : Math.min(100, (value / line) * 100);
+  }
   return el('div', { class: 'live-leg' }, [
     el('div', { class: 'live-leg-top' }, [
-      el('span', {}, value === null ? '—' : `${value} / ${line}`),
+      el('span', {}, label),
       el('span', { class: 'live-leg-clock' }, lv.state === 'pre' ? `KO ${lv.detail}` : lv.detail),
     ]),
     el('div', { class: 'live-leg-bar' }, el('div', { class: `live-leg-fill fill-${lv.status}`, style: `width:${pct}%;` })),
