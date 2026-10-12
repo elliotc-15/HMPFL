@@ -6,7 +6,7 @@
   "stake": 1.0,
   "odds": "2031.17/1",
   "potential_returns": 2032.17,
-  "result": "pending",
+  "result": "lost",
   "sat_out": [],
   "legs": [
     {
@@ -15,12 +15,14 @@
       "pick": "Will Shipley over 36.5 rushing yds",
       "type": "Rushing Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Will Shipley",
         "stat": "rush_yds",
         "line": 36.5
-      }
+      },
+      "actual": "6 rush yds",
+      "auto_settled": true
     },
     {
       "owner": "Morgan",
@@ -28,12 +30,14 @@
       "pick": "Quinshon Judkins over 55.5 rushing yds",
       "type": "Rushing Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Quinshon Judkins",
         "stat": "rush_yds",
         "line": 55.5
-      }
+      },
+      "actual": "44 rush yds",
+      "auto_settled": true
     },
     {
       "owner": "Matthew",
@@ -41,11 +45,13 @@
       "pick": "Over 46.5 total points",
       "type": "Game Total",
       "odds": "100/109",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "stat": "game_total",
         "line": 46.5
-      }
+      },
+      "actual": "38 total points",
+      "auto_settled": true
     },
     {
       "owner": "James",
@@ -53,12 +59,14 @@
       "pick": "Bengals -3.5",
       "type": "Spread",
       "odds": "50/91",
-      "result": "pending",
+      "result": "won",
       "live": {
         "stat": "spread",
         "team": "Bengals",
         "line": -3.5
-      }
+      },
+      "actual": "Bengals 31-24",
+      "auto_settled": true
     },
     {
       "owner": "Elliot",
@@ -66,12 +74,14 @@
       "pick": "TreVeyon Henderson over 58.5 rushing + receiving yds",
       "type": "Rush + Rec Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "TreVeyon Henderson",
         "stat": "rush_rec_yds",
         "line": 58.5
-      }
+      },
+      "actual": "38 rush + rec yds",
+      "auto_settled": true
     },
     {
       "owner": "Josh",
@@ -79,12 +89,14 @@
       "pick": "Chris Olave longest reception over 25.5 yds",
       "type": "Longest Reception",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Chris Olave",
         "stat": "rec_long",
         "line": 25.5
-      }
+      },
+      "actual": "16 yd longest reception",
+      "auto_settled": true
     },
     {
       "owner": "Carter",
@@ -92,12 +104,14 @@
       "pick": "David Montgomery over 5.5 receiving yds",
       "type": "Receiving Yds",
       "odds": "5/6",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "David Montgomery",
         "stat": "rec_yds",
         "line": 5.5
-      }
+      },
+      "actual": "0 rec yds",
+      "auto_settled": true
     },
     {
       "owner": "Rhys",
@@ -105,13 +119,15 @@
       "pick": "Jameis Winston under 197.5 passing yds",
       "type": "Passing Yds (Under)",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Jameis Winston",
         "stat": "pass_yds",
         "line": 197.5,
         "side": "under"
-      }
+      },
+      "actual": "326 pass yds",
+      "auto_settled": true
     },
     {
       "owner": "Jack",
@@ -119,12 +135,14 @@
       "pick": "Darnell Washington over 2.5 receptions",
       "type": "Receptions",
       "odds": "5/4",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Darnell Washington",
         "stat": "rec",
         "line": 2.5
-      }
+      },
+      "actual": "2 receptions",
+      "auto_settled": true
     },
     {
       "owner": "Ashley",
@@ -132,12 +150,14 @@
       "pick": "RJ Harvey over 4.5 receptions",
       "type": "Receptions",
       "odds": "6/5",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "RJ Harvey",
         "stat": "rec",
         "line": 4.5
-      }
+      },
+      "actual": "0 receptions",
+      "auto_settled": true
     },
     {
       "owner": "Dylan",
@@ -145,12 +165,14 @@
       "pick": "Sione Vaki longest reception over 3.5 yds",
       "type": "Longest Reception",
       "odds": "4/5",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Sione Vaki",
         "stat": "rec_long",
         "line": 3.5
-      }
+      },
+      "actual": "0 yd longest reception",
+      "auto_settled": true
     },
     {
       "owner": "Mike",
@@ -158,12 +180,15 @@
       "pick": "Jaxon Smith-Njigba anytime TD",
       "type": "Anytime TD",
       "odds": "5/6",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Jaxon Smith-Njigba",
         "stat": "tds",
         "line": 0.5
-      }
+      },
+      "actual": "1 TDs",
+      "auto_settled": true
     }
-  ]
+  ],
+  "note": "Results auto-settled from ESPN box scores."
 }
