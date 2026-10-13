@@ -1,0 +1,83 @@
+{
+  "season": "2026",
+  "week": 5,
+  "generated_at": "2026-10-13T18:05:23.066390+00:00",
+  "recap_text": "# HMPFL Week 5 Recap: Lockdown, Shakedowns, and One Prison Riot\n\nThe yard was rowdy this week, inmates. Some cells saw peaceful negotiations settled by a single point, while other blocks experienced full-blown massacres that'll have the warden calling in the National Guard. Let's run the tape.\n\n## The Tightest Cell Check\n\n**OJ's Denver Bronco** escaped with a 227.7-224.58 nail-biter over **Josh Allen's Prison Cell**, a measly 3.12-point margin that came down to the wire. Jordan Love (59.9) kept OJ's cellblock afloat, but it wasn't enough to fully drown out Josh Allen himself, who torched for 65.2 points in a losing effort. Sometimes you can put up a franchise quarterback's best game of the season and still get sent back to your cell empty-handed. That's HMPFL justice for you.\n\n## The Riot Squad Had to Be Called\n\nIf OJ's win was a quiet negotiation, **DUIiiiiiiii dont know jim's** 355.95-164.0 curb-stomping of the **Hernandez Hitmen** was a full cellblock uprising. A 191.95-point margin isn't a win, it's a conviction with no parole eligibility. Jaylen Warren (74.1) and Jahmyr Gibbs (72.4) combined to form basically an entire competent roster by themselves, and the Hitmen never had a chance. Someone check on the Hernandez Hitmen's mental health \u2014 that's the kind of beatdown that leaves scars.\n\nNot far behind in brutality: **Rice, Rice Baby \u2728** dropped 308.1 points on **The ConVicks** in a 137.45-point rout, powered by Christian Watson (59.6) and Parker Washington (56.9) going full lockdown mode on opposing secondaries. And **Smack my Diggs up** put together an 88.65-point beatdown of **Glove Don't Fit, Blitz**, fueled by an absolutely absurd 84.4-point outing from Drake Maye \u2014 the single best stat line of the week, no contest.\n\n## Standout Cellmates\n\nBeyond the headline numbers, **The Adrian BeatHisSons** got a two-QB combo platter from Stafford (63.3) and Jayden Daniels (62.5) to run past The Massage Boys by nearly 47 points, while Bucky Irving (62.5) kept **Steve Ruggs** competitive in a losing effort against **Ruggs, Drugs and TDs**.\n\n## Final Count\n\nSix games, five blowouts, and one genuine nail-biter. The warden's log shows a league full of haves and have-nots this week \u2014 either you're running the prison yard or you're doing hard time in the hole. Next week, the parole board reconvenes. Good luck out there, inmates.",
+  "games": [
+    {
+      "owner_a": "OJ\u2019s Denver Bronco",
+      "pts_a": 227.7,
+      "owner_b": "Josh Allen\u2019s Prison Cell",
+      "pts_b": 224.58,
+      "margin": 3.12,
+      "winner": "OJ\u2019s Denver Bronco"
+    },
+    {
+      "owner_a": "Ruggs, Drugs and TDs",
+      "pts_a": 257.57,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 233.3,
+      "margin": 24.27,
+      "winner": "Ruggs, Drugs and TDs"
+    },
+    {
+      "owner_a": "The Adrian BeatHisSons",
+      "pts_a": 255.25,
+      "owner_b": "The Massage Boys",
+      "pts_b": 208.3,
+      "margin": 46.95,
+      "winner": "The Adrian BeatHisSons"
+    },
+    {
+      "owner_a": "Smack my Diggs up ",
+      "pts_a": 282.25,
+      "owner_b": "Glove Don\u2019t Fit, Blitz",
+      "pts_b": 193.6,
+      "margin": 88.65,
+      "winner": "Smack my Diggs up "
+    },
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 170.65,
+      "owner_b": "Rice, Rice Baby \u2728",
+      "pts_b": 308.1,
+      "margin": 137.45,
+      "winner": "Rice, Rice Baby \u2728"
+    },
+    {
+      "owner_a": "DUIiiiiiiii dont know jim",
+      "pts_a": 355.95,
+      "owner_b": "Hernandez Hitmen",
+      "pts_b": 164.0,
+      "margin": 191.95,
+      "winner": "DUIiiiiiiii dont know jim"
+    }
+  ],
+  "top_performers": [
+    {
+      "owner": "Smack my Diggs up ",
+      "player": "Drake Maye (QB-NE)",
+      "points": 84.4
+    },
+    {
+      "owner": "DUIiiiiiiii dont know jim",
+      "player": "Jaylen Warren (RB-PIT)",
+      "points": 74.1
+    },
+    {
+      "owner": "DUIiiiiiiii dont know jim",
+      "player": "Jahmyr Gibbs (RB-DET)",
+      "points": 72.4
+    },
+    {
+      "owner": "Josh Allen\u2019s Prison Cell",
+      "player": "Josh Allen (QB-BUF)",
+      "points": 65.2
+    },
+    {
+      "owner": "The Adrian BeatHisSons",
+      "player": "Matthew Stafford (QB-LAR)",
+      "points": 63.3
+    }
+  ]
+}
