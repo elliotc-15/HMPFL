@@ -1,0 +1,167 @@
+{
+  "season": "2026",
+  "week": 6,
+  "placed": "2026-10-18",
+  "bookmaker": null,
+  "stake": 1.0,
+  "odds": "2799.88/1",
+  "potential_returns": 2800.88,
+  "result": "pending",
+  "sat_out": [],
+  "legs": [
+    {
+      "owner": "James",
+      "game": "Bears @ Falcons",
+      "pick": "Over 272.5 total rushing yards (both teams)",
+      "type": "Game Rushing Yds",
+      "odds": "5/6",
+      "result": "pending",
+      "live": {
+        "stat": "game_rush_yds",
+        "line": 272.5
+      }
+    },
+    {
+      "owner": "Elliot",
+      "game": "Bills @ Raiders",
+      "pick": "Nakobe Dean over 8.5 tackles + assists",
+      "type": "Tackles",
+      "odds": "4/6",
+      "result": "pending",
+      "live": {
+        "player": "Nakobe Dean",
+        "stat": "tackles",
+        "line": 8.5
+      }
+    },
+    {
+      "owner": "Joe",
+      "game": "Ravens @ Browns",
+      "pick": "Derrick Henry over 89.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Derrick Henry",
+        "stat": "rush_yds",
+        "line": 89.5
+      }
+    },
+    {
+      "owner": "Mike",
+      "game": "Texans @ Jaguars",
+      "pick": "Woody Marks over 15.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": "5/6",
+      "result": "pending",
+      "live": {
+        "player": "Woody Marks",
+        "stat": "rec_yds",
+        "line": 15.5
+      }
+    },
+    {
+      "owner": "Ashley",
+      "game": "Cowboys @ Packers",
+      "pick": "Over 61.5 total points",
+      "type": "Game Total",
+      "odds": "21/10",
+      "result": "pending",
+      "live": {
+        "stat": "game_total",
+        "line": 61.5
+      }
+    },
+    {
+      "owner": "Dylan",
+      "game": "Jets @ Patriots",
+      "pick": "Drake Maye 200+ passing yds",
+      "type": "Passing Yds",
+      "odds": "4/13",
+      "result": "pending",
+      "live": {
+        "player": "Drake Maye",
+        "stat": "pass_yds",
+        "line": 199.5
+      }
+    },
+    {
+      "owner": "Jack",
+      "game": "Steelers @ Buccaneers",
+      "pick": "Pat Freiermuth anytime TD",
+      "type": "Anytime TD",
+      "odds": "29/10",
+      "result": "pending",
+      "live": {
+        "player": "Pat Freiermuth",
+        "stat": "tds",
+        "line": 0.5
+      }
+    },
+    {
+      "owner": "Rhys",
+      "game": "Chargers @ Chiefs",
+      "pick": "Kenneth Walker III over 90.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Kenneth Walker III",
+        "stat": "rush_yds",
+        "line": 90.5
+      }
+    },
+    {
+      "owner": "Morgan",
+      "game": "Titans @ Colts",
+      "pick": "Jonathan Taylor over 90.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Jonathan Taylor",
+        "stat": "rush_yds",
+        "line": 90.5
+      }
+    },
+    {
+      "owner": "Carter",
+      "game": "Cardinals @ Rams",
+      "pick": "Tyler Higbee over 32.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Tyler Higbee",
+        "stat": "rec_yds",
+        "line": 32.5
+      }
+    },
+    {
+      "owner": "Josh",
+      "game": "Saints @ Giants",
+      "pick": "Jameis Winston over 222.5 passing yds",
+      "type": "Passing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Jameis Winston",
+        "stat": "pass_yds",
+        "line": 222.5
+      }
+    },
+    {
+      "owner": "Matthew",
+      "game": "Panthers @ Eagles",
+      "pick": "Tanner McKee over 0.5 passing TDs",
+      "type": "Passing TDs",
+      "odds": "5/13",
+      "result": "pending",
+      "live": {
+        "player": "Tanner McKee",
+        "stat": "pass_td",
+        "line": 0.5
+      }
+    }
+  ]
+}

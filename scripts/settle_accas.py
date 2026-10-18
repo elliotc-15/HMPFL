@@ -32,6 +32,7 @@ STAT_LABELS = {
     "rush_long": "yd longest rush", "rec_yds": "rec yds", "rec_long": "yd longest reception",
     "rec": "receptions", "rush_rec_yds": "rush + rec yds", "tds": "TDs",
     "longest_pass": "yd longest completion (team)", "game_total": "total points",
+    "tackles": "tackles + assists", "game_rush_yds": "total rushing yds (both teams)",
 }
 
 
@@ -91,6 +92,8 @@ def stat_value(box, player, stat):
     if stat == "rush_long": return num(rush.get("longRushing"))
     if stat == "rec_yds": return num(recv.get("receivingYards"))
     if stat == "rec_long": return num(recv.get("longReception"))
+    if stat == "tackles": return num((p.get("defensive") or {}).get("totalTackles"))
+    if stat == "game_rush_yds": return sum(num(o["rushing"].get("rushingYards")) for o in box.values() if o.get("rushing"))
     if stat == "rec": return num(recv.get("receptions"))
     if stat == "rush_rec_yds": return num(rush.get("rushingYards")) + num(recv.get("receivingYards"))
     if stat == "tds": return num(rush.get("rushingTouchdowns")) + num(recv.get("receivingTouchdowns"))

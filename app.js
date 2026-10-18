@@ -2067,6 +2067,8 @@ function legStatValue(box, player, stat) {
     case 'rush_long': return num(rush.longRushing);
     case 'rec_yds': return num(recv.receivingYards);
     case 'rec_long': return num(recv.longReception);
+    case 'tackles': return num((p.defensive || {}).totalTackles);
+    case 'game_rush_yds': return Object.values(box).reduce((t, o) => t + (o.rushing ? num(o.rushing.rushingYards) : 0), 0);
     case 'rec': return num(recv.receptions);
     case 'rush_rec_yds': return num(rush.rushingYards) + num(recv.receivingYards);
     case 'tds': return num(rush.rushingTouchdowns) + num(recv.receivingTouchdowns);
