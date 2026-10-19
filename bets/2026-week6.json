@@ -6,7 +6,7 @@
   "stake": 1.0,
   "odds": "2799.88/1",
   "potential_returns": 2800.88,
-  "result": "pending",
+  "result": "lost",
   "sat_out": [],
   "legs": [
     {
@@ -15,11 +15,13 @@
       "pick": "Over 272.5 total rushing yards (both teams)",
       "type": "Game Rushing Yds",
       "odds": "5/6",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "stat": "game_rush_yds",
         "line": 272.5
-      }
+      },
+      "actual": "161 total rushing yds (both teams)",
+      "auto_settled": true
     },
     {
       "owner": "Elliot",
@@ -27,12 +29,14 @@
       "pick": "Nakobe Dean over 8.5 tackles + assists",
       "type": "Tackles",
       "odds": "4/6",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Nakobe Dean",
         "stat": "tackles",
         "line": 8.5
-      }
+      },
+      "actual": "12 tackles + assists",
+      "auto_settled": true
     },
     {
       "owner": "Joe",
@@ -40,12 +44,14 @@
       "pick": "Derrick Henry over 89.5 rushing yds",
       "type": "Rushing Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Derrick Henry",
         "stat": "rush_yds",
         "line": 89.5
-      }
+      },
+      "actual": "58 rush yds",
+      "auto_settled": true
     },
     {
       "owner": "Mike",
@@ -53,12 +59,14 @@
       "pick": "Woody Marks over 15.5 receiving yds",
       "type": "Receiving Yds",
       "odds": "5/6",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Woody Marks",
         "stat": "rec_yds",
         "line": 15.5
-      }
+      },
+      "actual": "25 rec yds",
+      "auto_settled": true
     },
     {
       "owner": "Ashley",
@@ -66,11 +74,13 @@
       "pick": "Over 61.5 total points",
       "type": "Game Total",
       "odds": "21/10",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "stat": "game_total",
         "line": 61.5
-      }
+      },
+      "actual": "36 total points",
+      "auto_settled": true
     },
     {
       "owner": "Dylan",
@@ -78,12 +88,14 @@
       "pick": "Drake Maye 200+ passing yds",
       "type": "Passing Yds",
       "odds": "4/13",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Drake Maye",
         "stat": "pass_yds",
         "line": 199.5
-      }
+      },
+      "actual": "235 pass yds",
+      "auto_settled": true
     },
     {
       "owner": "Jack",
@@ -91,12 +103,14 @@
       "pick": "Pat Freiermuth anytime TD",
       "type": "Anytime TD",
       "odds": "29/10",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Pat Freiermuth",
         "stat": "tds",
         "line": 0.5
-      }
+      },
+      "actual": "0 TDs",
+      "auto_settled": true
     },
     {
       "owner": "Rhys",
@@ -104,12 +118,14 @@
       "pick": "Kenneth Walker III over 90.5 rushing yds",
       "type": "Rushing Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Kenneth Walker III",
         "stat": "rush_yds",
         "line": 90.5
-      }
+      },
+      "actual": "128 rush yds",
+      "auto_settled": true
     },
     {
       "owner": "Morgan",
@@ -117,12 +133,14 @@
       "pick": "Jonathan Taylor over 90.5 rushing yds",
       "type": "Rushing Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Jonathan Taylor",
         "stat": "rush_yds",
         "line": 90.5
-      }
+      },
+      "actual": "94 rush yds",
+      "auto_settled": true
     },
     {
       "owner": "Carter",
@@ -130,12 +148,14 @@
       "pick": "Tyler Higbee over 32.5 receiving yds",
       "type": "Receiving Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Tyler Higbee",
         "stat": "rec_yds",
         "line": 32.5
-      }
+      },
+      "actual": "22 rec yds",
+      "auto_settled": true
     },
     {
       "owner": "Josh",
@@ -143,12 +163,14 @@
       "pick": "Jameis Winston over 222.5 passing yds",
       "type": "Passing Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Jameis Winston",
         "stat": "pass_yds",
         "line": 222.5
-      }
+      },
+      "actual": "152 pass yds",
+      "auto_settled": true
     },
     {
       "owner": "Matthew",
@@ -156,12 +178,15 @@
       "pick": "Tanner McKee over 0.5 passing TDs",
       "type": "Passing TDs",
       "odds": "5/13",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Tanner McKee",
         "stat": "pass_td",
         "line": 0.5
-      }
+      },
+      "actual": "1 pass TDs",
+      "auto_settled": true
     }
-  ]
+  ],
+  "note": "Results auto-settled from ESPN box scores."
 }
