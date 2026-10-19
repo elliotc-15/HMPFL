@@ -118,6 +118,51 @@ def fmt(v):
     return str(int(v)) if float(v).is_integer() else str(v)
 
 
+def settle_leg(leg, events, boxes):
+    """Settle one pending leg in place if its game is final. Returns True if it was settled."""
+    spec = leg["live"]
+    ev = find_event(events, leg["game"])
+    if not ev or ((ev.get("status") or {}).get("type") or {}).get("state") != "post":
+        print(f"  - {leg['owner']}: game not final yet, left pending")
+        return False
+    comps = ev["competitions"][0]["competitors"]
+    stat = spec["stat"]
+    if stat == "game_total":
+        value = sum(num(c.get("score")) for c in comps)
+        actual = f"{fmt(value)} total points"
+    elif stat == "spread":
+        mine = next((c for c in comps if str(c["team"]["name"]).lower() == str(spec["team"]).lower()), None)
+        theirs = next((c for c in comps if c is not mine), None)
+        if not mine or not theirs:
+            print(f"  - {leg['owner']}: couldn't find {spec['team']} in the game, left pending")
+            return False
+        value = num(mine.get("score")) - num(theirs.get("score"))
+        actual = f"{spec['team']} {fmt(num(mine.get('score')))}-{fmt(num(theirs.get('score')))}"
+    else:
+        if ev["id"] not in boxes:
+            boxes[ev["id"]] = parse_box(get_json(f"{ESPN_NFL_API}/summary?event={ev['id']}"))
+        if not boxes[ev["id"]]:
+            # A final game with an empty box score is a feed glitch, not a row of zeros.
+            print(f"  - {leg['owner']}: box score not available yet, left pending")
+            return False
+        value = stat_value(boxes[ev["id"]], spec.get("player"), stat)
+        if value is None:
+            print(f"  - {leg['owner']}: unsupported stat {stat}, left pending")
+            return False
+        actual = f"{fmt(value)} {STAT_LABELS.get(stat, stat)}"
+    if stat == "spread":
+        won = value + spec["line"] > 0
+    elif spec.get("side") == "under":
+        won = value < spec["line"]
+    else:
+        won = value > spec["line"]
+    leg["result"] = "won" if won else "lost"
+    leg["actual"] = actual
+    leg["auto_settled"] = True
+    print(f"  - {leg['owner']}: {leg['pick']} -> {actual} -> {leg['result'].upper()}")
+    return True
+
+
 def settle_week(week):
     """Settle what can be settled in one week's bet dict in place. Returns True if anything changed."""
     pending = [leg for leg in week["legs"] if leg.get("result") == "pending" and leg.get("live")]
@@ -128,43 +173,10 @@ def settle_week(week):
     boxes = {}
     changed = False
     for leg in pending:
-        spec = leg["live"]
-        ev = find_event(events, leg["game"])
-        if not ev or ((ev.get("status") or {}).get("type") or {}).get("state") != "post":
-            print(f"  - {leg['owner']}: game not final yet, left pending")
-            continue
-        comps = ev["competitions"][0]["competitors"]
-        stat = spec["stat"]
-        if stat == "game_total":
-            value = sum(num(c.get("score")) for c in comps)
-            actual = f"{fmt(value)} total points"
-        elif stat == "spread":
-            mine = next((c for c in comps if str(c["team"]["name"]).lower() == str(spec["team"]).lower()), None)
-            theirs = next((c for c in comps if c is not mine), None)
-            if not mine or not theirs:
-                print(f"  - {leg['owner']}: couldn't find {spec['team']} in the game, left pending")
-                continue
-            value = num(mine.get("score")) - num(theirs.get("score"))
-            actual = f"{spec['team']} {fmt(num(mine.get('score')))}-{fmt(num(theirs.get('score')))}"
-        else:
-            if ev["id"] not in boxes:
-                boxes[ev["id"]] = parse_box(get_json(f"{ESPN_NFL_API}/summary?event={ev['id']}"))
-            value = stat_value(boxes[ev["id"]], spec["player"], stat)
-            if value is None:
-                print(f"  - {leg['owner']}: unsupported stat {stat}, left pending")
-                continue
-            actual = f"{fmt(value)} {STAT_LABELS.get(stat, stat)}"
-        if stat == "spread":
-            won = value + spec["line"] > 0
-        elif spec.get("side") == "under":
-            won = value < spec["line"]
-        else:
-            won = value > spec["line"]
-        leg["result"] = "won" if won else "lost"
-        leg["actual"] = actual
-        leg["auto_settled"] = True
-        changed = True
-        print(f"  - {leg['owner']}: {leg['pick']} -> {actual} -> {leg['result'].upper()}")
+        try:
+            changed = settle_leg(leg, events, boxes) or changed
+        except Exception as e:  # one malformed leg must never block the rest of the week
+            print(f"  ! {leg['owner']}: couldn't settle ({e!r}), left pending")
 
     results = [leg.get("result") for leg in week["legs"]]
     if "lost" in results:

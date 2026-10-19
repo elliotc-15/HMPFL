@@ -2006,9 +2006,9 @@ function buildAccaStats(weeks) {
       const o = bump(byOwner, leg.owner), t = bump(byType, leg.type || 'Other');
       const dec = fracToDecimal(leg.odds);
       [o, t].forEach(s => {
-        s.legs++;
-        if (leg.result === 'won') s.won++;
-        else if (leg.result === 'lost') s.lost++;
+        // "Legs" counts settled legs only, so Legs = Won + Lost; open legs go in Pending.
+        if (leg.result === 'won') { s.won++; s.legs++; }
+        else if (leg.result === 'lost') { s.lost++; s.legs++; }
         else if (leg.result !== 'void') s.pending++;
         if (dec) { s.oddsSum += dec; s.oddsN++; }
       });
@@ -2234,7 +2234,7 @@ function accaSlip(w, live) {
 function accaOwnerTable(rows) {
   const table = el('table', {}, [
     el('thead', {}, el('tr', {}, [
-      th('Inmate', 'owner', 'str'), th('Legs', 'legs'), th('Won', 'won'), th('Lost', 'lost'),
+      th('Inmate', 'owner', 'str'), th('Legs', 'legs'), th('Won', 'won'), th('Lost', 'lost'), th('Pending', 'pending'),
       th('Hit %', 'hit'), th('Avg Odds', 'avgodds'), th('Sat Out', 'satout'),
     ])),
     el('tbody', {}, rows.map(r => {
@@ -2245,11 +2245,12 @@ function accaOwnerTable(rows) {
         el('td', { class: 'num-cell' }, r.legs),
         el('td', { class: 'num-cell' }, r.won),
         el('td', { class: 'num-cell' }, r.lost),
+        el('td', { class: 'num-cell', style: r.pending ? '' : 'color:var(--paper-dim);' }, r.pending),
         el('td', { class: 'num-cell' }, hit === null ? '—' : hit.toFixed(0) + '%'),
         el('td', { class: 'num-cell' }, avg ? decimalToFrac(avg) : el('span', { title: 'No odds recorded for these legs yet', style: 'color:var(--paper-dim);' }, 'n/a')),
         el('td', { class: 'num-cell' }, r.satOut),
       ]);
-      Object.assign(tr.dataset, { owner: r.key, legs: r.legs, won: r.won, lost: r.lost, hit: hit ?? -1, avgodds: avg ?? 0, satout: r.satOut });
+      Object.assign(tr.dataset, { owner: r.key, legs: r.legs, won: r.won, lost: r.lost, pending: r.pending, hit: hit ?? -1, avgodds: avg ?? 0, satout: r.satOut });
       return tr;
     })),
   ]);
@@ -2260,7 +2261,7 @@ function accaOwnerTable(rows) {
 function accaTypeTable(rows) {
   const table = el('table', {}, [
     el('thead', {}, el('tr', {}, [
-      th('Bet Type', 'type', 'str'), th('Legs', 'legs'), th('Won', 'won'), th('Lost', 'lost'),
+      th('Bet Type', 'type', 'str'), th('Legs', 'legs'), th('Won', 'won'), th('Lost', 'lost'), th('Pending', 'pending'),
       th('Hit %', 'hit'), th('Avg Odds', 'avgodds'),
     ])),
     el('tbody', {}, rows.map(r => {
@@ -2271,10 +2272,11 @@ function accaTypeTable(rows) {
         el('td', { class: 'num-cell' }, r.legs),
         el('td', { class: 'num-cell' }, r.won),
         el('td', { class: 'num-cell' }, r.lost),
+        el('td', { class: 'num-cell', style: r.pending ? '' : 'color:var(--paper-dim);' }, r.pending),
         el('td', { class: 'num-cell' }, hit === null ? '—' : hit.toFixed(0) + '%'),
         el('td', { class: 'num-cell' }, avg ? decimalToFrac(avg) : el('span', { title: 'No odds recorded for these legs yet', style: 'color:var(--paper-dim);' }, 'n/a')),
       ]);
-      Object.assign(tr.dataset, { type: r.key, legs: r.legs, won: r.won, lost: r.lost, hit: hit ?? -1, avgodds: avg ?? 0 });
+      Object.assign(tr.dataset, { type: r.key, legs: r.legs, won: r.won, lost: r.lost, pending: r.pending, hit: hit ?? -1, avgodds: avg ?? 0 });
       return tr;
     })),
   ]);
@@ -2360,7 +2362,7 @@ async function renderAcca() {
   const settledNote = stats.legsWon + stats.legsLost ? '' : ' Results are still pending, so hit rates fill in once legs are settled.';
   root.appendChild(el('div', { class: 'panel' }, [
     el('h2', { class: 'section-title' }, 'Leg Leaderboard'),
-    el('p', { class: 'section-desc' }, `Who actually lands their leg. "Lost" doubles as the number of times that inmate sank the acca. Avg Odds only counts legs where the price was recorded. Click a column header to sort.${settledNote}`),
+    el('p', { class: 'section-desc' }, `Who actually lands their leg. Legs counts settled legs (Won + Lost); legs still being played show under Pending. "Lost" doubles as the number of times that inmate sank the acca. Avg Odds only counts legs where the price was recorded. Click a column header to sort.${settledNote}`),
     accaOwnerTable(owners),
   ]));
   root.appendChild(el('div', { class: 'panel' }, [
