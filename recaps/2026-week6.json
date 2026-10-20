@@ -1,0 +1,83 @@
+{
+  "season": "2026",
+  "week": 6,
+  "generated_at": "2026-10-20T15:36:37.159056+00:00",
+  "recap_text": "# HMPFL Week 6 Recap: Lockdown Report\n\nAnother week behind bars, another round of inmates fighting for their fantasy freedom. The warden's got the scoreboard posted on the cell block wall, and some of y'all are looking at hard time. Let's run the yard.\n\n## The Tightest Cell Check: ConVicks Survive By a Shiv's Edge\n\nThe ConVicks escaped with a 205.75\u2013200.1 nail-biter over OJ's Denver Bronco, winning by just 5.65 points. This one came down to the wire like a last-minute pardon request. Tyler Shough (52.8) and Christian McCaffrey (48.4) combined to bail The ConVicks out of solitary, proving that sometimes you don't need a flashy breakout \u2014 you just need your stars to show up for roll call.\n\n## The Yard Massacre: Rice, Rice Baby Runs the Block\n\nIf you thought prison justice was brutal, Rice, Rice Baby \u2728 just put Glove Don't Fit, Blitz in the infirmary, 259.35 to 183.75 \u2014 a 75.6-point beatdown that's the biggest blowout of the week by a mile. James Cook (48.6) led the charge, but this was less \"win\" and more \"full cavity search.\" Glove Don't Fit, Blitz actually got a monster game out of Kenneth Walker (55.8), the single highest individual score among losers this week, and it still wasn't close. Sometimes you bring a shank to a riot.\n\n## Trevor Lawrence Breaks Out\n\nBig shoutout to DUIiiiiiiii dont know jim, who rode Trevor Lawrence's absurd 60.8-point outburst \u2014 the week's top individual score \u2014 to a 217.5\u2013206.25 escape from The Massage Boys. Lawrence basically tunneled through the yard wall with a spoon and sprinted to the state line. Malik Nabers (43.0) gave The Massage Boys a fight, but it wasn't enough to stop the breakout.\n\n## Other Notable Headcounts\n\nSmack my Diggs Up handled business against Ruggs, Drugs and TDs, winning by 32.6 behind Drake Maye's 49.8. Steve Ruggs put The Adrian BeatHisSons in the hole, 202.5\u2013167.4, despite Jayden Daniels dropping 47.0 in a losing effort. And Hernandez Hitmen absolutely dominated Josh Allen's Prison Cell, 190.35\u2013133.60, a 56.75-point beating fueled by a two-QB system of C.J. Stroud (53.2) and Kirk Cousins (45.3) \u2014 that's some serious double-bunking production.\n\nStay sharp out there, inmates. Week 7's commissary orders are already being drawn up.",
+  "games": [
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 205.75,
+      "owner_b": "OJ\u2019s Denver Bronco",
+      "pts_b": 200.1,
+      "margin": 5.65,
+      "winner": "The ConVicks"
+    },
+    {
+      "owner_a": "The Massage Boys",
+      "pts_a": 206.25,
+      "owner_b": "DUIiiiiiiii dont know jim",
+      "pts_b": 217.5,
+      "margin": 11.25,
+      "winner": "DUIiiiiiiii dont know jim"
+    },
+    {
+      "owner_a": "Smack my Diggs up ",
+      "pts_a": 193.5,
+      "owner_b": "Ruggs, Drugs and TDs",
+      "pts_b": 160.9,
+      "margin": 32.6,
+      "winner": "Smack my Diggs up "
+    },
+    {
+      "owner_a": "The Adrian BeatHisSons",
+      "pts_a": 167.4,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 202.5,
+      "margin": 35.1,
+      "winner": "Steve Ruggs"
+    },
+    {
+      "owner_a": "Hernandez Hitmen",
+      "pts_a": 190.35,
+      "owner_b": "Josh Allen\u2019s Prison Cell",
+      "pts_b": 133.6,
+      "margin": 56.75,
+      "winner": "Hernandez Hitmen"
+    },
+    {
+      "owner_a": "Rice, Rice Baby \u2728",
+      "pts_a": 259.35,
+      "owner_b": "Glove Don\u2019t Fit, Blitz",
+      "pts_b": 183.75,
+      "margin": 75.6,
+      "winner": "Rice, Rice Baby \u2728"
+    }
+  ],
+  "top_performers": [
+    {
+      "owner": "DUIiiiiiiii dont know jim",
+      "player": "Trevor Lawrence (QB-JAX)",
+      "points": 60.8
+    },
+    {
+      "owner": "Glove Don\u2019t Fit, Blitz",
+      "player": "Kenneth Walker (RB-KC)",
+      "points": 55.8
+    },
+    {
+      "owner": "Hernandez Hitmen",
+      "player": "C.J. Stroud (QB-HOU)",
+      "points": 53.2
+    },
+    {
+      "owner": "The ConVicks",
+      "player": "Tyler Shough (QB-NO)",
+      "points": 52.8
+    },
+    {
+      "owner": "Smack my Diggs up ",
+      "player": "Drake Maye (QB-NE)",
+      "points": 49.8
+    }
+  ]
+}
