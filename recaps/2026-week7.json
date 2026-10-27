@@ -1,0 +1,83 @@
+{
+  "season": "2026",
+  "week": 7,
+  "generated_at": "2026-10-27T16:22:58.614792+00:00",
+  "recap_text": "# HMPFL Week 7 Recap: Lockdown at Midfield\n\nThe yard was rowdy this week, inmates. Scoreboards lit up like contraband cell phones, and at least one unlucky warden got shanked by the waiver wire. Let's walk the block.\n\n## Closest Call: Solitary by a Hair\n\nIn the tightest standoff of the week, **Smack my Diggs up** narrowly escaped **The Adrian BeatHisSons** 204.4 to 197.05. Just 7.35 points separated a W from a full week in the hole. Bo Nix (61.0) and Drake Maye (59.8) combined to give Smack my Diggs up a two-QB jailbreak that barely held the door shut. The Adrian BeatHisSons can appeal all they want \u2014 the warden's decision is final.\n\n## Biggest Blowout: Death Row\n\nIf you thought solitary was rough, spare a thought for **Josh Allen's Prison Cell**, who got locked up for a brutal 264.05 to 78.1 defeat at the hands of **DUIiiiiiiii dont know jim**. A 185.95-point margin isn't a loss, it's a sentencing hearing. Tee Higgins (46.6) led the firing squad, and frankly, somebody should check on Josh Allen's Prison Cell's roster \u2014 that's not a lineup, that's a hostage situation.\n\nHonorable mention to **The ConVicks**, who also got processed hard, falling to the **Hernandez Hitmen** 258.3 to 191.45 \u2014 a 66.85-point beatdown that had Quinshon Judkins (47.8) doing the heavy lifting like he's on work release.\n\n## Standout Performances\n\nTony Pollard put together a 68-point masterclass for **OJ's Denver Bronco**, the single best stat line of the week, powering a 238.6-216.3 win over **Glove Don't Fit, Blitz** (and yes, the glove still doesn't fit).\n\nMeanwhile **Steve Ruggs** ran a full-on prison riot of production, with Joe Burrow (59.1), Bucky Irving (48.5), and Javonte Williams (48.5) all going off in a 240.45-187.95 demolition of **The Massage Boys**. That's three inmates escaping over the wall in the same week \u2014 somebody check the cameras.\n\n## Storylines to Watch\n\n**Rice, Rice Baby \u2728** survived a shootout with **Ruggs, Drugs and TDs**, 251.9 to 242.65, thanks to Caleb Williams' 50.9-point breakout. Both squads combined for nearly 500 points \u2014 somebody tell the commissary there's a scoring surplus this week.\n\nAs we head into Week 8, the cell blocks are shifting. Some wardens are thriving, some inmates are doing hard time on the waiver wire, and Josh Allen's Prison Cell needs a new cellmate \u2014 preferably one that scores points.",
+  "games": [
+    {
+      "owner_a": "The Adrian BeatHisSons",
+      "pts_a": 197.05,
+      "owner_b": "Smack my Diggs up ",
+      "pts_b": 204.4,
+      "margin": 7.35,
+      "winner": "Smack my Diggs up "
+    },
+    {
+      "owner_a": "Ruggs, Drugs and TDs",
+      "pts_a": 242.65,
+      "owner_b": "Rice, Rice Baby \u2728",
+      "pts_b": 251.9,
+      "margin": 9.25,
+      "winner": "Rice, Rice Baby \u2728"
+    },
+    {
+      "owner_a": "OJ\u2019s Denver Bronco",
+      "pts_a": 238.6,
+      "owner_b": "Glove Don\u2019t Fit, Blitz",
+      "pts_b": 216.3,
+      "margin": 22.3,
+      "winner": "OJ\u2019s Denver Bronco"
+    },
+    {
+      "owner_a": "The Massage Boys",
+      "pts_a": 187.95,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 240.45,
+      "margin": 52.5,
+      "winner": "Steve Ruggs"
+    },
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 191.45,
+      "owner_b": "Hernandez Hitmen",
+      "pts_b": 258.3,
+      "margin": 66.85,
+      "winner": "Hernandez Hitmen"
+    },
+    {
+      "owner_a": "DUIiiiiiiii dont know jim",
+      "pts_a": 264.05,
+      "owner_b": "Josh Allen\u2019s Prison Cell",
+      "pts_b": 78.1,
+      "margin": 185.95,
+      "winner": "DUIiiiiiiii dont know jim"
+    }
+  ],
+  "top_performers": [
+    {
+      "owner": "OJ\u2019s Denver Bronco",
+      "player": "Tony Pollard (RB-TEN)",
+      "points": 68.0
+    },
+    {
+      "owner": "Smack my Diggs up ",
+      "player": "Bo Nix (QB-DEN)",
+      "points": 61.0
+    },
+    {
+      "owner": "Smack my Diggs up ",
+      "player": "Drake Maye (QB-NE)",
+      "points": 59.8
+    },
+    {
+      "owner": "Steve Ruggs",
+      "player": "Joe Burrow (QB-CIN)",
+      "points": 59.1
+    },
+    {
+      "owner": "The Massage Boys",
+      "player": "Jaxon Smith-Njigba (WR-SEA)",
+      "points": 51.6
+    }
+  ]
+}
