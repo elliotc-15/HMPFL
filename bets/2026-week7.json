@@ -1,0 +1,122 @@
+{
+  "season": "2026",
+  "week": 7,
+  "placed": "2026-10-25",
+  "bookmaker": null,
+  "stake": 1.0,
+  "odds": "3141.57/1",
+  "potential_returns": 3142.57,
+  "result": "lost",
+  "note": "Results taken from the bookmaker's settled slip; acca odds calculated from the leg prices.",
+  "sat_out": [],
+  "legs": [
+    {
+      "owner": "James",
+      "game": "Steelers @ Saints",
+      "pick": "D.K. Metcalf over 56.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": "20/23",
+      "result": "lost",
+      "actual": "56 rec yds (missed by 1)"
+    },
+    {
+      "owner": "Joe",
+      "game": "49ers @ Falcons",
+      "pick": "Bijan Robinson over 90.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "20/23",
+      "result": "lost",
+      "actual": "63 rush yds"
+    },
+    {
+      "owner": "Mike",
+      "game": "Bengals @ Ravens",
+      "pick": "Mike Gesicki over 22.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": "20/23",
+      "result": "lost",
+      "actual": "6 rec yds"
+    },
+    {
+      "owner": "Morgan",
+      "game": "Buccaneers @ Panthers",
+      "pick": "Chuba Hubbard over 66.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "20/23",
+      "result": "lost",
+      "actual": "33 rush yds"
+    },
+    {
+      "owner": "Elliot",
+      "game": "Giants @ Texans",
+      "pick": "J.J. McCarthy over 0.5 interceptions",
+      "type": "Interceptions",
+      "odds": "5/11",
+      "result": "lost",
+      "actual": "0 INTs"
+    },
+    {
+      "owner": "Josh",
+      "game": "Colts @ Vikings",
+      "pick": "Daniel Jones 2+ interceptions",
+      "type": "Interceptions",
+      "odds": "3/1",
+      "result": "lost",
+      "actual": "1 INT"
+    },
+    {
+      "owner": "Matthew",
+      "game": "Dolphins @ Jets",
+      "pick": "Garrett Wilson over 64.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": "1/1",
+      "result": "lost",
+      "actual": "26 rec yds"
+    },
+    {
+      "owner": "Ashley",
+      "game": "Browns @ Titans",
+      "pick": "Quinshon Judkins over 45.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": "5/6",
+      "result": "won",
+      "actual": "96 rush yds"
+    },
+    {
+      "owner": "Rhys",
+      "game": "Broncos @ Cardinals",
+      "pick": "Trey McBride over 6.5 receptions",
+      "type": "Receptions",
+      "odds": "4/6",
+      "result": "won",
+      "actual": "10 receptions"
+    },
+    {
+      "owner": "Carter",
+      "game": "Packers @ Lions",
+      "pick": "Matthew Golden over 73.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": "5/6",
+      "result": "lost",
+      "actual": "39 rec yds"
+    },
+    {
+      "owner": "Jack",
+      "game": "Rams @ Raiders",
+      "pick": "Tyler Higbee anytime TD",
+      "type": "Anytime TD",
+      "odds": "37/20",
+      "result": "lost",
+      "actual": "No TD"
+    },
+    {
+      "owner": "Dylan",
+      "game": "Chiefs @ Seahawks",
+      "pick": "Kenneth Walker III 70+ rushing yds",
+      "type": "Rushing Yds",
+      "odds": "5/13",
+      "result": "lost",
+      "actual": "36 rush yds"
+    }
+  ]
+}
