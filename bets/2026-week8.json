@@ -7,7 +7,7 @@
   "odds": "1757.74/1",
   "potential_returns": 1758.74,
   "result": "pending",
-  "note": "Placed as a Sky Bet BuildABet, which shows the combined price but not each leg's odds. The £1 stake is assumed, as in previous weeks.",
+  "note": "Placed as a Sky Bet BuildABet, which shows only the combined price (1757.74/1), so each leg's odds are estimated from other sportsbooks' published prices for the same or nearest line. The three Ravens @ Bills legs were priced together by Sky Bet as a same-game BuildABet (worth about 19/4 combined), so the leg prices won't multiply exactly to the total. £1 stake assumed.",
   "sat_out": [],
   "legs": [
     {
@@ -15,7 +15,7 @@
       "game": "Ravens @ Bills",
       "pick": "James Cook anytime TD",
       "type": "Anytime TD",
-      "odds": null,
+      "odds": "8/13",
       "result": "pending",
       "live": {
         "player": "James Cook",
@@ -28,7 +28,7 @@
       "game": "Ravens @ Bills",
       "pick": "Zay Flowers over 89.5 receiving yds",
       "type": "Receiving Yds",
-      "odds": null,
+      "odds": "6/5",
       "result": "pending",
       "live": {
         "player": "Zay Flowers",
@@ -41,7 +41,7 @@
       "game": "Ravens @ Bills",
       "pick": "D.J. Moore over 4.5 receptions",
       "type": "Receptions",
-      "odds": null,
+      "odds": "1/1",
       "result": "pending",
       "live": {
         "player": "D.J. Moore",
@@ -54,7 +54,7 @@
       "game": "Falcons @ Buccaneers",
       "pick": "Bucky Irving over 16.5 rush attempts",
       "type": "Rush Attempts",
-      "odds": null,
+      "odds": "1/2",
       "result": "pending",
       "live": {
         "player": "Bucky Irving",
@@ -67,7 +67,7 @@
       "game": "Cardinals @ Cowboys",
       "pick": "Jeremiyah Love over 44.5 rushing yds",
       "type": "Rushing Yds",
-      "odds": null,
+      "odds": "6/5",
       "result": "pending",
       "live": {
         "player": "Jeremiyah Love",
@@ -80,7 +80,7 @@
       "game": "Cardinals @ Cowboys",
       "pick": "Trey McBride over 7.5 receptions",
       "type": "Receptions",
-      "odds": null,
+      "odds": "20/23",
       "result": "pending",
       "live": {
         "player": "Trey McBride",
@@ -93,7 +93,7 @@
       "game": "Vikings @ Lions",
       "pick": "Jahmyr Gibbs over 4.5 receptions",
       "type": "Receptions",
-      "odds": null,
+      "odds": "6/5",
       "result": "pending",
       "live": {
         "player": "Jahmyr Gibbs",
@@ -106,7 +106,7 @@
       "game": "Vikings @ Lions",
       "pick": "Amon-Ra St. Brown over 77.5 receiving yds",
       "type": "Receiving Yds",
-      "odds": null,
+      "odds": "20/23",
       "result": "pending",
       "live": {
         "player": "Amon-Ra St. Brown",
@@ -119,7 +119,7 @@
       "game": "Colts @ Jaguars",
       "pick": "Over 45.5 total points",
       "type": "Game Total",
-      "odds": null,
+      "odds": "4/5",
       "result": "pending",
       "live": {
         "stat": "game_total",
@@ -131,7 +131,7 @@
       "game": "Chiefs @ Broncos",
       "pick": "Kenneth Walker III over 85.5 rushing yds",
       "type": "Rushing Yds",
-      "odds": null,
+      "odds": "20/23",
       "result": "pending",
       "live": {
         "player": "Kenneth Walker III",
@@ -144,7 +144,7 @@
       "game": "Chargers @ Rams",
       "pick": "Matthew Stafford over 248.5 passing yds",
       "type": "Passing Yds",
-      "odds": null,
+      "odds": "20/23",
       "result": "pending",
       "live": {
         "player": "Matthew Stafford",
@@ -157,7 +157,7 @@
       "game": "Browns @ Steelers",
       "pick": "Quinshon Judkins over 47.5 rushing yds",
       "type": "Rushing Yds",
-      "odds": null,
+      "odds": "10/11",
       "result": "pending",
       "live": {
         "player": "Quinshon Judkins",
