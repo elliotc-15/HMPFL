@@ -1,0 +1,169 @@
+{
+  "season": "2026",
+  "week": 8,
+  "placed": "2026-11-01",
+  "bookmaker": "Sky Bet",
+  "stake": 1.0,
+  "odds": "1757.74/1",
+  "potential_returns": 1758.74,
+  "result": "pending",
+  "note": "Placed as a Sky Bet BuildABet, which shows the combined price but not each leg's odds. The £1 stake is assumed, as in previous weeks.",
+  "sat_out": [],
+  "legs": [
+    {
+      "owner": "James",
+      "game": "Ravens @ Bills",
+      "pick": "James Cook anytime TD",
+      "type": "Anytime TD",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "James Cook",
+        "stat": "tds",
+        "line": 0.5
+      }
+    },
+    {
+      "owner": "Morgan",
+      "game": "Ravens @ Bills",
+      "pick": "Zay Flowers over 89.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Zay Flowers",
+        "stat": "rec_yds",
+        "line": 89.5
+      }
+    },
+    {
+      "owner": "Jack",
+      "game": "Ravens @ Bills",
+      "pick": "D.J. Moore over 4.5 receptions",
+      "type": "Receptions",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "D.J. Moore",
+        "stat": "rec",
+        "line": 4.5
+      }
+    },
+    {
+      "owner": "Elliot",
+      "game": "Falcons @ Buccaneers",
+      "pick": "Bucky Irving over 16.5 rush attempts",
+      "type": "Rush Attempts",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Bucky Irving",
+        "stat": "rush_att",
+        "line": 16.5
+      }
+    },
+    {
+      "owner": "Mike",
+      "game": "Cardinals @ Cowboys",
+      "pick": "Jeremiyah Love over 44.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Jeremiyah Love",
+        "stat": "rush_yds",
+        "line": 44.5
+      }
+    },
+    {
+      "owner": "Dylan",
+      "game": "Cardinals @ Cowboys",
+      "pick": "Trey McBride over 7.5 receptions",
+      "type": "Receptions",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Trey McBride",
+        "stat": "rec",
+        "line": 7.5
+      }
+    },
+    {
+      "owner": "Carter",
+      "game": "Vikings @ Lions",
+      "pick": "Jahmyr Gibbs over 4.5 receptions",
+      "type": "Receptions",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Jahmyr Gibbs",
+        "stat": "rec",
+        "line": 4.5
+      }
+    },
+    {
+      "owner": "Joe",
+      "game": "Vikings @ Lions",
+      "pick": "Amon-Ra St. Brown over 77.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Amon-Ra St. Brown",
+        "stat": "rec_yds",
+        "line": 77.5
+      }
+    },
+    {
+      "owner": "Josh",
+      "game": "Colts @ Jaguars",
+      "pick": "Over 45.5 total points",
+      "type": "Game Total",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "stat": "game_total",
+        "line": 45.5
+      }
+    },
+    {
+      "owner": "Matthew",
+      "game": "Chiefs @ Broncos",
+      "pick": "Kenneth Walker III over 85.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Kenneth Walker III",
+        "stat": "rush_yds",
+        "line": 85.5
+      }
+    },
+    {
+      "owner": "Rhys",
+      "game": "Chargers @ Rams",
+      "pick": "Matthew Stafford over 248.5 passing yds",
+      "type": "Passing Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Matthew Stafford",
+        "stat": "pass_yds",
+        "line": 248.5
+      }
+    },
+    {
+      "owner": "Ashley",
+      "game": "Browns @ Steelers",
+      "pick": "Quinshon Judkins over 47.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Quinshon Judkins",
+        "stat": "rush_yds",
+        "line": 47.5
+      }
+    }
+  ]
+}
