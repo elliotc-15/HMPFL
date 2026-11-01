@@ -1939,6 +1939,9 @@ async function renderRecap() {
 // TAB 12: THE ACCA (weekly group prop-bet accumulator)
 // Data lives in bets/<season>-week<N>.json, one file per week, listed in
 // bets/index.json. Each leg's result is 'won' | 'lost' | 'void' | 'pending'.
+// Each leg should also carry `player` (the NFL player the prop is on, null for
+// game totals) and `team` (that player's NFL team nickname as written in the
+// game label, e.g. "Bengals"), which feed the Team Sheet and Player Sheet.
 // ===========================================================
 function fracToDecimal(odds) {
   if (!odds) return null;
@@ -1993,10 +1996,15 @@ function hitRate(won, lost) {
   return won + lost ? (won / (won + lost)) * 100 : null;
 }
 
+// Who/which team a leg is on. Newer slips carry `player` and `team` on each
+// leg; fall back to the live-tracker spec so older or hand-typed slips still count.
+function legPlayer(leg) { return leg.player || (leg.live && leg.live.player) || null; }
+function legTeam(leg) { return leg.team || (leg.live && leg.live.team) || null; }
+
 function buildAccaStats(weeks) {
-  const byOwner = {}, byType = {};
+  const byOwner = {}, byType = {}, byTeam = {}, byPlayer = {};
   let legsWon = 0, legsLost = 0, staked = 0, returned = 0, landed = 0, settledWeeks = 0;
-  const bump = (map, key) => (map[key] = map[key] || { key, legs: 0, won: 0, lost: 0, pending: 0, satOut: 0, oddsSum: 0, oddsN: 0 });
+  const bump = (map, key) => (map[key] = map[key] || { key, legs: 0, won: 0, lost: 0, pending: 0, satOut: 0, oddsSum: 0, oddsN: 0, pl: 0, plN: 0, owners: new Set(), teams: new Set() });
   weeks.forEach(w => {
     staked += w.stake || 0;
     if (w.result === 'won') { landed++; returned += w.returns ?? w.potential_returns ?? 0; }
@@ -2004,19 +2012,31 @@ function buildAccaStats(weeks) {
     (w.sat_out || []).forEach(o => bump(byOwner, o).satOut++);
     w.legs.forEach(leg => {
       const o = bump(byOwner, leg.owner), t = bump(byType, leg.type || 'Other');
+      const team = legTeam(leg), player = legPlayer(leg);
+      const buckets = [o, t];
+      if (team) buckets.push(bump(byTeam, team));
+      if (player) {
+        const pb = bump(byPlayer, player);
+        if (team) pb.teams.add(team);
+        buckets.push(pb);
+      }
       const dec = fracToDecimal(leg.odds);
-      [o, t].forEach(s => {
+      buckets.forEach(s => {
+        s.owners.add(leg.owner);
         // "Legs" counts settled legs only, so Legs = Won + Lost; open legs go in Pending.
         if (leg.result === 'won') { s.won++; s.legs++; }
         else if (leg.result === 'lost') { s.lost++; s.legs++; }
         else if (leg.result !== 'void') s.pending++;
         if (dec) { s.oddsSum += dec; s.oddsN++; }
+        // Notional profit if each leg had been a £1 single at its listed price.
+        if (dec && leg.result === 'won') { s.pl += dec - 1; s.plN++; }
+        else if (dec && leg.result === 'lost') { s.pl -= 1; s.plN++; }
       });
       if (leg.result === 'won') legsWon++;
       if (leg.result === 'lost') legsLost++;
     });
   });
-  return { byOwner: Object.values(byOwner), byType: Object.values(byType), legsWon, legsLost, staked, returned, landed, settledWeeks };
+  return { byOwner: Object.values(byOwner), byType: Object.values(byType), byTeam: Object.values(byTeam), byPlayer: Object.values(byPlayer), legsWon, legsLost, staked, returned, landed, settledWeeks };
 }
 
 // ---------- LIVE ACCA TRACKER (ESPN public scoreboard/box scores) ----------
@@ -2284,6 +2304,58 @@ function accaTypeTable(rows) {
   return el('div', { class: 'table-wrap' }, table);
 }
 
+function fmtPL(n, counted) {
+  if (!counted) return el('span', { style: 'color:var(--paper-dim);' }, 'n/a');
+  const v = Math.round(n * 100) / 100;
+  const txt = (v > 0 ? '+' : v < 0 ? '−' : '') + fmtMoney(Math.abs(v));
+  return el('span', { style: v > 0 ? 'color:#6fd49b;' : v < 0 ? 'color:var(--rust-bright);' : '' }, txt);
+}
+
+// League table for teams or players: same columns as the leg leaderboard plus
+// a notional £1-singles profit/loss. `kind` is 'team' or 'player'.
+function accaSubjectTable(rows, kind) {
+  const isPlayer = kind === 'player';
+  const table = el('table', {}, [
+    el('thead', {}, el('tr', {}, [
+      th(isPlayer ? 'Player' : 'Team', 'name', 'str'),
+      isPlayer ? th('Team', 'team', 'str') : null,
+      th('Legs', 'legs'), th('Won', 'won'), th('Lost', 'lost'), th('Pending', 'pending'),
+      th('Hit %', 'hit'), th('Avg Odds', 'avgodds'), th('£1 P/L', 'pl'),
+      th('Picked By', 'owners', 'str'),
+    ])),
+    el('tbody', {}, rows.map(r => {
+      const hit = hitRate(r.won, r.lost);
+      const avg = r.oddsN ? r.oddsSum / r.oddsN : null;
+      const owners = [...r.owners].sort();
+      const team = [...r.teams].join(' / ');
+      const tr = el('tr', {}, [
+        el('td', { class: 'owner-cell' }, r.key),
+        isPlayer ? el('td', {}, team || '—') : null,
+        el('td', { class: 'num-cell' }, r.legs),
+        el('td', { class: 'num-cell' }, r.won),
+        el('td', { class: 'num-cell' }, r.lost),
+        el('td', { class: 'num-cell', style: r.pending ? '' : 'color:var(--paper-dim);' }, r.pending),
+        el('td', { class: 'num-cell' }, hit === null ? '—' : hit.toFixed(0) + '%'),
+        el('td', { class: 'num-cell' }, avg ? decimalToFrac(avg) : el('span', { title: 'No odds recorded for these legs yet', style: 'color:var(--paper-dim);' }, 'n/a')),
+        el('td', { class: 'num-cell' }, fmtPL(r.pl, r.plN)),
+        el('td', { style: 'color:var(--paper-dim);' }, owners.join(', ')),
+      ]);
+      Object.assign(tr.dataset, { name: r.key, team, legs: r.legs, won: r.won, lost: r.lost, pending: r.pending, hit: hit ?? -1, avgodds: avg ?? 0, pl: r.plN ? r.pl : 0, owners: owners.join(', ') });
+      return tr;
+    })),
+  ]);
+  makeSortable(table);
+  return el('div', { class: 'table-wrap' }, table);
+}
+
+// Default ranking for the team/player tables: profit first (it rewards
+// landing the longer prices), then hit rate, then volume.
+function sortSubjects(rows) {
+  return rows.sort((a, b) => (b.plN ? b.pl : -1e9) - (a.plN ? a.pl : -1e9)
+    || (hitRate(b.won, b.lost) ?? -1) - (hitRate(a.won, a.lost) ?? -1)
+    || b.legs - a.legs || a.key.localeCompare(b.key));
+}
+
 async function renderAcca() {
   const root = document.getElementById('tab-acca');
   const holder = el('div', {}, el('div', { class: 'status-msg' }, ['Counting the commissary', el('span', { class: 'blink' }, '...')]));
@@ -2369,6 +2441,17 @@ async function renderAcca() {
     el('h2', { class: 'section-title' }, 'What’s Working'),
     el('p', { class: 'section-desc' }, `Hit rate by type of pick — are anytime TDs worth it, or are the safe yardage overs doing the heavy lifting? Avg Odds only counts legs where the price was recorded.${settledNote}`),
     accaTypeTable(types),
+  ]));
+  const plNote = '£1 P/L is what you\u2019d be up or down if every leg had been a separate £1 single at its listed price, so it rewards landing the longer odds, not just hitting.';
+  root.appendChild(el('div', { class: 'panel' }, [
+    el('h2', { class: 'section-title' }, 'Team Sheet'),
+    el('p', { class: 'section-desc' }, `Which NFL teams pay out when we back their players. Every player prop counts towards the player\u2019s team, and a spread bet counts towards the team backed; game totals aren\u2019t tied to one team so they\u2019re left out. ${plNote} Click a column header to sort.${settledNote}`),
+    accaSubjectTable(sortSubjects(stats.byTeam), 'team'),
+  ]));
+  root.appendChild(el('div', { class: 'panel' }, [
+    el('h2', { class: 'section-title' }, 'Player Sheet'),
+    el('p', { class: 'section-desc' }, `Every NFL player we\u2019ve put a leg on, ranked the same way. ${plNote} Click a column header to sort.${settledNote}`),
+    accaSubjectTable(sortSubjects(stats.byPlayer), 'player'),
   ]));
 }
 
