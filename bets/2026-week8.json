@@ -6,8 +6,8 @@
   "stake": 1.0,
   "odds": "1757.74/1",
   "potential_returns": 1758.74,
-  "result": "pending",
-  "note": "Placed as a Sky Bet BuildABet, which shows only the combined price (1757.74/1), so each leg's odds are estimated from other sportsbooks' published prices for the same or nearest line. The three Ravens @ Bills legs were priced together by Sky Bet as a same-game BuildABet (worth about 19/4 combined), so the leg prices won't multiply exactly to the total. £1 stake assumed.",
+  "result": "lost",
+  "note": "Placed as a Sky Bet BuildABet, which shows only the combined price (1757.74/1), so each leg's odds are estimated from other sportsbooks' published prices for the same or nearest line. The three Ravens @ Bills legs were priced together by Sky Bet as a same-game BuildABet (worth about 19/4 combined), so the leg prices won't multiply exactly to the total. £1 stake assumed. Results auto-settled from ESPN box scores.",
   "sat_out": [],
   "legs": [
     {
@@ -16,12 +16,14 @@
       "pick": "James Cook anytime TD",
       "type": "Anytime TD",
       "odds": "8/13",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "James Cook",
         "stat": "tds",
         "line": 0.5
-      }
+      },
+      "actual": "1 TDs",
+      "auto_settled": true
     },
     {
       "owner": "Morgan",
@@ -29,12 +31,14 @@
       "pick": "Zay Flowers over 89.5 receiving yds",
       "type": "Receiving Yds",
       "odds": "6/5",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Zay Flowers",
         "stat": "rec_yds",
         "line": 89.5
-      }
+      },
+      "actual": "0 rec yds",
+      "auto_settled": true
     },
     {
       "owner": "Jack",
@@ -42,12 +46,14 @@
       "pick": "D.J. Moore over 4.5 receptions",
       "type": "Receptions",
       "odds": "1/1",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "D.J. Moore",
         "stat": "rec",
         "line": 4.5
-      }
+      },
+      "actual": "4 receptions",
+      "auto_settled": true
     },
     {
       "owner": "Elliot",
@@ -55,12 +61,14 @@
       "pick": "Bucky Irving over 16.5 rush attempts",
       "type": "Rush Attempts",
       "odds": "1/2",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Bucky Irving",
         "stat": "rush_att",
         "line": 16.5
-      }
+      },
+      "actual": "27 carries",
+      "auto_settled": true
     },
     {
       "owner": "Mike",
@@ -68,12 +76,14 @@
       "pick": "Jeremiyah Love over 44.5 rushing yds",
       "type": "Rushing Yds",
       "odds": "6/5",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Jeremiyah Love",
         "stat": "rush_yds",
         "line": 44.5
-      }
+      },
+      "actual": "23 rush yds",
+      "auto_settled": true
     },
     {
       "owner": "Dylan",
@@ -81,12 +91,14 @@
       "pick": "Trey McBride over 7.5 receptions",
       "type": "Receptions",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Trey McBride",
         "stat": "rec",
         "line": 7.5
-      }
+      },
+      "actual": "7 receptions",
+      "auto_settled": true
     },
     {
       "owner": "Carter",
@@ -94,12 +106,14 @@
       "pick": "Jahmyr Gibbs over 4.5 receptions",
       "type": "Receptions",
       "odds": "6/5",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Jahmyr Gibbs",
         "stat": "rec",
         "line": 4.5
-      }
+      },
+      "actual": "2 receptions",
+      "auto_settled": true
     },
     {
       "owner": "Joe",
@@ -107,12 +121,14 @@
       "pick": "Amon-Ra St. Brown over 77.5 receiving yds",
       "type": "Receiving Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Amon-Ra St. Brown",
         "stat": "rec_yds",
         "line": 77.5
-      }
+      },
+      "actual": "46 rec yds",
+      "auto_settled": true
     },
     {
       "owner": "Josh",
@@ -120,11 +136,13 @@
       "pick": "Over 45.5 total points",
       "type": "Game Total",
       "odds": "4/5",
-      "result": "pending",
+      "result": "won",
       "live": {
         "stat": "game_total",
         "line": 45.5
-      }
+      },
+      "actual": "49 total points",
+      "auto_settled": true
     },
     {
       "owner": "Matthew",
@@ -132,12 +150,14 @@
       "pick": "Kenneth Walker III over 85.5 rushing yds",
       "type": "Rushing Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Kenneth Walker III",
         "stat": "rush_yds",
         "line": 85.5
-      }
+      },
+      "actual": "69 rush yds",
+      "auto_settled": true
     },
     {
       "owner": "Rhys",
@@ -145,12 +165,14 @@
       "pick": "Matthew Stafford over 248.5 passing yds",
       "type": "Passing Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Matthew Stafford",
         "stat": "pass_yds",
         "line": 248.5
-      }
+      },
+      "actual": "157 pass yds",
+      "auto_settled": true
     },
     {
       "owner": "Ashley",
@@ -158,12 +180,14 @@
       "pick": "Quinshon Judkins over 47.5 rushing yds",
       "type": "Rushing Yds",
       "odds": "10/11",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Quinshon Judkins",
         "stat": "rush_yds",
         "line": 47.5
-      }
+      },
+      "actual": "25 rush yds",
+      "auto_settled": true
     }
   ]
 }
