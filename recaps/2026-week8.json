@@ -1,0 +1,83 @@
+{
+  "season": "2026",
+  "week": 8,
+  "generated_at": "2026-11-03T18:20:36.761430+00:00",
+  "recap_text": "# HMPFL Week 8: Lockdown Recap\n\nThe cellblock saw some chaos this week \u2014 a nail-biter escape, a full-blown prison riot of points, and one unfortunate soul who dropped 274 points and still got sent to solitary.\n\n## Closest Call: Stay of Execution\n\nIn a photo finish that had the warden reviewing the tape, **Glove Don't Fit, Blitz** narrowly survived **Hernandez Hitmen**, 198.1 to 197.4. That's a 0.7-point margin \u2014 closer than the space between bunk beds in general population. Hernandez Hitmen can appeal all they want, but the verdict stands.\n\n## Biggest Blowout: Maximum Security Beatdown\n\n**DUIiiiiiiii dont know jim** put up a jaw-dropping 319.3 points to demolish **The ConVicks** by 45.1. Here's the kicker \u2014 The ConVicks dropped 274.2 points, a total that wins most weeks in this league, and still got thrown in the hole. Patrick Mahomes went off for 62.8 points for The ConVicks and it still wasn't enough. Tough break, fellas \u2014 sometimes the house always wins.\n\n## Star of the Week: Joey B's Jailbreak\n\nNobody had a bigger night than **Joe Burrow**, who torched the league for 85.2 points in **Steve Ruggs'** lineup. Unfortunately, Steve Ruggs still lost by 32.95 to **Smack my Diggs up**, proving that in HMPFL, even a Hall of Fame outing from your QB can't bail out a sinking ship if the rest of your roster is on lockdown.\n\n## Other Notables\n\n**DUIiiiiiiii dont know jim** didn't just win big, they went full gang-up mode \u2014 Tee Higgins (60.0), Bhayshul Tuten (57.8), and Jahmyr Gibbs (52.1) all popped off in the same lineup, giving them three players in the top 10 performances of the week. That's not a fantasy team, that's a crime syndicate.\n\nMeanwhile, **OJ's Denver Bronco** stayed hot, riding Tyler Allgeier's 70.2-point explosion and Tony Pollard's 51.9 to a 40-point blowout over Ruggs, Drugs and TDs. OJ's squad is starting to look like the team nobody wants smoke with.\n\nStay vigilant out there, inmates \u2014 Week 9 is right around the corner, and the yard is only getting more dangerous.",
+  "games": [
+    {
+      "owner_a": "Hernandez Hitmen",
+      "pts_a": 197.4,
+      "owner_b": "Glove Don\u2019t Fit, Blitz",
+      "pts_b": 198.1,
+      "margin": 0.7,
+      "winner": "Glove Don\u2019t Fit, Blitz"
+    },
+    {
+      "owner_a": "The Massage Boys",
+      "pts_a": 179.27,
+      "owner_b": "Josh Allen\u2019s Prison Cell",
+      "pts_b": 176.75,
+      "margin": 2.52,
+      "winner": "The Massage Boys"
+    },
+    {
+      "owner_a": "The Adrian BeatHisSons",
+      "pts_a": 225.55,
+      "owner_b": "Rice, Rice Baby \u2728",
+      "pts_b": 209.7,
+      "margin": 15.85,
+      "winner": "The Adrian BeatHisSons"
+    },
+    {
+      "owner_a": "Smack my Diggs up ",
+      "pts_a": 231.05,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 198.1,
+      "margin": 32.95,
+      "winner": "Smack my Diggs up "
+    },
+    {
+      "owner_a": "OJ\u2019s Denver Bronco",
+      "pts_a": 240.1,
+      "owner_b": "Ruggs, Drugs and TDs",
+      "pts_b": 199.25,
+      "margin": 40.85,
+      "winner": "OJ\u2019s Denver Bronco"
+    },
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 274.2,
+      "owner_b": "DUIiiiiiiii dont know jim",
+      "pts_b": 319.3,
+      "margin": 45.1,
+      "winner": "DUIiiiiiiii dont know jim"
+    }
+  ],
+  "top_performers": [
+    {
+      "owner": "Steve Ruggs",
+      "player": "Joe Burrow (QB-CIN)",
+      "points": 85.2
+    },
+    {
+      "owner": "OJ\u2019s Denver Bronco",
+      "player": "Tyler Allgeier (RB-ARI)",
+      "points": 70.2
+    },
+    {
+      "owner": "The ConVicks",
+      "player": "Patrick Mahomes (QB-KC)",
+      "points": 62.8
+    },
+    {
+      "owner": "DUIiiiiiiii dont know jim",
+      "player": "Tee Higgins (WR-CIN)",
+      "points": 60.0
+    },
+    {
+      "owner": "DUIiiiiiiii dont know jim",
+      "player": "Bhayshul Tuten (RB-JAX)",
+      "points": 57.8
+    }
+  ]
+}
