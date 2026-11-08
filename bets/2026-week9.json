@@ -1,0 +1,199 @@
+{
+  "season": "2026",
+  "week": 9,
+  "placed": "2026-11-08",
+  "bookmaker": "Sky Bet",
+  "stake": 1.0,
+  "odds": "1858.75/1",
+  "potential_returns": 1859.75,
+  "result": "pending",
+  "note": "Three legs (Malik Washington, Jahmyr Gibbs, Jameson Williams) were placed as one Sky Bet Bet Builder at 21/4, so they have no individual prices.",
+  "sat_out": [],
+  "legs": [
+    {
+      "owner": "Elliot",
+      "game": "Browns @ Saints",
+      "pick": "Alvin Kamara over 3.5 receptions",
+      "player": "Alvin Kamara",
+      "team": "Saints",
+      "type": "Receptions",
+      "odds": "20/21",
+      "result": "pending",
+      "live": {
+        "player": "Alvin Kamara",
+        "stat": "rec",
+        "line": 3.5
+      }
+    },
+    {
+      "owner": "Mike",
+      "game": "Cowboys @ Colts",
+      "pick": "CeeDee Lamb over 94.5 receiving yds",
+      "player": "CeeDee Lamb",
+      "team": "Cowboys",
+      "type": "Receiving Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "CeeDee Lamb",
+        "stat": "rec_yds",
+        "line": 94.5
+      }
+    },
+    {
+      "owner": "Ashley",
+      "game": "Broncos @ Panthers",
+      "pick": "Chuba Hubbard over 69.5 rushing yds",
+      "player": "Chuba Hubbard",
+      "team": "Panthers",
+      "type": "Rushing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Chuba Hubbard",
+        "stat": "rush_yds",
+        "line": 69.5
+      }
+    },
+    {
+      "owner": "Josh",
+      "game": "Jets @ Chiefs",
+      "pick": "Emmett Johnson over 15.5 receiving yds",
+      "player": "Emmett Johnson",
+      "team": "Chiefs",
+      "type": "Receiving Yds",
+      "odds": "10/11",
+      "result": "pending",
+      "live": {
+        "player": "Emmett Johnson",
+        "stat": "rec_yds",
+        "line": 15.5
+      }
+    },
+    {
+      "owner": "Jev",
+      "game": "Lions @ Dolphins",
+      "pick": "Malik Washington over 43.5 receiving yds",
+      "player": "Malik Washington",
+      "team": "Dolphins",
+      "type": "Receiving Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Malik Washington",
+        "stat": "rec_yds",
+        "line": 43.5
+      },
+      "note": "Part of a 21/4 Bet Builder with Jahmyr Gibbs and Jameson Williams; Sky Bet only prices the three together."
+    },
+    {
+      "owner": "Deej",
+      "game": "Lions @ Dolphins",
+      "pick": "Jahmyr Gibbs over 99.5 rushing yds",
+      "player": "Jahmyr Gibbs",
+      "team": "Lions",
+      "type": "Rushing Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Jahmyr Gibbs",
+        "stat": "rush_yds",
+        "line": 99.5
+      },
+      "note": "Part of a 21/4 Bet Builder with Malik Washington and Jameson Williams; Sky Bet only prices the three together."
+    },
+    {
+      "owner": "Doc",
+      "game": "Lions @ Dolphins",
+      "pick": "Jameson Williams longest reception over 22.5 yds",
+      "player": "Jameson Williams",
+      "team": "Lions",
+      "type": "Longest Reception",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Jameson Williams",
+        "stat": "rec_long",
+        "line": 22.5
+      },
+      "note": "Part of a 21/4 Bet Builder with Malik Washington and Jahmyr Gibbs; Sky Bet only prices the three together."
+    },
+    {
+      "owner": "Carter",
+      "game": "Raiders @ 49ers",
+      "pick": "George Kittle over 67.5 receiving yds",
+      "player": "George Kittle",
+      "team": "49ers",
+      "type": "Receiving Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "George Kittle",
+        "stat": "rec_yds",
+        "line": 67.5
+      }
+    },
+    {
+      "owner": "James",
+      "game": "Texans @ Chargers",
+      "pick": "Nico Collins over 70.5 receiving yds",
+      "player": "Nico Collins",
+      "team": "Texans",
+      "type": "Receiving Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Nico Collins",
+        "stat": "rec_yds",
+        "line": 70.5
+      }
+    },
+    {
+      "owner": "Joe",
+      "game": "Packers @ Patriots",
+      "pick": "Rhamondre Stevenson over 54.5 rushing yds",
+      "player": "Rhamondre Stevenson",
+      "team": "Patriots",
+      "type": "Rushing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Rhamondre Stevenson",
+        "stat": "rush_yds",
+        "line": 54.5
+      }
+    },
+    {
+      "owner": "Bear",
+      "game": "Buccaneers @ Bears",
+      "pick": "Chris Godwin under 32.5 receiving yds",
+      "player": "Chris Godwin",
+      "team": "Buccaneers",
+      "type": "Receiving Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Chris Godwin",
+        "stat": "rec_yds",
+        "line": 32.5,
+        "side": "under"
+      }
+    },
+    {
+      "owner": "Bink",
+      "game": "Bills @ Vikings",
+      "pick": "Jordan Mason under 46.5 rushing yds",
+      "player": "Jordan Mason",
+      "team": "Vikings",
+      "type": "Rushing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Jordan Mason",
+        "stat": "rush_yds",
+        "line": 46.5,
+        "side": "under"
+      }
+    }
+  ]
+}
