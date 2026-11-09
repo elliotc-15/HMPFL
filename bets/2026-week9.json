@@ -6,8 +6,8 @@
   "stake": 1.0,
   "odds": "1858.75/1",
   "potential_returns": 1859.75,
-  "result": "pending",
-  "note": "Three legs (Malik Washington, Jahmyr Gibbs, Jameson Williams) were placed as one Sky Bet Bet Builder at 21/4, so they have no individual prices.",
+  "result": "lost",
+  "note": "Three legs (Malik Washington, Jahmyr Gibbs, Jameson Williams) were placed as one Sky Bet Bet Builder at 21/4, so they have no individual prices. Results auto-settled from ESPN box scores.",
   "sat_out": [],
   "legs": [
     {
@@ -18,12 +18,14 @@
       "team": "Saints",
       "type": "Receptions",
       "odds": "20/21",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Alvin Kamara",
         "stat": "rec",
         "line": 3.5
-      }
+      },
+      "actual": "3 receptions",
+      "auto_settled": true
     },
     {
       "owner": "Mike",
@@ -33,12 +35,14 @@
       "team": "Cowboys",
       "type": "Receiving Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "CeeDee Lamb",
         "stat": "rec_yds",
         "line": 94.5
-      }
+      },
+      "actual": "195 rec yds",
+      "auto_settled": true
     },
     {
       "owner": "Ashley",
@@ -48,12 +52,14 @@
       "team": "Panthers",
       "type": "Rushing Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Chuba Hubbard",
         "stat": "rush_yds",
         "line": 69.5
-      }
+      },
+      "actual": "79 rush yds",
+      "auto_settled": true
     },
     {
       "owner": "Josh",
@@ -63,12 +69,14 @@
       "team": "Chiefs",
       "type": "Receiving Yds",
       "odds": "10/11",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Emmett Johnson",
         "stat": "rec_yds",
         "line": 15.5
-      }
+      },
+      "actual": "0 rec yds",
+      "auto_settled": true
     },
     {
       "owner": "Jack",
@@ -78,13 +86,15 @@
       "team": "Dolphins",
       "type": "Receiving Yds",
       "odds": null,
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Malik Washington",
         "stat": "rec_yds",
         "line": 43.5
       },
-      "note": "Part of a 21/4 Bet Builder with Jahmyr Gibbs and Jameson Williams; Sky Bet only prices the three together."
+      "note": "Part of a 21/4 Bet Builder with Jahmyr Gibbs and Jameson Williams; Sky Bet only prices the three together.",
+      "actual": "21 rec yds",
+      "auto_settled": true
     },
     {
       "owner": "Matthew",
@@ -94,13 +104,15 @@
       "team": "Lions",
       "type": "Rushing Yds",
       "odds": null,
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Jahmyr Gibbs",
         "stat": "rush_yds",
         "line": 99.5
       },
-      "note": "Part of a 21/4 Bet Builder with Malik Washington and Jameson Williams; Sky Bet only prices the three together."
+      "note": "Part of a 21/4 Bet Builder with Malik Washington and Jameson Williams; Sky Bet only prices the three together.",
+      "actual": "74 rush yds",
+      "auto_settled": true
     },
     {
       "owner": "Dylan",
@@ -110,13 +122,15 @@
       "team": "Lions",
       "type": "Longest Reception",
       "odds": null,
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Jameson Williams",
         "stat": "rec_long",
         "line": 22.5
       },
-      "note": "Part of a 21/4 Bet Builder with Malik Washington and Jahmyr Gibbs; Sky Bet only prices the three together."
+      "note": "Part of a 21/4 Bet Builder with Malik Washington and Jahmyr Gibbs; Sky Bet only prices the three together.",
+      "actual": "31 yd longest reception",
+      "auto_settled": true
     },
     {
       "owner": "Carter",
@@ -126,12 +140,14 @@
       "team": "49ers",
       "type": "Receiving Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "George Kittle",
         "stat": "rec_yds",
         "line": 67.5
-      }
+      },
+      "actual": "58 rec yds",
+      "auto_settled": true
     },
     {
       "owner": "James",
@@ -141,12 +157,14 @@
       "team": "Texans",
       "type": "Receiving Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Nico Collins",
         "stat": "rec_yds",
         "line": 70.5
-      }
+      },
+      "actual": "55 rec yds",
+      "auto_settled": true
     },
     {
       "owner": "Joe",
@@ -156,12 +174,14 @@
       "team": "Patriots",
       "type": "Rushing Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "lost",
       "live": {
         "player": "Rhamondre Stevenson",
         "stat": "rush_yds",
         "line": 54.5
-      }
+      },
+      "actual": "32 rush yds",
+      "auto_settled": true
     },
     {
       "owner": "Rhys",
@@ -171,13 +191,15 @@
       "team": "Buccaneers",
       "type": "Receiving Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Chris Godwin",
         "stat": "rec_yds",
         "line": 32.5,
         "side": "under"
-      }
+      },
+      "actual": "16 rec yds",
+      "auto_settled": true
     },
     {
       "owner": "Morgan",
