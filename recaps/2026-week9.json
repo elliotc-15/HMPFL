@@ -1,0 +1,83 @@
+{
+  "season": "2026",
+  "week": 9,
+  "generated_at": "2026-11-10T18:34:20.945840+00:00",
+  "recap_text": "# HMPFL Week 9: Lockdown Recap\n\nThe cellblock was electric this week, inmates \u2014 equal parts nail-biting escape attempts and full-on prison riots on the scoreboard. Let's run the tape.\n\n## Closest Call: A Stay of Execution\n\nRice, Rice Baby \u2728 thought they had their release papers signed, sealed, and ready to go, but Steve Ruggs snuck through the yard in the dead of night to steal it 242.75 to 240.9. A margin of just 1.85 points \u2014 that's the fantasy equivalent of a pardon arriving five minutes before lights-out. Steve Ruggs rode a stacked QB room (more on that below) to survive the closest shave of the week, while Rice, Rice Baby \u2728 heads back to the cell wondering what could've been.\n\n## Biggest Blowout: Solitary Confinement\n\nThe ConVicks absolutely buried Josh Allen's Prison Cell, 216.2 to a bleak 112.0 \u2014 a 104.2-point beatdown that should come with its own warden's incident report. That's not a loss, that's a transfer to administrative segregation. Josh Allen's Prison Cell might want to request a cellmate swap before Week 10.\n\nHonorable mention to Glove Don't Fit, Blitz, who hung 284.7 points on DUIiiiiiiii dont know jim in a 57.85-point rout \u2014 the single highest score of the week, and not particularly close.\n\n## Standout Performances: Yard Legends\n\nC.J. Stroud was an absolute menace for Glove Don't Fit, Blitz, dropping 87.4 points like he was running the whole prison economy himself. Kenneth Walker III chipped in 66.6 for good measure \u2014 that duo alone could've beaten some entire rosters.\n\nSteve Ruggs quietly assembled a three-man crew for the ages: Joe Burrow (57.5), Brock Purdy (51.2), and Bucky Irving (50.5) all cracked 50+, proving depth wins prison yard turf wars. Meanwhile, the Hernandez Hitmen got a dynamic Dallas-Green Bay wideout combo from CeeDee Lamb (53.0) and Matthew Golden (51.8) to help bury Ruggs, Drugs and TDs by 32 points.\n\n## Storylines to Watch\n\nThe Adrian BeatHisSons rolled past OJ's Denver Bronco despite Jordan Love's monster 74.8-point outing \u2014 sometimes even a great night from your franchise QB isn't enough to beat the house. Smack my Diggs Up handled The Massage Boys in a workmanlike 12.84-point W, proving not every week needs fireworks to get the job done.\n\nStay sharp out there, gentlemen. The warden's always watching, and next week's commissary depends on your waiver wire discipline.",
+  "games": [
+    {
+      "owner_a": "Rice, Rice Baby \u2728",
+      "pts_a": 240.9,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 242.75,
+      "margin": 1.85,
+      "winner": "Steve Ruggs"
+    },
+    {
+      "owner_a": "Smack my Diggs up ",
+      "pts_a": 192.02,
+      "owner_b": "The Massage Boys",
+      "pts_b": 179.18,
+      "margin": 12.84,
+      "winner": "Smack my Diggs up "
+    },
+    {
+      "owner_a": "Ruggs, Drugs and TDs",
+      "pts_a": 180.25,
+      "owner_b": "Hernandez Hitmen",
+      "pts_b": 212.3,
+      "margin": 32.05,
+      "winner": "Hernandez Hitmen"
+    },
+    {
+      "owner_a": "OJ\u2019s Denver Bronco",
+      "pts_a": 196.8,
+      "owner_b": "The Adrian BeatHisSons",
+      "pts_b": 235.75,
+      "margin": 38.95,
+      "winner": "The Adrian BeatHisSons"
+    },
+    {
+      "owner_a": "DUIiiiiiiii dont know jim",
+      "pts_a": 226.85,
+      "owner_b": "Glove Don\u2019t Fit, Blitz",
+      "pts_b": 284.7,
+      "margin": 57.85,
+      "winner": "Glove Don\u2019t Fit, Blitz"
+    },
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 216.2,
+      "owner_b": "Josh Allen\u2019s Prison Cell",
+      "pts_b": 112.0,
+      "margin": 104.2,
+      "winner": "The ConVicks"
+    }
+  ],
+  "top_performers": [
+    {
+      "owner": "Glove Don\u2019t Fit, Blitz",
+      "player": "C.J. Stroud (QB-HOU)",
+      "points": 87.4
+    },
+    {
+      "owner": "OJ\u2019s Denver Bronco",
+      "player": "Jordan Love (QB-GB)",
+      "points": 74.8
+    },
+    {
+      "owner": "Glove Don\u2019t Fit, Blitz",
+      "player": "Kenneth Walker III (RB-KC)",
+      "points": 66.6
+    },
+    {
+      "owner": "Steve Ruggs",
+      "player": "Joe Burrow (QB-CIN)",
+      "points": 57.5
+    },
+    {
+      "owner": "Hernandez Hitmen",
+      "player": "CeeDee Lamb (WR-DAL)",
+      "points": 53.0
+    }
+  ]
+}
