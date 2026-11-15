@@ -1,0 +1,181 @@
+{
+  "season": "2026",
+  "week": 10,
+  "placed": "2026-11-15",
+  "bookmaker": null,
+  "stake": 1.0,
+  "odds": "1089.36/1",
+  "potential_returns": 1090.36,
+  "result": "pending",
+  "note": "Same-game legs were placed as three Bet Builders, each priced as a single unit: Chiefs @ Falcons at 4/1, Bills @ Jets at 41/10 and Panthers @ Saints at 5/2. Those legs have no individual odds. Acca odds are calculated from the four singles and the three Bet Builders, and the £1 stake is assumed.",
+  "sat_out": [],
+  "legs": [
+    {
+      "owner": "Carter",
+      "game": "Texans @ Browns",
+      "pick": "C.J. Stroud over 243.5 passing yds",
+      "type": "Passing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "C.J. Stroud",
+        "stat": "pass_yds",
+        "line": 243.5
+      }
+    },
+    {
+      "owner": "Morgan",
+      "game": "Vikings @ Packers",
+      "pick": "Jordan Love over 260.5 passing yds",
+      "type": "Passing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Jordan Love",
+        "stat": "pass_yds",
+        "line": 260.5
+      }
+    },
+    {
+      "owner": "Rhys",
+      "game": "Jaguars @ Titans",
+      "pick": "Trevor Lawrence over 244.5 passing yds",
+      "type": "Passing Yds",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Trevor Lawrence",
+        "stat": "pass_yds",
+        "line": 244.5
+      }
+    },
+    {
+      "owner": "Jack",
+      "game": "Dolphins @ Colts",
+      "pick": "Jonathan Taylor under 97.5 rushing + receiving yds",
+      "type": "Rush + Rec Yds (Under)",
+      "odds": "20/23",
+      "result": "pending",
+      "live": {
+        "player": "Jonathan Taylor",
+        "stat": "rush_rec_yds",
+        "line": 97.5,
+        "side": "under"
+      }
+    },
+    {
+      "owner": "James",
+      "game": "Chiefs @ Falcons",
+      "pick": "Patrick Mahomes over 1.5 passing TDs",
+      "type": "Passing TDs",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Patrick Mahomes",
+        "stat": "pass_td",
+        "line": 1.5
+      },
+      "note": "Bet Builder at 4/1 with Mahomes, Rice and Bijan Robinson legs"
+    },
+    {
+      "owner": "Joe",
+      "game": "Chiefs @ Falcons",
+      "pick": "Rashee Rice over 55.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Rashee Rice",
+        "stat": "rec_yds",
+        "line": 55.5
+      },
+      "note": "Bet Builder at 4/1 with Mahomes, Rice and Bijan Robinson legs"
+    },
+    {
+      "owner": "Josh",
+      "game": "Chiefs @ Falcons",
+      "pick": "Bijan Robinson under 87.5 rushing yds",
+      "type": "Rushing Yds (Under)",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Bijan Robinson",
+        "stat": "rush_yds",
+        "line": 87.5,
+        "side": "under"
+      },
+      "note": "Bet Builder at 4/1 with Mahomes, Rice and Bijan Robinson legs"
+    },
+    {
+      "owner": "Elliot",
+      "game": "Bills @ Jets",
+      "pick": "Josh Allen over 31.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Josh Allen",
+        "stat": "rush_yds",
+        "line": 31.5
+      },
+      "note": "Bet Builder at 41/10 with Josh Allen, Breece Hall and James Cook legs"
+    },
+    {
+      "owner": "Mike",
+      "game": "Bills @ Jets",
+      "pick": "Breece Hall under 53.5 rushing yds",
+      "type": "Rushing Yds (Under)",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Breece Hall",
+        "stat": "rush_yds",
+        "line": 53.5,
+        "side": "under"
+      },
+      "note": "Bet Builder at 41/10 with Josh Allen, Breece Hall and James Cook legs"
+    },
+    {
+      "owner": "Dylan",
+      "game": "Bills @ Jets",
+      "pick": "James Cook over 90.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "James Cook",
+        "stat": "rush_yds",
+        "line": 90.5
+      },
+      "note": "Bet Builder at 41/10 with Josh Allen, Breece Hall and James Cook legs"
+    },
+    {
+      "owner": "Matthew",
+      "game": "Panthers @ Saints",
+      "pick": "Travis Etienne over 31.5 rushing yds",
+      "type": "Rushing Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Travis Etienne",
+        "stat": "rush_yds",
+        "line": 31.5
+      },
+      "note": "Bet Builder at 5/2 with Etienne and Olave legs"
+    },
+    {
+      "owner": "Ashley",
+      "game": "Panthers @ Saints",
+      "pick": "Chris Olave over 72.5 receiving yds",
+      "type": "Receiving Yds",
+      "odds": null,
+      "result": "pending",
+      "live": {
+        "player": "Chris Olave",
+        "stat": "rec_yds",
+        "line": 72.5
+      },
+      "note": "Bet Builder at 5/2 with Etienne and Olave legs"
+    }
+  ]
+}
