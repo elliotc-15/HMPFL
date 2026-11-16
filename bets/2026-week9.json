@@ -209,13 +209,15 @@
       "team": "Vikings",
       "type": "Rushing Yds",
       "odds": "20/23",
-      "result": "pending",
+      "result": "won",
       "live": {
         "player": "Jordan Mason",
         "stat": "rush_yds",
         "line": 46.5,
         "side": "under"
-      }
+      },
+      "actual": "35 rush yds",
+      "auto_settled": true
     }
   ]
 }
