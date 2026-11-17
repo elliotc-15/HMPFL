@@ -1,0 +1,83 @@
+{
+  "season": "2026",
+  "week": 10,
+  "generated_at": "2026-11-17T19:44:11.694783+00:00",
+  "recap_text": "# HMPFL Week 10 Recap: Lockdown Report\n\nThe warden's office is buried in incident reports this week, inmates. Week 10 delivered everything from a nail-biting standoff to a full-blown prison riot on the scoreboard. Let's review the surveillance footage.\n\n## Closest Call: A Near-Escape\n\n**Steve Ruggs** barely slipped past **OJ's Denver Bronco** in the week's tightest contest, 227.05 to 216.2. A margin of just 10.85 points means OJ's crew was one missed field goal away from flipping this one \u2014 close enough that you could hear the cell door practically click shut on them. Ruggs' squad lives to see commissary day another week.\n\n## Biggest Blowout: Maximum Security Massacre\n\nIf you thought the big house couldn't get any more brutal, meet **DUIiiiiiiii dont know jim**, who absolutely torched **Ruggs, Drugs and TDs** 318.75 to 188.5 \u2014 a jaw-dropping 130.25-point margin. That's not a beatdown, that's solitary confinement with no yard time. Ruggs, Drugs and TDs didn't just lose this week, they got transferred to a different facility.\n\nHonorable mention to **Josh Allen's Prison Cell**, who got bodied by **Glove Don't Fit, Blitz** 250.1 to 166.63. The cell doors are definitely not fitting this week.\n\n## Standout Performances: Cell Block Legends\n\n**Christian McCaffrey** put together a 92.6-point masterpiece for **The ConVicks**, pairing with Patrick Mahomes' 77.3 to help blow out The Massage Boys 279.75\u2013236.7. That's a two-man crime spree that should get CMC his own wing named after him.\n\nNot to be outdone, **Jahmyr Gibbs** dropped 82.4 points carrying **DUIiiiiiiii dont know jim** to their record-setting blowout \u2014 Gibbs basically tunneled through the yard with a spoon and came out the other side a legend.\n\nMeanwhile **Steve Ruggs** basically ran a quarterback factory, getting 79.5 from Joe Burrow AND 76.6 from Brock Purdy in the same lineup. That's two aces in one deck \u2014 practically contraband.\n\n## The Massacre Nobody Saw Coming\n\n**Rice, Rice Baby \u2728** absolutely feasted on **Smack my Diggs up**, winning 297.7 to 224.72 despite Diggs' squad getting strong nights from Ja'Marr Chase (74.7) and George Pickens (68.5). Sometimes you put together a great lineup and the other guy just breaks out of max security anyway.\n\nStay locked up, stay ready \u2014 Week 11 awaits, and nobody's getting early parole.",
+  "games": [
+    {
+      "owner_a": "OJ\u2019s Denver Bronco",
+      "pts_a": 216.2,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 227.05,
+      "margin": 10.85,
+      "winner": "Steve Ruggs"
+    },
+    {
+      "owner_a": "The Adrian BeatHisSons",
+      "pts_a": 208.85,
+      "owner_b": "Hernandez Hitmen",
+      "pts_b": 191.15,
+      "margin": 17.7,
+      "winner": "The Adrian BeatHisSons"
+    },
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 279.75,
+      "owner_b": "The Massage Boys",
+      "pts_b": 236.7,
+      "margin": 43.05,
+      "winner": "The ConVicks"
+    },
+    {
+      "owner_a": "Smack my Diggs up ",
+      "pts_a": 224.72,
+      "owner_b": "Rice, Rice Baby \u2728",
+      "pts_b": 297.7,
+      "margin": 72.98,
+      "winner": "Rice, Rice Baby \u2728"
+    },
+    {
+      "owner_a": "Glove Don\u2019t Fit, Blitz",
+      "pts_a": 250.1,
+      "owner_b": "Josh Allen\u2019s Prison Cell",
+      "pts_b": 166.63,
+      "margin": 83.47,
+      "winner": "Glove Don\u2019t Fit, Blitz"
+    },
+    {
+      "owner_a": "Ruggs, Drugs and TDs",
+      "pts_a": 188.5,
+      "owner_b": "DUIiiiiiiii dont know jim",
+      "pts_b": 318.75,
+      "margin": 130.25,
+      "winner": "DUIiiiiiiii dont know jim"
+    }
+  ],
+  "top_performers": [
+    {
+      "owner": "The ConVicks",
+      "player": "Christian McCaffrey (RB-SF)",
+      "points": 92.6
+    },
+    {
+      "owner": "DUIiiiiiiii dont know jim",
+      "player": "Jahmyr Gibbs (RB-DET)",
+      "points": 82.4
+    },
+    {
+      "owner": "Steve Ruggs",
+      "player": "Joe Burrow (QB-CIN)",
+      "points": 79.5
+    },
+    {
+      "owner": "The ConVicks",
+      "player": "Patrick Mahomes (QB-KC)",
+      "points": 77.3
+    },
+    {
+      "owner": "Steve Ruggs",
+      "player": "Brock Purdy (QB-SF)",
+      "points": 76.6
+    }
+  ]
+}
