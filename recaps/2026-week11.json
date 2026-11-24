@@ -1,0 +1,83 @@
+{
+  "season": "2026",
+  "week": 11,
+  "generated_at": "2026-11-24T21:03:58.648831+00:00",
+  "recap_text": "# HMPFL Week 11 Recap: Lockdown & Letdowns\n\nThe yard was rowdy this week, inmates. Some cells put up numbers that'll make the warden's eyes bulge, while others got shivved so bad they'll need protective custody for Week 12.\n\n## Closest Call: Cellblock Nail-Biter\n\nIn the tightest margin of the week, **Smack my Diggs up** narrowly escaped **OJ's Denver Bronco** 200.6\u2013196.2. Just 4.4 points separated freedom from another week in the hole \u2014 OJ's crew is probably still arguing with the parole board about that one.\n\n## The Big House Blowout\n\nSomebody call internal affairs, because **The ConVicks** got absolutely processed by **Glove Don't Fit, Blitz**, 252.25\u2013160.0. That's a 92.25-point smackdown \u2014 the kind of beating that leaves you doing push-ups in the yard just to cope. Patrick Mahomes (57.4) put in a heroic, lonely shift for the ConVicks, but even the King of KC couldn't stop this riot.\n\nClose behind in brutality: **The Massage Boys** ran a full-on cavity search on **Rice, Rice Baby \u2728**, winning 283.35\u2013194.0. Jonah Coleman went off for 64.3 points, Fernando Mendoza chipped in 48.1, and Emmett Johnson added 47.6 \u2014 a full squad shakedown.\n\n## Big Bodies, Big Numbers\n\nThe headline stat of the week belongs to **Dak Prescott**, who threw up a jaw-dropping **78.3 points** for **Ruggs, Drugs and TDs**, who cruised past Josh Allen's Prison Cell 267.85\u2013212.5. Add in Ashton Jeanty's 54.8 and Jared Goff's 49.8, and that roster basically ran its own commissary this week \u2014 nobody else stood a chance.\n\n## Other Notable Lockups\n\n**The Adrian BeatHisSons** handled business against **DUIiiiiiiii dont know jim**, 177.5\u2013130.9, despite Jahmyr Gibbs trying to bust his squad out solo with 52.1 points. Didn't matter \u2014 that cell stayed locked.\n\nMeanwhile, **Steve Ruggs** put the cuffs on **Hernandez Hitmen**, winning 203.8\u2013172.25, even as CeeDee Lamb (45.9) tried to mount an escape.\n\n## Warden's Final Word\n\nWeek 11 reminds us: some crews are running the prison, and others are just doing time. The Massage Boys and Ruggs, Drugs and TDs are flexing serious muscle right now, while The ConVicks might want to request a cellmate transfer before things get worse. Stay sharp out there \u2014 Week 12 waits for no inmate.",
+  "games": [
+    {
+      "owner_a": "OJ\u2019s Denver Bronco",
+      "pts_a": 196.2,
+      "owner_b": "Smack my Diggs up ",
+      "pts_b": 200.6,
+      "margin": 4.4,
+      "winner": "Smack my Diggs up "
+    },
+    {
+      "owner_a": "Hernandez Hitmen",
+      "pts_a": 172.25,
+      "owner_b": "Steve Ruggs",
+      "pts_b": 203.8,
+      "margin": 31.55,
+      "winner": "Steve Ruggs"
+    },
+    {
+      "owner_a": "The Adrian BeatHisSons",
+      "pts_a": 177.5,
+      "owner_b": "DUIiiiiiiii dont know jim",
+      "pts_b": 130.9,
+      "margin": 46.6,
+      "winner": "The Adrian BeatHisSons"
+    },
+    {
+      "owner_a": "Ruggs, Drugs and TDs",
+      "pts_a": 267.85,
+      "owner_b": "Josh Allen\u2019s Prison Cell",
+      "pts_b": 212.5,
+      "margin": 55.35,
+      "winner": "Ruggs, Drugs and TDs"
+    },
+    {
+      "owner_a": "The Massage Boys",
+      "pts_a": 283.35,
+      "owner_b": "Rice, Rice Baby \u2728",
+      "pts_b": 194.0,
+      "margin": 89.35,
+      "winner": "The Massage Boys"
+    },
+    {
+      "owner_a": "The ConVicks",
+      "pts_a": 160.0,
+      "owner_b": "Glove Don\u2019t Fit, Blitz",
+      "pts_b": 252.25,
+      "margin": 92.25,
+      "winner": "Glove Don\u2019t Fit, Blitz"
+    }
+  ],
+  "top_performers": [
+    {
+      "owner": "Ruggs, Drugs and TDs",
+      "player": "Dak Prescott (QB-DAL)",
+      "points": 78.3
+    },
+    {
+      "owner": "The Massage Boys",
+      "player": "Jonah Coleman (RB-DEN)",
+      "points": 64.3
+    },
+    {
+      "owner": "The ConVicks",
+      "player": "Patrick Mahomes (QB-KC)",
+      "points": 57.4
+    },
+    {
+      "owner": "Ruggs, Drugs and TDs",
+      "player": "Ashton Jeanty (RB-LV)",
+      "points": 54.8
+    },
+    {
+      "owner": "Glove Don\u2019t Fit, Blitz",
+      "player": "Chuba Hubbard (RB-CAR)",
+      "points": 53.0
+    }
+  ]
+}
